@@ -4,7 +4,7 @@
   "description": "WEBSCRPT Remote configerable dashboard",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "start": "./node_modules/.bin/nodemon ./app.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Hopson97/Dashboard#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "nodemon": "^1.18.9"
   }
 }
