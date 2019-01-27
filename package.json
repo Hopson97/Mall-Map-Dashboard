@@ -1,0 +1,22 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "WEBSCRPT Remote configerable dashboard",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hopson97/Dashboard.git"
+  },
+  "author": "UP857956",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hopson97/Dashboard/issues"
+  },
+  "homepage": "https://github.com/Hopson97/Dashboard#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
