@@ -3,8 +3,18 @@
     <head>
         <title>Homepage</title>
         <link rel = "stylesheet" href = "style.css">
+        <script src="input.js"></script>
     </head>
     <body>
-
+        
     </body>
+    <script>
+        async function test() {
+            const response = await fetch("https://api.github.com/users/hopson97/repos");
+            const str = response.json();
+            const json = JSON.stringify(str);
+            console.log(json);
+        }
+        test();
+    </script>
 </html> 
