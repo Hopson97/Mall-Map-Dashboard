@@ -1,0 +1,55 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.home-container {
+    display: grid;
+    grid-template-columns: 20% 25% 10% 25% 20%;
+    grid-template-rows: 30% auto 30%;
+    transform: translateY(-50%);
+    margin-top: 20%;
+    font-size: 300%;
+}
+
+
+.home-input-button {
+    grid-column-start: 2;
+    grid-column-end: 3;
+}
+
+.home-dashboard-button {
+    grid-column-start: 4;
+    grid-column-end: 5;
+}
+
+.home-button {
+    grid-row-end: 3;
+    text-align: center;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    background-color: teal;
+    text-decoration:none;
+    color: white;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.input-main {
+    width: 70%;
+    margin: auto;
+}
+
+.input-header {
+    width: 100%;
+    background-color: cyan;
+}
+
+.repo-info {
+    border: 1px solid black;
+}

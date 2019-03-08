@@ -1,1 +1,38 @@
-test2
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Homepage</title>
+    <meta charset="utf-8">
+    <link rel='shortcut icon' type='image/x-icon' href='img/favicon.ico' />
+    <link rel="stylesheet" type="text/css" href="styles/style.css">
+</head>
+
+<body>
+    <header class = "input-header">
+        <div class="input-header-container"></div>
+        <h1>Key Performance Indicator</h1>
+        <p>By UP857956</p>
+    </header>
+    <main class="input-main">
+        <input type=text id="name" required>
+        <button id="submit" type="button">Get</button>
+        <div id="repoList">
+            <div class="repo-info">
+                <p class="repo-name">test</p>
+                <p class="repo-issues">test</p>
+                <p class="repo-stars">test</p>
+            </div>
+        </div>
+        <template id="repo-info">
+            <a class="repo-info">
+                <p class="repo-name"></p>
+                <p class="repo-issues"></p>
+                <p class="repo-stars"></p>
+            </a>
+        </template>
+    </main>
+</body>
+<script src="js/input.js"></script>
+
+</html>

@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Homepage</title>
-        <link rel = "stylesheet" href = "style.css">
-        <script src="input.js"></script>
+        <meta charset="utf-8">
+        <link rel='shortcut icon' type='image/x-icon' href='img/favicon.ico' />
+        <link rel="stylesheet" type="text/css" href="styles/style.css">
     </head>
-    <body>
-        
+    <body class="home-gradient">
+        <header class="center-text">
+            <h1>Key Performance Indicator</h1>
+            <p>By UP857956</p>
+        </header>
+        <main>
+            <div class="home-container">
+
+                <a href="input" class="home-input-button home-button center-text">
+                    Input
+                </a>
+
+                <a href="dashboard" class="home-dashboard-button home-button center-text">
+                    Dashboard
+                </a>
+            </div>
+        </main>
     </body>
-    <script>
-        async function test() {
-            const response = await fetch("https://api.github.com/users/hopson97/repos");
-            const str = response.json();
-            const json = JSON.stringify(str);
-            console.log(json);
-        }
-        test();
-    </script>
-</html> 
+</html>
