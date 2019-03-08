@@ -4,7 +4,7 @@
   "description": "WEBSCRPT Remote configerable dashboard",
   "main": "index.js",
   "scripts": {
-    "start": "./node_modules/.bin/nodemon ./app.js"
+    "start": "./node_modules/.bin/nodemon ./server/app.js"
   },
   "repository": {
     "type": "git",

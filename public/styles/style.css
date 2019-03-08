@@ -40,9 +40,25 @@ body {
     text-align: center;
 }
 
-.input-main {
-    width: 70%;
+.input-main-container {
+    width: 90%;
     margin: auto;
+}
+
+.input-grid-container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+
+.input-options {
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+
+.input-result {
+    grid-column-start: 2;
+    grid-column-end: 3;
 }
 
 .input-header {
@@ -52,4 +68,16 @@ body {
 
 .repo-info {
     border: 1px solid black;
+}
+
+.repo-info:hover {
+    border: 2px solid black;
+}
+
+.repo-info-items {
+    margin: 10px;
+}
+
+.repo-name {
+    font-size: 150%;
 }
