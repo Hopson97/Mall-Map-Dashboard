@@ -1,7 +1,15 @@
 const express = require('express')
-        const app = express();
+const path = require('path');
+const bodyParser = require('body-parser');
 
-        app.use(bodyParser.json());
-        app.use(express.static(path.join(__dirname, `../public`), {
-            extensions: "html"
-        }));
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, `../public`), {
+    extensions: "html"
+}));
+
+app.listen(8080, e => {
+    console.log("The server has started");
+});
