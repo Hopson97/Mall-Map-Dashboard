@@ -1,23 +1,17 @@
 {
-  "name": "dashboard",
-  "version": "1.0.0",
-  "description": "WEBSCRPT Remote configerable dashboard",
-  "main": "index.js",
-  "scripts": {
-    "start": "./node_modules/.bin/nodemon ./server/app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Hopson97/Dashboard.git"
-  },
-  "author": "UP857956",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Hopson97/Dashboard/issues"
-  },
-  "homepage": "https://github.com/Hopson97/Dashboard#readme",
-  "dependencies": {
-    "express": "^4.16.4",
-    "nodemon": "^1.18.9"
-  }
+    "name": "coursework3",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "nodemon": "^1.18.10"
+    },
+    "dependencies": {
+        "express": "^4.16.4"
+    }
 }
