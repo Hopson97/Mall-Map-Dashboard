@@ -17,14 +17,14 @@ const dashboardData = {
     text: "none"
 }
 
-const clients = [];
+const socketServer = expressWs.getWss();
 
 /**
  * Post the text
  */
 app.post("/text", (request, response) => {
     dashboardData.text = request.body;
-    for (const c of clients) {
+    for (const c of socketServer.clients) {
         c.send(JSON.stringify({
             type: "update",
             text: dashboardData.text
@@ -38,8 +38,6 @@ app.ws('/', function (ws, req) {
         console.log("Message:" + msg);
     });
     console.log('socket', req.testing);
-    clients.push(ws);
-    console.log(clients.length);
 });
 
 
