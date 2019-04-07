@@ -3,7 +3,8 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 
-const app = express();
+const expressWs = require('express-ws')(express());
+const app = expressWs.app;
 
 app.use(bodyParser.json());
 app.use(bodyParser.text());
@@ -16,11 +17,29 @@ const dashboardData = {
     text: "none"
 }
 
+const clients = [];
+
 /**
  * Post the text
  */
 app.post("/text", (request, response) => {
     dashboardData.text = request.body;
+    for (const c of clients) {
+        c.send(JSON.stringify({
+            type: "update",
+            text: dashboardData.text
+        }))
+    }
+});
+
+
+app.ws('/', function (ws, req) {
+    ws.on('message', function (msg) {
+        console.log("Message:" + msg);
+    });
+    console.log('socket', req.testing);
+    clients.push(ws);
+    console.log(clients.length);
 });
 
 

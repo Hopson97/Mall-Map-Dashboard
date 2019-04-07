@@ -6,13 +6,15 @@
     "scripts": {
         "test": "cross-env SINGLE=true ./node_modules/.bin/qunit test/test.js",
         "start": "nodemon server/index.js --config nodemon-config.json"
-      },
+    },
     "author": "",
     "license": "ISC",
     "devDependencies": {
         "nodemon": "^1.18.10"
     },
     "dependencies": {
-        "express": "^4.16.4"
+        "express": "^4.16.4",
+        "express-ws": "^4.0.0",
+        "ws": "^6.2.1"
     }
 }
