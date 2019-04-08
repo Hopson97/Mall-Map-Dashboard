@@ -28,13 +28,13 @@ app.post("/text", (request, response) => {
         c.send(JSON.stringify({
             type: "update",
             text: dashboardData.text
-        }))
+        }));
     }
 });
 
 
 app.ws('/', function (ws, req) {
-    ws.on('message', function (msg) {
+    ws.on('message', (msg) => {
         console.log("Message:" + msg);
     });
     console.log('socket', req.testing);
