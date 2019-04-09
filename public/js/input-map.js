@@ -1,8 +1,13 @@
  "use strict"
 
-let isMouseDown = false;
-let offsetX = 200;
+let offsetX = 0;
 let offsetY = 0;
+const keydown = {
+    "w": false,
+    "a": false,
+    "s": false,
+    "d": false
+};
 
 window.addEventListener("load", e => {
     const canvas = document.getElementById("map-canvas");
@@ -21,10 +26,18 @@ window.addEventListener("load", e => {
     loop(canvas, ctx);
 
     canvas.addEventListener("click", handleCanvasClick);
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 });
+
+function handleInput() {
+    const offset = 5;
+    if(keydown["w"]) offsetY -= offset; 
+    else if(keydown["s"]) offsetY += offset;
+
+    if(keydown["a"]) offsetX -= offset; 
+    else if(keydown["d"]) offsetX += offset; 
+}
 
 /**
  * The main loop function for drawing the canvas
@@ -40,6 +53,8 @@ function loop(canvas, context) {
      * 
      */
     function draw() {
+        handleInput();
+
         context.fillStyle = BG_COLOUR;
         context.strokeStyle = "white";
         context.fillRect(0, 0, WIDTH, HEIGHT);
@@ -54,21 +69,15 @@ function loop(canvas, context) {
 }
 
 function handleCanvasClick(e) {
-    const clientX = e.clientX - e.target.offsetLeft;//.x;
-    const clientY = e.clientY - e.target.offsetTop;//.y;
+    const clientX = e.clientX - e.target.offsetLeft - offsetX;//.x;
+    const clientY = e.clientY - e.target.offsetTop - offsetY;//.y;
     console.log(`${clientX} ${clientY}`);
 }
 
-function handleMouseDown(e) {
-    console.log("Mouse down");
-    isMouseDown = true;
+function handleKeyDown(e) {
+    keydown[e.key] = true;
 }
 
-function handleMouseUp(e) {
-    console.log("Mouse up");
-    isMouseDown = false;
-}
-
-function handleMouseMove(e) {
-    
+function handleKeyUp(e) {
+    keydown[e.key] = false;
 }

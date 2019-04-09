@@ -20,14 +20,6 @@ body {
     font-family: 'Open Sans',serif;
 }
 
-canvas {
-    border: solid white;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
-}
 
 header {
     width: 100%;
@@ -45,6 +37,15 @@ main {
   General classes
 ===================
 */
+
+.input-canvas {
+    border: solid white;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
 
 .centered {
     width: 50%;
