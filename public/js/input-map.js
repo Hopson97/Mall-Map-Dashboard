@@ -31,13 +31,13 @@ class Renderer {
 window.addEventListener("load", e => {
     const canvas = document.getElementById("map-canvas");
     if (window.innerWidth >= 1280) {
-        canvas.width = 1000;
-        canvas.height = 600;
+        canvas.width = 800;
+        canvas.height = 800;
         console.log("Desktop");
     }
     else {
         canvas.width = window.innerWidth - window.innerWidth * 0.1;
-        canvas.height = canvas.width * 2;
+        canvas.height = canvas.width;
         console.log("Mobile");
     }
     const ctx = canvas.getContext("2d");

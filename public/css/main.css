@@ -27,14 +27,14 @@ body {
 */
 header {
     width: 100%;
-    background-color: rgb(0, 84, 153);
+    background-color: rgb(100, 100, 100);
     color: white;
     border-bottom: solid white;
 }
 
 header .header-container {
     width: 90%;
-    padding: 5px;
+    padding: 15px;
     margin: auto;
 }
 
@@ -44,13 +44,13 @@ header .header-container {
 =====================================
 */
 main {
-    background-color: rgb(88, 135, 189);
+    background-color: rgb(50, 50, 50);
     height: 100%;
     display: flex;
 }
 
 main nav {
-    background-color: rgb(81, 142, 223);
+    background-color: rgb(75, 75, 75);
     padding: 2px;
     border-right: solid white;
 }
@@ -72,7 +72,7 @@ main nav a {
 }
 
 main nav a:hover {
-    background-color: rgb(21, 67, 128);
+    background-color: rgb(173, 173, 173);
 }
 
 /*
@@ -97,3 +97,9 @@ main nav a:hover {
     border: solid black 2px;
     border-radius: 25px;
 }
+
+@media screen and (max-width: 1280px) {
+    main nav {
+        display: none;
+    }
+}   

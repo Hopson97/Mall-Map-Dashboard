@@ -12,8 +12,8 @@ window.addEventListener("load", e => {
         nav.appendChild(clone);
     };
 
-    addButton("Map", 'input-map');
-    addButton("Stores", 'input-stores');
-    addButton("Adverts", 'input-adverts');
-    addButton("Announcement", 'input-announcements');
+    addButton("Edit Map", 'input-map');
+    addButton("Announcements", 'input-announcements');
+    addButton("Add Stores", 'input-stores');
+    addButton("Add Adverts", 'input-adverts');
 });
