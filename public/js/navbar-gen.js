@@ -15,5 +15,5 @@ window.addEventListener("load", e => {
     addButton("Map", 'input-map');
     addButton("Stores", 'input-stores');
     addButton("Adverts", 'input-adverts');
-    addButton("Announcements", 'input-announcements');
+    addButton("Announcement", 'input-announcements');
 });
