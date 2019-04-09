@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
 * {
-    margin:0;
-    padding:0;
-    border:0;
-    outline:0;
-    vertical-align:baseline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    vertical-align: baseline;
 }
 
 /*
@@ -15,9 +15,9 @@
 */
 
 body {
-    background-color: #EEEEEEEE;
+    background-color: rgba(182, 216, 224, 0.933);
     color: black;
-    font-family: 'Open Sans',serif;
+    font-family: 'Open Sans', serif;
 }
 
 /*
@@ -27,13 +27,14 @@ body {
 */
 header {
     width: 100%;
-    padding: 5px;
-    background-color: rgb(50, 50, 50);
+    background-color: rgb(14, 64, 87);
     color: white;
+    border-bottom: solid white;
 }
 
-.header-container {
+header .header-container {
     width: 90%;
+    padding: 5px;
     margin: auto;
 }
 
@@ -43,8 +44,35 @@ header {
 =====================================
 */
 main {
-    background-color: rgb(100, 100, 100);
+    background-color: rgb(88, 135, 189);
     height: 100%;
+    display: flex;
+}
+
+main nav {
+    background-color: rgb(81, 142, 223);
+    padding: 2px;
+    border-right: solid white;
+}
+
+
+
+main nav .nav-button {
+    width: 90%;
+    margin: auto;
+}
+
+main nav a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    transition: 1s;
+    font-size: 110%;
+}
+
+main nav a:hover {
+    background-color: rgb(21, 67, 128);
 }
 
 /*
@@ -55,17 +83,13 @@ main {
 
 .input-canvas {
     border: solid white;
-    padding-left: 0;
-    padding-right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    display: block;
+    margin: 10px;
 }
 
 .centered {
     width: 50%;
     margin: auto;
-    
+
 }
 
 .rounded-box {
@@ -73,4 +97,3 @@ main {
     border: solid black 2px;
     border-radius: 25px;
 }
-
