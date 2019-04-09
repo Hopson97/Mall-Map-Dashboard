@@ -10,6 +10,7 @@
     color: black;
     font-weight: bold;
     padding: 10px;
+    transition: 0.3s;
 }
 
 .main-menu-button:hover {
@@ -25,6 +26,7 @@
     
     .main-menu-button {
         font-size: 125%;
+        
     }
 
     .dashboard-button{

@@ -1,5 +1,5 @@
 "use strict"
-
+/*
 window.addEventListener("load", e => {
     const formElement = document.getElementById("form");
 
@@ -16,3 +16,4 @@ window.addEventListener("load", e => {
         });
     });
 })
+*/

@@ -1,4 +1,3 @@
-
 "use strict";
 
 window.addEventListener("load", e => {
@@ -14,9 +13,6 @@ function handleMessage (event) {
     const data = JSON.parse(event.data);
     console.log(data);
     switch(data.type) {
-        case "update":
-            const textElement = document.getElementById("text");
-            textElement.innerText = data.text;
-            break;
+
     }
 }

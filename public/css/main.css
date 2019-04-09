@@ -8,10 +8,36 @@
     vertical-align:baseline;
 }
 
+/*
+=======================
+   Element Selectors
+=======================
+*/
+
 body {
     background-color: #EEEEEEEE;
     color: black;
     font-family: 'Open Sans',serif;
+}
+
+canvas {
+    border: solid white;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+header {
+    width: 100%;
+    background-color: rgb(50, 50, 50);
+    color: white;
+}
+
+main {
+    background-color: rgb(100, 100, 100);
+    height: 100%;
 }
 
 /*
