@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
 * {
     margin:0;
     padding:0;
@@ -6,19 +8,27 @@
     vertical-align:baseline;
 }
 
-input[type=text] {
-    margin: 2px 0px 2px 2px;
-    padding: 1%;
-    border: solid black;
-}
-
-input[type=submit] {
-    padding: 1%;
-    border: solid black;
-}
-
-
 body {
     background-color: #EEEEEEEE;
     color: black;
+    font-family: 'Open Sans',serif;
 }
+
+/*
+===================
+  General classes
+===================
+*/
+
+.centered {
+    width: 50%;
+    margin: auto;
+    
+}
+
+.rounded-box {
+    padding: 10%;
+    border: solid black 2px;
+    border-radius: 25px;
+}
+
