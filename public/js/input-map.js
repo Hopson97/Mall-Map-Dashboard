@@ -8,6 +8,13 @@ const keydown = {
     "s": false,
     "d": false
 };
+const buttonPressed = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+}
+
 const mapData = {
     geometry: []
 }
@@ -49,7 +56,7 @@ window.addEventListener("load", e => {
     const ctx = canvas.getContext("2d");
     //Set canvas size based on the size of the device
     if (window.innerWidth >= 1280) {
-        canvas.width  = window.innerHeight * 0.6;
+        canvas.width = window.innerHeight * 0.6;
         canvas.height = window.innerHeight * 0.6;
     } else {
         canvas.width = window.innerWidth - window.innerWidth * 0.3;
@@ -59,10 +66,18 @@ window.addEventListener("load", e => {
     canvas.addEventListener("click", handleCanvasClick);
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-    document.getElementById("up-arrow")
-        .addEventListener("mousedown", e => {
-            offsetY -= PAN_SPEED
-        });
+
+    const upArrow = document.getElementById("up-arrow");
+    const leftArrow = document.getElementById("left-arrow");
+    const rightArrow = document.getElementById("right-arrow");
+    const downArrow = document.getElementById("down-arrow");
+
+
+
+    upArrow.addEventListener("mousedown", () => buttonPressed.up = true);
+    upArrow.addEventListener("mouseup", () => buttonPressed.up = false);
+    upArrow.addEventListener("mouseout", () => buttonPressed.up = false);
+    /*
     document.getElementById("down-arrow")
         .addEventListener("mousedown", e => {
             offsetY += PAN_SPEED
@@ -75,6 +90,7 @@ window.addEventListener("load", e => {
         .addEventListener("mousedown", e => {
             offsetX += PAN_SPEED
         });
+    */
     //Begin the main loop
     loop(canvas, ctx);
 });
@@ -104,10 +120,18 @@ function loop(canvas, context) {
  * Function for handling keyboard input (if any)
  */
 function handleInput() {
-    if (keydown["w"]) offsetY -= PAN_SPEED;
-    else if (keydown["s"]) offsetY += PAN_SPEED;
-    if (keydown["a"]) offsetX -= PAN_SPEED;
-    else if (keydown["d"]) offsetX += PAN_SPEED;
+    if (keydown["w"] || buttonPressed.up) {
+        offsetY -= PAN_SPEED;
+    }
+    else if (keydown["s"] || buttonPressed.down) {
+        offsetY += PAN_SPEED;
+    }
+    if (keydown["a"] || buttonPressed.left) {
+        offsetX -= PAN_SPEED;
+    }
+    else if (keydown["d"] || buttonPressed.right) {
+        offsetX += PAN_SPEED;
+    }
 }
 /**
  * Handles the click event on the canvas
