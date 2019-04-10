@@ -83,8 +83,7 @@ main nav a:hover {
 */
 
 .input-canvas {
-    border: solid white;
-    margin: 10px;
+    border: 2px solid white;
 }
 
 .centered {
@@ -99,8 +98,20 @@ main nav a:hover {
     border-radius: 25px;
 }
 
+.arrows {
+    border-top: solid white 2px;
+    border-right: solid white 2px;
+    border-bottom: solid white 2px;
+    background-color: rgb(32, 32, 32);
+    padding: 5px;
+}
+
 .arrows img {
     display: block;
+    padding: 5px;
+    margin: 3px;
+    border: 2px solid white;
+    border-radius: 20px;
 }
 
 /*
@@ -108,6 +119,7 @@ main nav a:hover {
 */
 .input-map-flex {
     display: flex;
+    margin: 10px;
 }
 
 .arrows {

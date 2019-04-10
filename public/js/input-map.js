@@ -9,10 +9,10 @@ const keydown = {
     "d": false
 };
 const buttonPressed = {
-    up: false,
-    down: false,
-    left: false,
-    right: false
+    'up': false,
+    'down': false,
+    'left': false,
+    'right': false
 }
 
 const mapData = {
@@ -72,25 +72,19 @@ window.addEventListener("load", e => {
     const rightArrow = document.getElementById("right-arrow");
     const downArrow = document.getElementById("down-arrow");
 
+    function setUpButton(element, direction) {
+        element.addEventListener("mousedown", () => buttonPressed[direction] = true);
+        element.addEventListener("mouseup", () => buttonPressed[direction] = false);
+        element.addEventListener("mouseout", () => buttonPressed[direction] = false);
+        element.addEventListener("touchstart", () => buttonPressed[direction] = true);
+        element.addEventListener("touchend", () => buttonPressed[direction] = false);
+    }
 
+    setUpButton(document.getElementById("up-arrow"), 'up');
+    setUpButton(document.getElementById("left-arrow"), 'left');
+    setUpButton(document.getElementById("right-arrow"), 'right');
+    setUpButton(document.getElementById("down-arrow"), 'down');
 
-    upArrow.addEventListener("mousedown", () => buttonPressed.up = true);
-    upArrow.addEventListener("mouseup", () => buttonPressed.up = false);
-    upArrow.addEventListener("mouseout", () => buttonPressed.up = false);
-    /*
-    document.getElementById("down-arrow")
-        .addEventListener("mousedown", e => {
-            offsetY += PAN_SPEED
-        });
-    document.getElementById("left-arrow")
-        .addEventListener("mousedown", e => {
-            offsetX -= PAN_SPEED
-        });
-    document.getElementById("right-arrow")
-        .addEventListener("mousedown", e => {
-            offsetX += PAN_SPEED
-        });
-    */
     //Begin the main loop
     loop(canvas, ctx);
 });
