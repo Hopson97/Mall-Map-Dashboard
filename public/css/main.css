@@ -55,12 +55,10 @@ main nav {
     border-right: solid white;
 }
 
-
-
 main nav .nav-button {
-    width: 90%;
-    margin: auto;
+    padding-left: 5px;
 }
+
 
 main nav a {
     display: block;
@@ -69,6 +67,10 @@ main nav a {
     color: white;
     transition: 1s;
     font-size: 110%;
+}
+
+.nav-button-container {
+    display: flex;
 }
 
 main nav a:hover {
