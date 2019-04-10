@@ -99,8 +99,25 @@ main nav a:hover {
     border-radius: 25px;
 }
 
+.arrows img {
+    display: block;
+}
+
+/*
+    map input stuff
+*/
+.input-map-flex {
+    display: flex;
+}
+
+.arrows {
+    color: white;
+}
+
 @media screen and (max-width: 1280px) {
     main nav {
         display: none;
     }
 }   
+
+
