@@ -3,12 +3,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const mapData = {
-    
-}
+let wss;
 
 const router = express.Router();
 router.use(bodyParser.json());
 
 
-module.exports = router;
+module.exports = {
+    router: router,
+    setWss: _wss => {
+        wss = _wss;
+    }
+};

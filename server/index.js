@@ -13,9 +13,10 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, `../public`), {
     extensions: "html"
 }));
-app.use('/api', api);
+app.use('/api', api.router);
 
-const socketServer = expressWs.getWss();
+const wss = expressWs.getWss();
+api.setWss(wss);
 
 app.ws('/', function (ws, req) {
     ws.on('message', (msg) => {

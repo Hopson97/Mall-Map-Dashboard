@@ -33,6 +33,7 @@ class Renderer {
         this.height = canvas.height;
         this.context = context;
     }
+    
     /**
      * Clears the canvas to full black
      */
@@ -40,6 +41,7 @@ class Renderer {
         this.context.fillStyle = "black";
         this.context.fillRect(0, 0, this.width, this.height);
     }
+
     /**
      * Draws a rectangle to the canvas
      * @param {Number} x The world-x coordinate to draw the rectangle to
@@ -51,6 +53,8 @@ class Renderer {
         this.context.strokeRect(x + offsetX, y + offsetY, w, h);
     }
 } //Class renderer
+
+
 window.addEventListener("load", e => {
     const canvas = document.getElementById("map-canvas");
     const ctx = canvas.getContext("2d");
@@ -66,11 +70,6 @@ window.addEventListener("load", e => {
     canvas.addEventListener("click", handleCanvasClick);
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
-    const upArrow = document.getElementById("up-arrow");
-    const leftArrow = document.getElementById("left-arrow");
-    const rightArrow = document.getElementById("right-arrow");
-    const downArrow = document.getElementById("down-arrow");
 
     function setUpButton(element, direction) {
         element.addEventListener("mousedown", () => buttonPressed[direction] = true);
@@ -88,6 +87,7 @@ window.addEventListener("load", e => {
     //Begin the main loop
     loop(canvas, ctx);
 });
+
 /**
  * The main loop for drawing the map/ animations
  * @param {Canvas} canvas The canvas to draw onto
@@ -110,23 +110,26 @@ function loop(canvas, context) {
         window.requestAnimationFrame(mainloop);
     }
 }
+
 /**
  * Function for handling keyboard input (if any)
  */
 function handleInput() {
     if (keydown["w"] || buttonPressed.up) {
         offsetY -= PAN_SPEED;
-    }
+    } 
     else if (keydown["s"] || buttonPressed.down) {
         offsetY += PAN_SPEED;
     }
+
     if (keydown["a"] || buttonPressed.left) {
         offsetX -= PAN_SPEED;
-    }
+    } 
     else if (keydown["d"] || buttonPressed.right) {
         offsetX += PAN_SPEED;
     }
 }
+
 /**
  * Handles the click event on the canvas
  * @param {Event} e The click event
@@ -141,6 +144,7 @@ function handleCanvasClick(e) {
         }
     }
 }
+
 /**
  * Sets the key down event for the key pressed to true
  * @param {Event} e The key down event
@@ -148,6 +152,7 @@ function handleCanvasClick(e) {
 function handleKeyDown(e) {
     keydown[e.key] = true;
 }
+
 /**
  * Sets the key down event for the key pressed to false
  * @param {Event} e The key down event
