@@ -1,13 +1,17 @@
  "use strict"
 
-let offsetX = 0;
-let offsetY = 0;
+let offsetX = 10;
+let offsetY = 10;
 const keydown = {
     "w": false,
     "a": false,
     "s": false,
     "d": false
 };
+
+const mapData =  {
+    geometry: []
+}
 
 /**
  * Class to abstract the rendering of the map
@@ -43,7 +47,7 @@ class Renderer {
     renderRect(x, y, w, h) {
         this.context.strokeRect(x + offsetX, y + offsetY, w, h);
     }
-}
+}//Class renderer
 
 
 window.addEventListener("load", e => {
@@ -54,12 +58,10 @@ window.addEventListener("load", e => {
     if (window.innerWidth >= 1280) {
         canvas.width = 800;
         canvas.height = 800;
-        console.log("Desktop");
     }
     else {
         canvas.width = window.innerWidth - window.innerWidth * 0.1;
         canvas.height = canvas.width;
-        console.log("Mobile");
     }
 
     //Setup event listeners
@@ -77,7 +79,9 @@ window.addEventListener("load", e => {
  * @param {2DRenderingContext} context The context used for drawing onto the canvas
  */
 function loop(canvas, context) {
-    const renderer = new Renderer(canvas, context);
+    const renderer      = new Renderer(canvas, context);
+    mapData.geometry    = getRooms();
+
     context.lineWidth = 2;
     context.strokeStyle = "white";
 
@@ -86,10 +90,11 @@ function loop(canvas, context) {
         handleInput();
 
         renderer.clear();
-        for (let i = 0; i < 10; i++) {
-            renderer.renderRect(100 + i * 50, 100, 50, 100);
-            renderer.renderRect(100 + i * 50, 300, 50, 100);
+
+        for (const room of mapData.geometry) {
+            renderer.renderRect(room.x, room.y, room.width, room.height);
         }
+
 
         context.stroke();
         window.requestAnimationFrame(mainloop);
@@ -114,9 +119,14 @@ function handleInput() {
  */
 function handleCanvasClick(e) {
     //Convert the browser coordinates to canvas/world coordinates
-    const clientX = e.clientX - e.target.offsetLeft - offsetX;
-    const clientY = e.clientY - e.target.offsetTop - offsetY;
-    console.log(`${clientX} ${clientY}`);
+    const x = e.clientX - e.target.offsetLeft - offsetX;
+    const y = e.clientY - e.target.offsetTop - offsetY;
+
+    for (const room of mapData.geometry) {
+        if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
+            console.log(`Room clicked: ${room.id}`);
+        }
+    }
 }
 
 /**
