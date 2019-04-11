@@ -1,7 +1,8 @@
 "use strict"
+
 let offsetX = 10;
 let offsetY = 10;
-const PAN_SPEED = 5;
+const PAN_SPEED = 4;
 const keydown = {
     "w": false,
     "a": false,
@@ -60,11 +61,11 @@ window.addEventListener("load", e => {
     const ctx = canvas.getContext("2d");
     //Set canvas size based on the size of the device
     if (window.innerWidth >= 1280) {
-        //Canvas fills 80% of window
-        canvas.width = window.innerWidth * 0.8;
-        canvas.height = window.innerHeight * 0.8;
+        //Canvas fills 70% of window
+        canvas.width = window.innerWidth * 0.7;
+        canvas.height = window.innerHeight * 0.7;
     } else {
-        canvas.width = window.innerWidth - window.innerWidth * 0.3;
+        canvas.width = window.innerWidth * 0.9;
         canvas.height = canvas.width;
     }
 
@@ -109,7 +110,8 @@ function loop(canvas, context) {
     mapData.rooms = geometry.rooms;
     mapData.paths = geometry.paths;
     mapData.bounds = geometry.bounds;
-
+    mapData.width = canvas.width;
+    mapData.height = canvas.height;
     context.lineWidth = 2;
     context.strokeStyle = "white";
     window.requestAnimationFrame(mainloop);
@@ -118,7 +120,7 @@ function loop(canvas, context) {
         handleInput();
         renderer.clear();
 
-        
+
         for (const room of mapData.rooms) {
             context.fillStyle = typeToColour(room.type);
             renderer.renderRect(room.x, room.y, room.width, room.height);
@@ -149,11 +151,16 @@ function handleInput() {
         offsetX += PAN_SPEED;
     }
 
-    //Handle bounds of world
-    //offsetX = Math.min(offsetX, mapData.bounds.maxX);
+    //Prevent out of bounds of world
+    offsetX = Math.min(offsetX, mapData.width - 10);
+    offsetX = Math.max(offsetX, -mapData.bounds.maxX + 10);
+
+    offsetY = Math.min(offsetY, mapData.height - 10);
+    offsetY = Math.max(offsetY, -mapData.bounds.maxY + 10);
 }
 
-/**
+
+/**popup.style.display = block;
  * Handles the click event on the canvas
  * @param {Event} e The click event
  */
@@ -165,7 +172,7 @@ async function handleCanvasClick(e) {
         if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
             console.log(`Room clicked: ${room.id}`);
             const popup = document.getElementById("store-select-popup");
-            //popup.style.display = block;
+
             /*
             const response = await fetch("/api/stores/list");
             const data     = await response.json();
