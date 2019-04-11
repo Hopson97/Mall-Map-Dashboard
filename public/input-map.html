@@ -38,11 +38,14 @@
                 </div>
             </div>
         </div>
-        <div class="popup-bg">
+        <div id="popup" class="popup-bg hidden">
             <div class="popup" id="store-select-popup">
-                <div>
-                    Game
+                <h2>Select store to set:</h2>
+                <div id="store-list">
                 </div>
+
+                <a class="store-selection" href="input-stores">Add more stores</a>
+
             </div>
         </div>
     </main>
@@ -57,6 +60,13 @@
             <div class="nav-button"></div>
         </div>
     </a>
+</template>
+<template id="store-list-section">
+    <div class="flex-even store-selection">
+        <p></p>
+        <p>-</p>
+        <p></p>
+    </div>
 </template>
 
 </html>

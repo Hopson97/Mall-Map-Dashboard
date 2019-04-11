@@ -3,12 +3,16 @@
 let offsetX = 10;
 let offsetY = 10;
 const PAN_SPEED = 4;
+
+//Keys currently pressed
 const keydown = {
     "w": false,
     "a": false,
     "s": false,
     "d": false
 };
+
+//Arrow buttons on screen; false meaning they are not being pressed
 const buttonPressed = {
     'up': false,
     'down': false,
@@ -16,7 +20,12 @@ const buttonPressed = {
     'right': false
 }
 
-const mapData = {}
+//Object to store map data
+const mapData = {} 
+
+//The highlighted room currently being edited 
+let selectedStore = -1; 
+
 /**
  * Class to abstract the rendering of the map
  * It uses the offset vector to draw objects in the correct location
@@ -65,7 +74,7 @@ window.addEventListener("load", e => {
         canvas.width = window.innerWidth * 0.7;
         canvas.height = window.innerHeight * 0.7;
     } else {
-        canvas.width = window.innerWidth * 0.9;
+        canvas.width = window.innerWidth * 0.6;
         canvas.height = canvas.width;
     }
 
@@ -95,6 +104,9 @@ window.addEventListener("load", e => {
     setUpButton(document.getElementById("right-arrow"), 'right');
     setUpButton(document.getElementById("down-arrow"), 'down');
 
+    //Build various DOM sections
+    buildStoreDOM();
+
     //Begin the main loop
     loop(canvas, ctx);
 });
@@ -122,7 +134,12 @@ function loop(canvas, context) {
 
 
         for (const room of mapData.rooms) {
-            context.fillStyle = typeToColour(room.type);
+            if (selectedStore.id == room.id) {
+                context.fillStyle = "lime";
+            }
+            else {
+                context.fillStyle = typeToColour(room.type);
+            }
             renderer.renderRect(room.x, room.y, room.width, room.height);
         }
         context.fillStyle = "white";
@@ -162,27 +179,57 @@ function handleInput() {
 
 /**popup.style.display = block;
  * Handles the click event on the canvas
- * @param {Event} e The click event
+ * @param {Event} event The click event
  */
-async function handleCanvasClick(e) {
+function handleCanvasClick(event) {
     //Convert the browser coordinates to canvas/world coordinates
-    const x = e.clientX - e.target.offsetLeft - offsetX;
-    const y = e.clientY - e.target.offsetTop - offsetY;
+    const x = event.clientX - event.target.offsetLeft - offsetX;
+    const y = event.clientY - event.target.offsetTop - offsetY;
     for (const room of mapData.rooms) {
         if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
             console.log(`Room clicked: ${room.id}`);
-            const popup = document.getElementById("store-select-popup");
+            const popup = document.getElementById("popup");
+            popup.classList.remove("hidden");
+            selectedStore = room; 
+        }
+    }
+}
 
-            /*
-            const response = await fetch("/api/stores/list");
-            const data     = await response.json();
-            console.log(data);
-            */
+/**
+ * Sets the key down event for the key pressed to true
+ * @param {Event} event The key down event
+ */
+function handleKeyDown(event) {
+    keydown[event.key] = true;
+}
+
+/**
+ * Sets the key down event for the key pressed to false
+ * @param {Event} event The key down event
+ */
+function handleKeyUp(event) {
+    keydown[event.key] = false;
+}
+
+async function buildStoreDOM() {
+    const storeList = document.getElementById("store-list");
+    const storeListSect = document.getElementById("store-list-section");
+    const response = await fetch("/api/stores/list");
+    const json     = await response.json();
+    for (const store of json) {
+        const clone = document.importNode(storeListSect.content, true);
+        const container = clone.querySelector("div");
+        const contentElements = clone.querySelectorAll('p');
+        contentElements[0].textContent = store.name;
+        contentElements[2].textContent = store.type;
+
+        //Listens for the click event on the buttons
+        container.addEventListener("click", async () => {
             const data = {
-                name: "Game",
-                type: "Entertainment",
-                id: room.id
-            }
+                name: store.name,
+                type: store.type,
+                id: selectedStore.id
+            };
             const response = await fetch("api/map/sect-data", {
                 method: "POST",
                 headers: {
@@ -192,24 +239,12 @@ async function handleCanvasClick(e) {
             });
             const success = await response.text();
             if (success) {
-                room.type = data.type;
+                selectedStore.type = data.type;
+                selectedStore = -1;
+                const popup = document.getElementById("popup");
+                popup.classList.add("hidden");
             }
-        }
+        });
+        storeList.append(clone);
     }
-}
-
-/**
- * Sets the key down event for the key pressed to true
- * @param {Event} e The key down event
- */
-function handleKeyDown(e) {
-    keydown[e.key] = true;
-}
-
-/**
- * Sets the key down event for the key pressed to false
- * @param {Event} e The key down event
- */
-function handleKeyUp(e) {
-    keydown[e.key] = false;
 }
