@@ -15,9 +15,7 @@ const buttonPressed = {
     'right': false
 }
 
-const mapData = {
-    geometry: []
-}
+const mapData = {}
 /**
  * Class to abstract the rendering of the map
  * It uses the offset vector to draw objects in the correct location
@@ -51,6 +49,7 @@ class Renderer {
      */
     renderRect(x, y, w, h) {
         this.context.strokeRect(x + offsetX, y + offsetY, w, h);
+        this.context.fillRect(x + offsetX, y + offsetY, w, h);
     }
 } //Class renderer
 
@@ -68,11 +67,20 @@ window.addEventListener("load", e => {
         canvas.width = window.innerWidth - window.innerWidth * 0.3;
         canvas.height = canvas.width;
     }
-    //Setup event listeners
+
+    /*
+        Event listener setup
+    */
+    //Setup input for the canvas
     canvas.addEventListener("click", handleCanvasClick);
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
 
+    /**
+     * Sets up one of the input buttons to allow for touch controls
+     * @param {HTMLImageElement} element The image to add the event listener to
+     * @param {String} direction The direction the arrow is pointing in
+     */
     function setUpButton(element, direction) {
         element.addEventListener("mousedown", () => buttonPressed[direction] = true);
         element.addEventListener("mouseup", () => buttonPressed[direction] = false);
@@ -97,7 +105,11 @@ window.addEventListener("load", e => {
  */
 function loop(canvas, context) {
     const renderer = new Renderer(canvas, context);
-    mapData.geometry = getRooms();
+    const geometry = getMallLayout();
+    mapData.rooms = geometry.rooms;
+    mapData.paths = geometry.paths;
+    mapData.bounds = geometry.bounds;
+
     context.lineWidth = 2;
     context.strokeStyle = "white";
     window.requestAnimationFrame(mainloop);
@@ -105,10 +117,18 @@ function loop(canvas, context) {
     function mainloop() {
         handleInput();
         renderer.clear();
-        for (const room of mapData.geometry) {
+
+        
+        for (const room of mapData.rooms) {
+            context.fillStyle = typeToColour(room.type);
             renderer.renderRect(room.x, room.y, room.width, room.height);
         }
+        context.fillStyle = "white";
+        for (const path of mapData.paths) {
+            renderer.renderRect(path.x, path.y, path.width, path.height);
+        }
         context.stroke();
+        context.fill();
         window.requestAnimationFrame(mainloop);
     }
 }
@@ -128,6 +148,9 @@ function handleInput() {
     } else if (keydown["d"] || buttonPressed.right) {
         offsetX += PAN_SPEED;
     }
+
+    //Handle bounds of world
+    //offsetX = Math.min(offsetX, mapData.bounds.maxX);
 }
 
 /**
@@ -135,47 +158,51 @@ function handleInput() {
  * @param {Event} e The click event
  */
 async function handleCanvasClick(e) {
-        //Convert the browser coordinates to canvas/world coordinates
-        const x = e.clientX - e.target.offsetLeft - offsetX;
-        const y = e.clientY - e.target.offsetTop - offsetY;
-        for (const room of mapData.geometry) {
-            if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
-                console.log(`Room clicked: ${room.id}`);
-                const popup = document.getElementById("store-select-popup");
-                //popup.style.display = block;
-                /*
-                const response = await fetch("/api/stores/list");
-                const data     = await response.json();
-                console.log(data);
-                */
-                const data = {
-                    name: "Game",
-                    type: "Entertainment",
-                    id: room.id
-                }
-                const response = await fetch("api/map/sect-data", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
-                    });
-                }
+    //Convert the browser coordinates to canvas/world coordinates
+    const x = e.clientX - e.target.offsetLeft - offsetX;
+    const y = e.clientY - e.target.offsetTop - offsetY;
+    for (const room of mapData.rooms) {
+        if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
+            console.log(`Room clicked: ${room.id}`);
+            const popup = document.getElementById("store-select-popup");
+            //popup.style.display = block;
+            /*
+            const response = await fetch("/api/stores/list");
+            const data     = await response.json();
+            console.log(data);
+            */
+            const data = {
+                name: "Game",
+                type: "Entertainment",
+                id: room.id
+            }
+            const response = await fetch("api/map/sect-data", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+            const success = await response.text();
+            if (success) {
+                room.type = data.type;
             }
         }
+    }
+}
 
-        /**
-         * Sets the key down event for the key pressed to true
-         * @param {Event} e The key down event
-         */
-        function handleKeyDown(e) {
-            keydown[e.key] = true;
-        }
+/**
+ * Sets the key down event for the key pressed to true
+ * @param {Event} e The key down event
+ */
+function handleKeyDown(e) {
+    keydown[e.key] = true;
+}
 
-        /**
-         * Sets the key down event for the key pressed to false
-         * @param {Event} e The key down event
-         */
-        function handleKeyUp(e) {
-            keydown[e.key] = false;
-        }
+/**
+ * Sets the key down event for the key pressed to false
+ * @param {Event} e The key down event
+ */
+function handleKeyUp(e) {
+    keydown[e.key] = false;
+}
