@@ -16,7 +16,7 @@
 
 body {
     background-color: rgba(182, 216, 224, 0.933);
-    color: black;
+    color: white;
     font-family: 'Open Sans', serif;
 }
 
@@ -28,7 +28,6 @@ body {
 header {
     width: 100%;
     background-color: rgb(100, 100, 100);
-    color: white;
     border-bottom: solid white;
 }
 
@@ -46,8 +45,9 @@ header .header-container {
 main {
     background-color: rgb(50, 50, 50);
     height: 100%;
-    display: flex;
 }
+
+
 
 main nav {
     background-color: rgb(75, 75, 75);
@@ -73,7 +73,7 @@ main nav a {
 }
 
 main nav a:hover {
-    background-color: rgb(173, 173, 173);
+    background-color: rgb(125, 125, 125);
 }
 
 /*
@@ -81,16 +81,9 @@ main nav a:hover {
   General classes
 ===================
 */
-
 .main-content {
-    margin: 5px;
-    padding: 5px;
     background-color: rgb(100, 100, 100);
     width: 100%;
-}
-
-.store-table-container table {
-
 }
 
 .input-canvas {
@@ -125,6 +118,10 @@ main nav a:hover {
     border-radius: 20px;
 }
 
+.flex {
+    display: flex;
+}
+
 /*
     map input stuff
 */
@@ -142,11 +139,38 @@ table {
     margin: auto;
 }
 
-th, td {
+th,
+td {
     text-align: left;
     padding: 10px;
 }
 
+.table-data {
+    transition: 1s;
+}
+
+.table-data:hover {
+    background-color: rgb(125, 125, 125);
+}
+/*
+.popup-bg {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+}
+*/
 @media screen and (max-width: 1280px) {
     main nav {
         display: none;

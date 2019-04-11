@@ -33,7 +33,7 @@ class Renderer {
         this.height = canvas.height;
         this.context = context;
     }
-    
+
     /**
      * Clears the canvas to full black
      */
@@ -57,11 +57,13 @@ class Renderer {
 
 window.addEventListener("load", e => {
     const canvas = document.getElementById("map-canvas");
+    console.log(canvas);
     const ctx = canvas.getContext("2d");
     //Set canvas size based on the size of the device
     if (window.innerWidth >= 1280) {
-        canvas.width = window.innerHeight * 0.6;
-        canvas.height = window.innerHeight * 0.6;
+        //Canvas fills 80% of window
+        canvas.width = window.innerWidth * 0.8;
+        canvas.height = window.innerHeight * 0.8;
     } else {
         canvas.width = window.innerWidth - window.innerWidth * 0.3;
         canvas.height = canvas.width;
@@ -117,15 +119,13 @@ function loop(canvas, context) {
 function handleInput() {
     if (keydown["w"] || buttonPressed.up) {
         offsetY -= PAN_SPEED;
-    } 
-    else if (keydown["s"] || buttonPressed.down) {
+    } else if (keydown["s"] || buttonPressed.down) {
         offsetY += PAN_SPEED;
     }
 
     if (keydown["a"] || buttonPressed.left) {
         offsetX -= PAN_SPEED;
-    } 
-    else if (keydown["d"] || buttonPressed.right) {
+    } else if (keydown["d"] || buttonPressed.right) {
         offsetX += PAN_SPEED;
     }
 }
@@ -134,29 +134,48 @@ function handleInput() {
  * Handles the click event on the canvas
  * @param {Event} e The click event
  */
-function handleCanvasClick(e) {
-    //Convert the browser coordinates to canvas/world coordinates
-    const x = e.clientX - e.target.offsetLeft - offsetX;
-    const y = e.clientY - e.target.offsetTop - offsetY;
-    for (const room of mapData.geometry) {
-        if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
-            console.log(`Room clicked: ${room.id}`);
+async function handleCanvasClick(e) {
+        //Convert the browser coordinates to canvas/world coordinates
+        const x = e.clientX - e.target.offsetLeft - offsetX;
+        const y = e.clientY - e.target.offsetTop - offsetY;
+        for (const room of mapData.geometry) {
+            if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
+                console.log(`Room clicked: ${room.id}`);
+                const popup = document.getElementById("store-select-popup");
+                //popup.style.display = block;
+                /*
+                const response = await fetch("/api/stores/list");
+                const data     = await response.json();
+                console.log(data);
+                */
+                const data = {
+                    name: "Game",
+                    type: "Entertainment",
+                    id: room.id
+                }
+                const response = await fetch("api/map/sect-data", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    });
+                }
+            }
         }
-    }
-}
 
-/**
- * Sets the key down event for the key pressed to true
- * @param {Event} e The key down event
- */
-function handleKeyDown(e) {
-    keydown[e.key] = true;
-}
+        /**
+         * Sets the key down event for the key pressed to true
+         * @param {Event} e The key down event
+         */
+        function handleKeyDown(e) {
+            keydown[e.key] = true;
+        }
 
-/**
- * Sets the key down event for the key pressed to false
- * @param {Event} e The key down event
- */
-function handleKeyUp(e) {
-    keydown[e.key] = false;
-}
+        /**
+         * Sets the key down event for the key pressed to false
+         * @param {Event} e The key down event
+         */
+        function handleKeyUp(e) {
+            keydown[e.key] = false;
+        }
