@@ -76,6 +76,10 @@ main nav a:hover {
     background-color: rgb(125, 125, 125);
 }
 
+canvas {
+    border: 2px solid white;
+}
+
 /*
 ===================
   General classes
@@ -84,10 +88,6 @@ main nav a:hover {
 .main-content {
     background-color: rgb(100, 100, 100);
     width: 100%;
-}
-
-.input-canvas {
-    border: 2px solid white;
 }
 
 .centered {

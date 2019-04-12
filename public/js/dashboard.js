@@ -7,50 +7,53 @@ window.addEventListener("load", e => {
     const canvas = document.getElementById("map-canvas");
     canvas.width = window.innerWidth * 0.8;
     canvas.height = window.innerHeight * 0.8;
-    
+
     beginRendering(canvas);
-}); 
+});
 
 function beginRendering(canvas) {
-    const gl = canvas.getContext("webgl");
+    const gl = canvas.getContext("webgl2");
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
     //TEMP
     const shader = createShaderFromSource(
-        gl, 
-        vertexShaderSource, 
+        gl,
+        vertexShaderSource,
         fragmentShaderSource);
     gl.useProgram(shader);
     const positions = [
-         0.0,  0.5, 
-        -0.5, -0.5,
-         0.5, -0.5
+        0.0, 0.5, 0.0,
+        -0.5, -0.5, 0.0,
+        0.5, -0.5, 0.0,
     ];
+    const colours = [
+        0.0, 1.0, 0.0,
+        1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0,
+    ];
+    const positionLocation = gl.getAttribLocation(shader, 'inVertexPosition');
+    const colourLocation   = gl.getAttribLocation(shader, 'inColour');
 
-    const vbo = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-    const l = gl.getAttribLocation(shader, 'inVertexPosition');
-    gl.vertexAttribPointer(
-        l, 2, gl.FLOAT, false, 0, 0
-    );
-    gl.enableVertexAttribArray(l);
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    const posBuffer = createBuffer(gl, positions, positionLocation, 3);
+    const colBuffer = createBuffer(gl, colours, colourLocation, 3);
 
     const projection = mat4.create();
     mat4.perspective(
-        projection, 
-        60 * Math.PI / 180.0, 
+        projection,
+        60 * Math.PI / 180.0,
         gl.canvas.clientWidth / gl.canvas.clientHeight,
-        0.0, 
+        0.0,
         100.0);
 
     const modelViewMatrix = mat4.create();
     mat4.translate(
         modelViewMatrix,
         modelViewMatrix,
-        [0.0, 0.0, -6.0]);
+        [0.0, 0.0, -3.0]);
 
-    const modelViewLocation  = gl.getUniformLocation(shader, 'modelViewMatrix');
+    const modelViewLocation = gl.getUniformLocation(shader, 'modelViewMatrix');
     const projectionLocation = gl.getUniformLocation(shader, 'projectionMatrix');
 
     gl.uniformMatrix4fv(
@@ -62,6 +65,7 @@ function beginRendering(canvas) {
     );
 
     window.requestAnimationFrame(mainloop);
+
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -73,27 +77,26 @@ function beginRendering(canvas) {
 }
 
 
-function handleMessage (event) {
+function handleMessage(event) {
     const data = JSON.parse(event.data);
     console.log(data);
-    switch(data.type) {
+    switch (data.type) {
 
     }
 }
-
 
 /*
  * =========================
  * OpenGL Helper functions
  */
 
- //SHADERS
- /**
-  * Compiles and creates a shader
-  * @param {WebGLRenderingContext} gl The openl/webgl rendering context
-  * @param {String} source The source code of the shader
-  * @param {Number} type The type of the shader (vertex/fragment)s
-  */
+//SHADERS
+/**
+ * Compiles and creates a shader
+ * @param {WebGLRenderingContext} gl The openl/webgl rendering context
+ * @param {String} source The source code of the shader
+ * @param {Number} type The type of the shader (vertex/fragment)s
+ */
 function createShader(gl, source, type) {
     const shader = gl.createShader(type);
 
@@ -116,7 +119,7 @@ function createShader(gl, source, type) {
  */
 function createShaderProgram(gl, vertexShader, fragmentShader) {
     const program = gl.createProgram();
-    
+
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
 
@@ -142,22 +145,49 @@ function createShaderFromSource(gl, vertexSource, fragmentSource) {
     return createShaderProgram(gl, vertexShader, fragmentShader);
 }
 
+function createBuffer(gl, data, attribLocation, dataPerVertex) {
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array(data),
+        gl.STATIC_DRAW);
+    gl.vertexAttribPointer(
+        attribLocation,
+        dataPerVertex,
+        gl.FLOAT,
+        false,
+        0,
+        0
+    );
+    gl.enableVertexAttribArray(attribLocation);
+    return buffer;
+}
 //Shader programs
-const vertexShaderSource = 
-`
-    attribute vec3 inVertexPosition;
+const vertexShaderSource =
+    `#version 300 es
+    in vec3 inVertexPosition;
+    in vec3 inColour;
+    
+    out vec3 passColour;
 
     uniform mat4 modelViewMatrix;
     uniform mat4 projectionMatrix;
 
     void main() {
         gl_Position = projectionMatrix * modelViewMatrix * vec4(inVertexPosition.xyz, 1.0);
+        passColour = inColour;
     }
 `;
 
-const fragmentShaderSource = 
-`
+const fragmentShaderSource =
+    `#version 300 es
+    precision highp float;
+
+    in vec3 passColour;
+    out vec4 colour;
+
     void main() {
-        gl_FragColor = vec4(1.0, 0.5, 1.0, 1.0);
+        colour = vec4(passColour.xyz, 1.0);
     }
 `;
