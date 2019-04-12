@@ -35,12 +35,8 @@ async function main(canvas) {
     const projViewLocation = gl.getUniformLocation(shader, 'projViewMatrix');
     const modelMatrixLocation = gl.getUniformLocation(shader, 'modelMatrix');
 
-    gl.uniformMatrix4fv(
-        projViewLocation, false, projectionViewMatrix
-    );
-    const modelMatrix = createModelMatrix(
-        rot,
-        pos);
+    gl.uniformMatrix4fv(projViewLocation, false, projectionViewMatrix);
+    const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -5, 0));
     gl.uniformMatrix4fv(
         modelMatrixLocation, false, modelMatrix
     );
