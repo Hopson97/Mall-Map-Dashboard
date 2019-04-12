@@ -16,4 +16,5 @@ window.addEventListener("load", e => {
     addButton("Announcements", 'input-announcements');
     addButton("Add Stores", 'input-stores');
     addButton("Add Adverts", 'input-adverts');
+    addButton("Dashboard", 'dashboard');
 });

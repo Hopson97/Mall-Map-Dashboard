@@ -66,7 +66,6 @@ class Renderer {
 
 window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
-    console.log(canvas);
     const ctx = canvas.getContext("2d");
     //Set canvas size based on the size of the device
     if (window.innerWidth >= 1280) {
