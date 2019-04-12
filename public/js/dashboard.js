@@ -1,10 +1,7 @@
 "use strict";
 
 window.addEventListener("load", e => {
-    
-
     const socket = new WebSocket("ws://localhost:8080");
-
     socket.addEventListener("message", handleMessage);
 
     const canvas = document.getElementById("map-canvas");
@@ -38,8 +35,33 @@ function beginRendering(canvas) {
         l, 2, gl.FLOAT, false, 0, 0
     );
     gl.enableVertexAttribArray(l);
-    window.requestAnimationFrame(mainloop);
 
+    const projection = mat4.create();
+    mat4.perspective(
+        projection, 
+        60 * Math.PI / 180.0, 
+        gl.canvas.clientWidth / gl.canvas.clientHeight,
+        0.0, 
+        100.0);
+
+    const modelViewMatrix = mat4.create();
+    mat4.translate(
+        modelViewMatrix,
+        modelViewMatrix,
+        [0.0, 0.0, -6.0]);
+
+    const modelViewLocation  = gl.getUniformLocation(shader, 'modelViewMatrix');
+    const projectionLocation = gl.getUniformLocation(shader, 'projectionMatrix');
+
+    gl.uniformMatrix4fv(
+        modelViewLocation, false, modelViewMatrix
+    );
+
+    gl.uniformMatrix4fv(
+        projectionLocation, false, projection
+    );
+
+    window.requestAnimationFrame(mainloop);
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -123,10 +145,13 @@ function createShaderFromSource(gl, vertexSource, fragmentSource) {
 //Shader programs
 const vertexShaderSource = 
 `
-    attribute vec2 inVertexPosition;
+    attribute vec3 inVertexPosition;
+
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;
 
     void main() {
-        gl_Position = vec4(inVertexPosition.xy, 0.0, 1.0);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(inVertexPosition.xyz, 1.0);
     }
 `;
 
