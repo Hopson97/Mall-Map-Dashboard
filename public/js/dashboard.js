@@ -1,6 +1,6 @@
 "use strict";
 
-window.addEventListener("load", e => {
+window.addEventListener("load", async e => {
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
 
@@ -8,10 +8,10 @@ window.addEventListener("load", e => {
     canvas.width = window.innerWidth * 0.9;
     canvas.height = window.innerHeight * 0.9;
 
-    main(canvas);
+    await main(canvas);
 });
 
-function main(canvas) {
+async function main(canvas) {
     const gl = canvas.getContext("webgl2");
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
@@ -24,11 +24,6 @@ function main(canvas) {
         1, 0, 0,
         1, 0, -1,
         0, 0, -1,
-
-        0, 0, 0,
-        0, -1, 0,
-        0, -1, -1,
-        0, 0, -1,
     ];
     const colours = [
 
@@ -36,25 +31,16 @@ function main(canvas) {
 
     const indices = [
         0, 1, 2, 2, 3, 0,
-        4, 5, 6, 6, 7, 4
     ]
 
     for (let i = 0; i < positions.length; i++) {
         colours.push(Math.random());
     }
 
-
-
-    
-
-
-    const positionLocation = gl.getAttribLocation(shader, 'inVertexPosition');
-    const colourLocation = gl.getAttribLocation(shader, 'inColour');
-
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
-    const posBuffer = createBuffer(gl, positions, positionLocation, 3);
-    const colBuffer = createBuffer(gl, colours, colourLocation, 3);
+    const posBuffer = createBuffer(gl, positions, 0, 3);
+    const colBuffer = createBuffer(gl, colours, 1, 3);
     const eleBuffer = createElementBuffer(gl, indices);
 
     const projection = createProjectionMatrix(90, gl);
@@ -63,8 +49,8 @@ function main(canvas) {
     const pos = new Vector3(0,-1, 0);
 
     const viewMatrix = createViewMatrix(
-        new Vector3(0, 0, 0),
-        new Vector3(0, 0, 7));
+        new Vector3(30, 0, 0),
+        new Vector3(15, 10, 35));
 
     const projectionViewMatrix = mat4.create();
     mat4.multiply(projectionViewMatrix, projection, viewMatrix);
@@ -75,24 +61,29 @@ function main(canvas) {
     gl.uniformMatrix4fv(
         projViewLocation, false, projectionViewMatrix
     );
+    const modelMatrix = createModelMatrix(
+        rot,
+        pos);
+    gl.uniformMatrix4fv(
+        modelMatrixLocation, false, modelMatrix
+    );
 
+    const objects = await createMapMesh(gl);
+    gl.bindVertexArray(vao);
 
     window.requestAnimationFrame(mainloop);
 
+
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT);
-        rot.y += 1;
-        pos.x = Math.sin(toRadians(rot.y)) * 2;
-        pos.z = Math.cos(toRadians(rot.y)) * 2;
-
-        const modelMatrix = createModelMatrix(
-            rot,
-            pos);
-        gl.uniformMatrix4fv(
-            modelMatrixLocation, false, modelMatrix
-        );
+        
         
         gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+
+        for (const o of objects) {
+            gl.bindVertexArray(o);
+            gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+        }
 
         window.requestAnimationFrame(mainloop);
     }
@@ -105,6 +96,48 @@ function handleMessage(event) {
     switch (data.type) {
 
     }
+}
+
+async function createMapMesh(gl) {
+    const geometry = getMallLayout();
+    const response = await fetch("/api/stores/list");
+    const roomsJson = await response.json();
+    console.log("hi");
+
+    const objects = [];
+    const scaleFactor = 15;
+    for (const room of geometry.rooms) {
+        const x = room.x / scaleFactor;
+        const z = room.y / scaleFactor;
+        const w = room.width / scaleFactor;
+        const d = room.height / scaleFactor;
+
+        const positions = [
+            x,      0, z,
+            x + w,  0, z,
+            x + w,  0, z + d,
+            x,      0, z + d
+        ];
+        const colours = [
+            0, 1, 1,
+            1, 1, 0,
+            1, 0, 1,
+            1, 1, 1
+        ];
+    
+        const indices = [
+            0, 1, 2, 2, 3, 0
+        ]
+    
+
+        const vao = gl.createVertexArray();
+        gl.bindVertexArray(vao);
+        const posBuffer = createBuffer(gl, positions, 0, 3);
+        const colBuffer = createBuffer(gl, colours, 1, 3);
+        const eleBuffer = createElementBuffer(gl, indices);
+        objects.push(vao);
+    }
+    return objects;
 }
 
 /*
@@ -247,6 +280,23 @@ function createModelMatrix(rotation, translation) {
     return matrix;
 }
 
+/**
+ * Creates a view matrix
+ * @param {Vector3} rotation The rotation of the model
+ * @param {Vector3} translation The translation of the model
+ */
+function createViewMatrix(rotation, translation) {
+    const matrix = mat4.create();
+
+    mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
+    mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
+    mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
+
+    mat4.translate(matrix, matrix, translation.getNegation().toGLMatrixVec3());
+
+    return matrix;
+}
+
 function createProjectionMatrix(fov, gl) {
     const projection = mat4.create();
     mat4.perspective(
@@ -256,15 +306,6 @@ function createProjectionMatrix(fov, gl) {
         0.0,
         100.0);
     return projection;
-}
-
-/**
- * Creates a view matrix
- * @param {Vector3} rotation The rotation of the model
- * @param {Vector3} translation The translation of the model
- */
-function createViewMatrix(rotation, translation) {
-    return createModelMatrix(rotation, translation.getNegation());
 }
 
 /**
