@@ -155,7 +155,8 @@ function loop(canvas, context) {
                 context.fillStyle = "lime";
             }
             else {
-                context.fillStyle = typeToColour(room.type);
+                const colour = typeToColour(room.type);
+                context.fillStyle = `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`;
             }
             renderer.renderRect(room.x, room.y, room.width, room.height);
         }

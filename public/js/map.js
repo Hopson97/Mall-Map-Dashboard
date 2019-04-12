@@ -15,11 +15,11 @@ function typeToColour(type) {
     const l = type.toLowerCase();
     switch (l) {
         case "entertainment":
-            return "purple";
+            return [128, 0, 128];
             
         case "none":
         default:
-            return "gray";
+            return [50, 50, 50];
     }
 }
 

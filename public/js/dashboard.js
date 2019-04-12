@@ -5,8 +5,8 @@ window.addEventListener("load", e => {
     socket.addEventListener("message", handleMessage);
 
     const canvas = document.getElementById("map-canvas");
-    canvas.width = window.innerWidth * 0.8;
-    canvas.height = window.innerHeight * 0.8;
+    canvas.width = window.innerWidth * 0.9;
+    canvas.height = window.innerHeight * 0.9;
 
     beginRendering(canvas);
 });
@@ -14,6 +14,7 @@ window.addEventListener("load", e => {
 function beginRendering(canvas) {
     const gl = canvas.getContext("webgl2");
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     //TEMP
     const shader = createShaderFromSource(
@@ -32,7 +33,7 @@ function beginRendering(canvas) {
         0.0, 0.0, 1.0,
     ];
     const positionLocation = gl.getAttribLocation(shader, 'inVertexPosition');
-    const colourLocation   = gl.getAttribLocation(shader, 'inColour');
+    const colourLocation = gl.getAttribLocation(shader, 'inColour');
 
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
@@ -47,28 +48,32 @@ function beginRendering(canvas) {
         0.0,
         100.0);
 
-    const modelViewMatrix = mat4.create();
-    mat4.translate(
-        modelViewMatrix,
-        modelViewMatrix,
-        [0.0, 0.0, -3.0]);
+    const modelMatrix = createModelMatrix(
+        new Vector3(0, 45, 0),
+        new Vector3(0, 0, 0));
 
-    const modelViewLocation = gl.getUniformLocation(shader, 'modelViewMatrix');
-    const projectionLocation = gl.getUniformLocation(shader, 'projectionMatrix');
+    const viewMatrix = createViewMatrix(
+        new Vector3(0, 0, 0),
+        new Vector3(0, 0, 5));
+
+    const projectionViewMatrix = mat4.create();
+    mat4.multiply(projectionViewMatrix, projection, viewMatrix);
+
+    const projViewLocation = gl.getUniformLocation(shader, 'projViewMatrix');
+    const modelMatrixLocation = gl.getUniformLocation(shader, 'modelMatrix');
 
     gl.uniformMatrix4fv(
-        modelViewLocation, false, modelViewMatrix
+        projViewLocation, false, projectionViewMatrix
     );
 
     gl.uniformMatrix4fv(
-        projectionLocation, false, projection
+        modelMatrixLocation, false, modelMatrix
     );
 
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT);
-
 
         gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -87,8 +92,32 @@ function handleMessage(event) {
 
 /*
  * =========================
- * OpenGL Helper functions
+ * OpenGL Helper functions and classes
  */
+/**
+ * Class to represent a 3d position
+ */
+class Vector3 {
+    /**
+     * Creates a 3D vector
+     * @param {Number} x The X component of the vector
+     * @param {Number} y The Y component of the vector
+     * @param {Number} z The Z component of the vector
+     */
+    constructor(x = 0, y = 0, z = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    getNegation() {
+        return new Vector3(-this.x, -this.y, -this.z);
+    }
+
+    toGLMatrixVec3() {
+        return vec3.fromValues(this.x, this.y, this.z);
+    }
+}
 
 //SHADERS
 /**
@@ -134,7 +163,7 @@ function createShaderProgram(gl, vertexShader, fragmentShader) {
 }
 
 /**
- * 
+ * Creates a WebGL shader
  * @param {WebGLRenderingContext} gl The OpenGL/WebGL render context
  * @param {String} vertexSource The source code of the vertex shader
  * @param {String} fragmentSource The sourcde code of the fragment shader
@@ -145,24 +174,58 @@ function createShaderFromSource(gl, vertexSource, fragmentSource) {
     return createShaderProgram(gl, vertexShader, fragmentShader);
 }
 
+//BUFFERS
+/**
+ * Creates a webgl vertex buffer object
+ * @param {WebGLRenderingContext} gl The OpenGL/WebGL rendering context
+ * @param {Array} data A array of floating point numbers 
+ * @param {Number} attribLocation The location of the attribute in the vertex shader
+ * @param {Number} dataPerVertex The amount of data per vertex (2d/3d/4d etc)
+ */
 function createBuffer(gl, data, attribLocation, dataPerVertex) {
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-        gl.ARRAY_BUFFER,
-        new Float32Array(data),
-        gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
     gl.vertexAttribPointer(
-        attribLocation,
-        dataPerVertex,
-        gl.FLOAT,
-        false,
-        0,
-        0
-    );
+        attribLocation, dataPerVertex, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(attribLocation);
     return buffer;
 }
+
+//MATHS
+/**
+ * Creates a model matrix
+ * @param {Vector3} rotation The rotation of the model
+ * @param {Vector3} translation The translation of the model
+ */
+function createModelMatrix(rotation, translation) {
+    const matrix = mat4.create();
+
+    mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
+    mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
+    mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
+    mat4.translate(matrix, matrix, translation.toGLMatrixVec3());
+
+    return matrix;
+}
+
+/**
+ * Creates a view matrix
+ * @param {Vector3} rotation The rotation of the model
+ * @param {Vector3} translation The translation of the model
+ */
+function createViewMatrix(rotation, translation) {
+    return createModelMatrix(rotation, translation.getNegation());
+}
+
+/**
+ * Converts degrees to radians
+ * @param {Number} degrees The number to convert in degrees
+ */
+function toRadians(degrees) {
+    return degrees * Math.PI / 180.0;
+}
+
 //Shader programs
 const vertexShaderSource =
     `#version 300 es
@@ -171,11 +234,11 @@ const vertexShaderSource =
     
     out vec3 passColour;
 
-    uniform mat4 modelViewMatrix;
-    uniform mat4 projectionMatrix;
+    uniform mat4 modelMatrix;
+    uniform mat4 projViewMatrix;
 
     void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(inVertexPosition.xyz, 1.0);
+        gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
         passColour = inColour;
     }
 `;
