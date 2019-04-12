@@ -92,11 +92,27 @@ async function createMapMesh(gl) {
             x + w,  0, z + d,
             x,      0, z + d
         ];
+        let colour;
+        if (roomsJson[room.id]) {
+            const rgb = typeToColour(roomsJson[room.id].type);
+            const r = rgb[0] / 100;
+            const g = rgb[1] / 100;
+            const b = rgb[2] / 100;
+            colour = {r, g, b};
+        }
+        else {
+            const rgb = typeToColour("none");
+            const r = rgb[0] / 100;
+            const g = rgb[1] / 100;
+            const b = rgb[2] / 100;
+            colour = {r, g, b};
+        }
+        console.log(colour);
         const colours = [
-            0, 1, 1,
-            1, 1, 0,
-            1, 0, 1,
-            1, 1, 1
+            colour.r, colour.g, colour.b,
+            colour.r, colour.g, colour.b,
+            colour.r, colour.g, colour.b,
+            colour.r, colour.g, colour.b,
         ];
     
         const indices = [
