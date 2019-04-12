@@ -8,30 +8,46 @@ window.addEventListener("load", e => {
     canvas.width = window.innerWidth * 0.9;
     canvas.height = window.innerHeight * 0.9;
 
-    beginRendering(canvas);
+    main(canvas);
 });
 
-function beginRendering(canvas) {
+function main(canvas) {
     const gl = canvas.getContext("webgl2");
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
 
     //TEMP
-    const shader = createShaderFromSource(
-        gl,
-        vertexShaderSource,
-        fragmentShaderSource);
+    const shader = createShaderFromSource(gl, vertexShaderSource, fragmentShaderSource);
     gl.useProgram(shader);
     const positions = [
-        0.0, 0.5, 0.0,
-        -0.5, -0.5, 0.0,
-        0.5, -0.5, 0.0,
+        0, 0, 0,
+        1, 0, 0,
+        1, 0, -1,
+        0, 0, -1,
+
+        0, 0, 0,
+        0, -1, 0,
+        0, -1, -1,
+        0, 0, -1,
     ];
     const colours = [
-        0.0, 1.0, 0.0,
-        1.0, 0.0, 0.0,
-        0.0, 0.0, 1.0,
+
     ];
+
+    const indices = [
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4
+    ]
+
+    for (let i = 0; i < positions.length; i++) {
+        colours.push(Math.random());
+    }
+
+
+
+    
+
+
     const positionLocation = gl.getAttribLocation(shader, 'inVertexPosition');
     const colourLocation = gl.getAttribLocation(shader, 'inColour');
 
@@ -39,6 +55,7 @@ function beginRendering(canvas) {
     gl.bindVertexArray(vao);
     const posBuffer = createBuffer(gl, positions, positionLocation, 3);
     const colBuffer = createBuffer(gl, colours, colourLocation, 3);
+    const eleBuffer = createElementBuffer(gl, indices);
 
     const projection = mat4.create();
     mat4.perspective(
@@ -48,13 +65,12 @@ function beginRendering(canvas) {
         0.0,
         100.0);
 
-    const modelMatrix = createModelMatrix(
-        new Vector3(0, 45, 0),
-        new Vector3(0, 0, 0));
+    const rot = new Vector3(0, 0, 0);
+    const pos = new Vector3(0,-1, 0);
 
     const viewMatrix = createViewMatrix(
         new Vector3(0, 0, 0),
-        new Vector3(0, 0, 5));
+        new Vector3(0, 0, 7));
 
     const projectionViewMatrix = mat4.create();
     mat4.multiply(projectionViewMatrix, projection, viewMatrix);
@@ -66,16 +82,23 @@ function beginRendering(canvas) {
         projViewLocation, false, projectionViewMatrix
     );
 
-    gl.uniformMatrix4fv(
-        modelMatrixLocation, false, modelMatrix
-    );
 
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT);
+        rot.y += 1;
+        pos.x = Math.sin(toRadians(rot.y)) * 2;
+        pos.z = Math.cos(toRadians(rot.y)) * 2;
 
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        const modelMatrix = createModelMatrix(
+            rot,
+            pos);
+        gl.uniformMatrix4fv(
+            modelMatrixLocation, false, modelMatrix
+        );
+        
+        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
         window.requestAnimationFrame(mainloop);
     }
@@ -192,6 +215,13 @@ function createBuffer(gl, data, attribLocation, dataPerVertex) {
     return buffer;
 }
 
+function createElementBuffer(gl, data) {
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data), gl.STATIC_DRAW);
+    return buffer;
+}
+
 //MATHS
 /**
  * Creates a model matrix
@@ -201,10 +231,10 @@ function createBuffer(gl, data, attribLocation, dataPerVertex) {
 function createModelMatrix(rotation, translation) {
     const matrix = mat4.create();
 
+    mat4.translate(matrix, matrix, translation.toGLMatrixVec3());
     mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
-    mat4.translate(matrix, matrix, translation.toGLMatrixVec3());
 
     return matrix;
 }
