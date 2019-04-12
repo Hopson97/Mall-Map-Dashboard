@@ -8,15 +8,18 @@ let wss;
 const router = express.Router();
 router.use(bodyParser.json());
 
-const rooms = [    
-];
+const rooms = {  
+};
 
 router.post("/sect-data", (request, response) => {
     const name = request.body.name;
     const type = request.body.type;
     const id   = request.body.id;
 
-    rooms.push({id, name, type});
+    rooms[id] = {
+        name, type
+    };
+
     console.log(rooms);
     response.send(true);
 });

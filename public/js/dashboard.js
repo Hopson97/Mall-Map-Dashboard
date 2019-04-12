@@ -19,29 +19,6 @@ async function main(canvas) {
     //TEMP
     const shader = createShaderFromSource(gl, vertexShaderSource, fragmentShaderSource);
     gl.useProgram(shader);
-    const positions = [
-        0, 0, 0,
-        1, 0, 0,
-        1, 0, -1,
-        0, 0, -1,
-    ];
-    const colours = [
-
-    ];
-
-    const indices = [
-        0, 1, 2, 2, 3, 0,
-    ]
-
-    for (let i = 0; i < positions.length; i++) {
-        colours.push(Math.random());
-    }
-
-    const vao = gl.createVertexArray();
-    gl.bindVertexArray(vao);
-    const posBuffer = createBuffer(gl, positions, 0, 3);
-    const colBuffer = createBuffer(gl, colours, 1, 3);
-    const eleBuffer = createElementBuffer(gl, indices);
 
     const projection = createProjectionMatrix(90, gl);
 
@@ -69,20 +46,17 @@ async function main(canvas) {
     );
 
     const objects = await createMapMesh(gl);
-    gl.bindVertexArray(vao);
+
 
     window.requestAnimationFrame(mainloop);
 
 
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT);
-        
-        
-        gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
         for (const o of objects) {
             gl.bindVertexArray(o);
-            gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
         }
 
         window.requestAnimationFrame(mainloop);
@@ -100,9 +74,9 @@ function handleMessage(event) {
 
 async function createMapMesh(gl) {
     const geometry = getMallLayout();
-    const response = await fetch("/api/stores/list");
+    const response = await fetch("/api/map/sect-data");
     const roomsJson = await response.json();
-    console.log("hi");
+    console.log(roomsJson);
 
     const objects = [];
     const scaleFactor = 15;

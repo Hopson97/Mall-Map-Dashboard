@@ -21,10 +21,10 @@ const buttonPressed = {
 }
 
 //Object to store map data
-const mapData = {} 
+const mapData = {}
 
 //The highlighted room currently being edited 
-let selectedStore = -1; 
+let selectedStore = -1;
 
 /**
  * Class to abstract the rendering of the map
@@ -120,12 +120,13 @@ async function initMapData() {
     const response = await fetch("api/map/sect-data");
     const json = await response.json();
 
-    for (const roomData of json) {
-        for (const room of mapData.rooms) {
-            if (room.id == roomData.id) {
-                room.name = roomData.name;
-                room.type = roomData.type;
-            }
+    console.log(json);
+
+
+    for (const room of mapData.rooms) {
+        if (json[room.id]) {
+            room.name = json[room.id].name;
+            room.type = json[room.id].type;
         }
     }
 
@@ -153,8 +154,7 @@ function loop(canvas, context) {
         for (const room of mapData.rooms) {
             if (selectedStore.id == room.id) {
                 context.fillStyle = "lime";
-            }
-            else {
+            } else {
                 const colour = typeToColour(room.type);
                 context.fillStyle = `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`;
             }
@@ -208,7 +208,7 @@ function handleCanvasClick(event) {
             console.log(`Room clicked: ${room.id}`);
             const popup = document.getElementById("popup");
             popup.classList.remove("hidden");
-            selectedStore = room; 
+            selectedStore = room;
         }
     }
 }
@@ -233,7 +233,7 @@ async function buildStoreDOM() {
     const storeList = document.getElementById("store-list");
     const storeListSect = document.getElementById("store-list-section");
     const response = await fetch("/api/stores/list");
-    const json     = await response.json();
+    const json = await response.json();
     for (const store of json) {
         const clone = document.importNode(storeListSect.content, true);
         const container = clone.querySelector("div");
