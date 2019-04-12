@@ -64,7 +64,7 @@ class Renderer {
 } //Class renderer
 
 
-window.addEventListener("load", e => {
+window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
     console.log(canvas);
     const ctx = canvas.getContext("2d");
@@ -104,12 +104,34 @@ window.addEventListener("load", e => {
     setUpButton(document.getElementById("right-arrow"), 'right');
     setUpButton(document.getElementById("down-arrow"), 'down');
 
-    //Build various DOM sections
+    //Build various DOM sections and initilize some data
     buildStoreDOM();
+    await initMapData();
 
     //Begin the main loop
     loop(canvas, ctx);
 });
+
+async function initMapData() {
+    const geometry = getMallLayout();
+    mapData.rooms = geometry.rooms;
+    mapData.paths = geometry.paths;
+    mapData.bounds = geometry.bounds;
+
+    const response = await fetch("api/map/sect-data");
+    const json = await response.json();
+
+    for (const roomData of json) {
+        for (const room of mapData.rooms) {
+            if (room.id == roomData.id) {
+                room.name = roomData.name;
+                room.type = roomData.type;
+            }
+        }
+    }
+
+    console.log(json);
+}
 
 /**
  * The main loop for drawing the map/ animations
@@ -118,20 +140,16 @@ window.addEventListener("load", e => {
  */
 function loop(canvas, context) {
     const renderer = new Renderer(canvas, context);
-    const geometry = getMallLayout();
-    mapData.rooms = geometry.rooms;
-    mapData.paths = geometry.paths;
-    mapData.bounds = geometry.bounds;
-    mapData.width = canvas.width;
-    mapData.height = canvas.height;
     context.lineWidth = 2;
     context.strokeStyle = "white";
+    mapData.width = canvas.width;
+    mapData.height = canvas.height;
+
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
         handleInput();
         renderer.clear();
-
 
         for (const room of mapData.rooms) {
             if (selectedStore.id == room.id) {
