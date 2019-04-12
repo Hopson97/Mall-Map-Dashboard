@@ -57,13 +57,7 @@ function main(canvas) {
     const colBuffer = createBuffer(gl, colours, colourLocation, 3);
     const eleBuffer = createElementBuffer(gl, indices);
 
-    const projection = mat4.create();
-    mat4.perspective(
-        projection,
-        60 * Math.PI / 180.0,
-        gl.canvas.clientWidth / gl.canvas.clientHeight,
-        0.0,
-        100.0);
+    const projection = createProjectionMatrix(90, gl);
 
     const rot = new Vector3(0, 0, 0);
     const pos = new Vector3(0,-1, 0);
@@ -114,8 +108,11 @@ function handleMessage(event) {
 }
 
 /*
- * =========================
- * OpenGL Helper functions and classes
+ * =========================================
+ *
+ *      WebGL Helper functions and classes
+
+ * ==========================================
  */
 /**
  * Class to represent a 3d position
@@ -133,10 +130,16 @@ class Vector3 {
         this.z = z;
     }
 
+    /**
+     * Gets the negative component of this vector
+     */
     getNegation() {
         return new Vector3(-this.x, -this.y, -this.z);
     }
 
+    /**
+     * Gets the gl.matrix libraries vec3 equalilivent of this vector
+     */
     toGLMatrixVec3() {
         return vec3.fromValues(this.x, this.y, this.z);
     }
@@ -215,6 +218,11 @@ function createBuffer(gl, data, attribLocation, dataPerVertex) {
     return buffer;
 }
 
+/**
+ * 
+ * @param {WebGLContext} gl The OpenGL/WebGL2 rendering context
+ * @param {*} data 
+ */
 function createElementBuffer(gl, data) {
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
@@ -237,6 +245,17 @@ function createModelMatrix(rotation, translation) {
     mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
 
     return matrix;
+}
+
+function createProjectionMatrix(fov, gl) {
+    const projection = mat4.create();
+    mat4.perspective(
+        projection,
+        toRadians(fov),
+        gl.canvas.clientWidth / gl.canvas.clientHeight,
+        0.0,
+        100.0);
+    return projection;
 }
 
 /**
