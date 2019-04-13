@@ -13,9 +13,11 @@ window.addEventListener("load", async e => {
 
 async function main(canvas) {
     const gl = canvas.getContext("webgl2");
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 1.0, 1.0);
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    // gl.enable(gl.DEPTH_TEST);
+    //gl.enable(gl.DEPTH_TEST);
+    //gl.depthFunc(gl.LESS);
+    //gl.depthMask(true);
 
     //TEMP
     const shader = createShaderFromSource(gl, vertexShaderSource, fragmentShaderSource);
@@ -23,37 +25,43 @@ async function main(canvas) {
 
     const projection = createProjectionMatrix(90, gl);
 
-    const rot = new Vector3(0, 0, 0);
-    const pos = new Vector3(0, -1, 0);
+    const camera = {
+        position: new Vector3(0, 10, 20),
+        rotation: new Vector3(60, 0, 0)
+    };
 
-    const viewMatrix = createViewMatrix(
-        new Vector3(30, 0, 0),
-        new Vector3(15, 10, 35));
-
+    const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -5, 0));
     const projectionViewMatrix = mat4.create();
-    mat4.multiply(projectionViewMatrix, projection, viewMatrix);
+    const lightPosition = new Vector3(0, 10, 0);
+
+
 
     const projViewLocation = gl.getUniformLocation(shader, 'projViewMatrix');
     const modelMatrixLocation = gl.getUniformLocation(shader, 'modelMatrix');
+    const lightPositionLocation = gl.getUniformLocation(shader, "lightPosition");
 
-    gl.uniformMatrix4fv(projViewLocation, false, projectionViewMatrix);
-    const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -5, 0));
-    gl.uniformMatrix4fv(
-        modelMatrixLocation, false, modelMatrix
-    );
+
+    gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
+    gl.uniform3fv(lightPositionLocation, lightPosition.toFloat32Array());
 
     const objects = await createMapMesh(gl);
-
-
+    const modelRotation = new Vector3(0, 0, 0);
     window.requestAnimationFrame(mainloop);
 
-
     function mainloop() {
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        const viewMatrix = createViewMatrix(camera.rotation, camera.position);
+        mat4.multiply(projectionViewMatrix, projection, viewMatrix);
+        gl.uniformMatrix4fv(projViewLocation, false, projectionViewMatrix);
+
+        const modelMatrix = createModelMatrix(modelRotation, new Vector3(0, -5, 0));
+        modelRotation.y += 0.05;
+        gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
 
         for (const o of objects) {
             gl.bindVertexArray(o);
-            gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, QUAD_COUNT * 6, gl.UNSIGNED_SHORT, 0);
         }
 
         window.requestAnimationFrame(mainloop);
@@ -68,35 +76,36 @@ function handleMessage(event) {
 
     }
 }
-
+const og = {};
+const QUAD_COUNT = 5;
 async function createMapMesh(gl) {
     const geometry = getMallLayout();
     const response = await fetch("/api/map/sect-data");
     const roomsJson = await response.json();
 
+    console.log(geometry);
+
+
     const objects = [];
     const SCALE_FACTOR = 15;
-    const GAP_SIZE = 0.2;
-    const WALL_HEIGHT = 1.5;
-    const QUAD_COUNT = 2;
+    const GAP_SIZE = 0.5;
+
+    og.x = geometry.bounds.maxX / SCALE_FACTOR / 2;
+    og.y = geometry.bounds.maxX / SCALE_FACTOR / 2;
     for (const room of geometry.rooms) {
         const x = room.x / SCALE_FACTOR + GAP_SIZE;
         const z = room.y / SCALE_FACTOR + GAP_SIZE;
-        const w = room.width / SCALE_FACTOR - GAP_SIZE;
-        const d = room.height / SCALE_FACTOR - GAP_SIZE;
+        const roomWidth = room.width / SCALE_FACTOR - GAP_SIZE;
+        const roomDepth = room.height / SCALE_FACTOR - GAP_SIZE;
 
-        const positions = [
-            x, 0, z,
-            x + w, 0, z,
-            x + w, 0, z + d,
-            x, 0, z + d,
+        const positions = [];
+        positions.push(...createFloorQuadGeometry(x, 0, z, roomWidth, roomDepth));
 
-            x, 0, z,
-            x + w, 0, z,
-            x + w, WALL_HEIGHT, z,
-            x, WALL_HEIGHT, z
+        positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, roomWidth + GAP_SIZE, GAP_SIZE / 2));
+        positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z + roomDepth, roomWidth + GAP_SIZE, GAP_SIZE / 2));
+        positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
+        positions.push(...createFloorQuadGeometry(x + roomWidth, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
 
-        ];
         let colour;
         if (roomsJson[room.id]) {
             const response = await fetch("api/stores/store-info?id=" + roomsJson[room.id]);
@@ -110,9 +119,15 @@ async function createMapMesh(gl) {
 
         const colours = [];
         const indices = [];
+        const normals = [];
         for (let i = 0; i < QUAD_COUNT; i++) {
+
+            if (i != 0) {
+                colour = new Colour(0.9, 0.9, 0.9);
+            }
             for (let v = 0; v < 4; v++) {
                 colours.push(colour.r, colour.g, colour.b);
+                normals.push(0, 1, 0);
             }
             indices.push(
                 i * 4, i * 4 + 1, i * 4 + 2,
@@ -124,6 +139,7 @@ async function createMapMesh(gl) {
         gl.bindVertexArray(vao);
         const posBuffer = createBuffer(gl, positions, 0, 3);
         const colBuffer = createBuffer(gl, colours, 1, 3);
+        const norBuffer = createBuffer(gl, normals, 2, 3);
         const eleBuffer = createElementBuffer(gl, indices);
         objects.push(vao);
     }
@@ -165,6 +181,10 @@ class Vector3 {
      */
     toGLMatrixVec3() {
         return vec3.fromValues(this.x, this.y, this.z);
+    }
+
+    toFloat32Array() {
+        return new Float32Array([this.x, this.y, this.z]);
     }
 }
 
@@ -266,7 +286,7 @@ function createModelMatrix(rotation, translation) {
     mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
-
+    mat4.translate(matrix, matrix, vec3.fromValues(-og.x, 0, -og.y));
     return matrix;
 }
 
@@ -277,7 +297,6 @@ function createModelMatrix(rotation, translation) {
  */
 function createViewMatrix(rotation, translation) {
     const matrix = mat4.create();
-
     mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
@@ -289,6 +308,8 @@ function createViewMatrix(rotation, translation) {
 
 function createProjectionMatrix(fov, gl) {
     const projection = mat4.create();
+
+
     mat4.perspective(
         projection,
         toRadians(fov),
@@ -306,20 +327,44 @@ function toRadians(degrees) {
     return degrees * Math.PI / 180.0;
 }
 
+//GEOMETRY FUNCTIONS
+/**
+ * Creates vertex positions for a quad in the Y-plane
+ * @param {Number} x The x-coordinate to begin the floor
+ * @param {Number} y The y-coordinate of the floor
+ * @param {Number} z The z-coordinate to begin the floor
+ * @param {Number} width The width of the wall
+ * @param {Number} depth The height(depth) of the wall
+ */
+function createFloorQuadGeometry(x, y, z, width, depth) {
+    return [
+        x, y, z,
+        x + width, y, z,
+        x + width, y, z + depth,
+        x, y, z + depth,
+    ];
+}
+
 //Shader programs
 const vertexShaderSource =
     `#version 300 es
     in vec3 inVertexPosition;
     in vec3 inColour;
+    in vec3 inNormal;
     
     out vec3 passColour;
+    out vec3 passNormal;
+    out vec3 passFragmentPosition;
 
     uniform mat4 modelMatrix;
     uniform mat4 projViewMatrix;
 
     void main() {
         gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
+        
         passColour = inColour;
+        passNormal = inNormal;
+        passFragmentPosition = vec3(modelMatrix * vec4(inVertexPosition, 1.0));
     }
 `;
 
@@ -328,9 +373,17 @@ const fragmentShaderSource =
     precision highp float;
 
     in vec3 passColour;
+    in vec3 passNormal;
+    in vec3 passFragmentPosition;
+
     out vec4 colour;
 
+    uniform vec3 lightPosition;
+
     void main() {
-        colour = vec4(passColour.xyz, 1.0);
+        vec3 lightDirection = normalize(lightPosition - passFragmentPosition);
+        float diff = max(dot(passNormal, lightDirection), 0.1);
+        vec3  finalColour = passColour * diff;
+        colour = vec4(finalColour.xyz, 1.0);
     }
 `;
