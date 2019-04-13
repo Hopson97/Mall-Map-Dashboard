@@ -29,12 +29,17 @@ async function main(canvas) {
     initGl(gl);
 
     const camera = {
-        position: new Vector3(15, 10, 30),
+        position: new Vector3(15, 15, 35.5),
         rotation: new Vector3(60, 0, 0)
     };
 
+    //TEMP
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    //TEMP
+
     const matrix = {
-        model: createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -5, 0)),
+        model: createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0)),
         view: createViewMatrix(camera.rotation, camera.position),
         perspective: createProjectionMatrix(90, gl),
         projectionView: mat4.create()
@@ -53,7 +58,35 @@ async function main(canvas) {
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
+        //TEMP
+        const speed = 0.1;
+        if (keydown["s"]) {
+            camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
+            camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
+        }
+        else if (keydown["w"]){
+            camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
+            camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
+        }
+        if (keydown["a"]) {
+            camera.rotation.y -= 1;
+        }
+        else if (keydown["d"]) {
+            camera.rotation.y += 1;
+        }
+        if (keydown["p"]) {
+            console.log(camera);
+        }
+        //TEMP
+
+
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        //camera.rotation.y += 0.25;
+
+        matrix.view = createViewMatrix(camera.rotation, camera.position)
+        mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
+        shader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
 
         //Render rooms
         for (const room of objects.rooms) {
@@ -113,6 +146,29 @@ function createFloorQuadGeometry(x, y, z, width, depth) {
     ];
 }
 
+function createWallZPlane(x, y, z, width, height, zOffset) {
+    return [
+        x,          y,          z + zOffset,
+        x + width,  y,          z + zOffset,
+        x + width,  y + height, z + zOffset,
+        x,          y + height, z + zOffset
+    ];
+}
+
+function createWallXPlane(x, y, z, width, height, xOffset) {
+    return [
+        x + xOffset,    y,          z,
+        x + xOffset,    y,          z + width,
+        x + xOffset,    y + height, z + width,
+        x + xOffset,    y + height, z
+    ];
+}
+
+/**
+ * Fills the mesh data with the same basic data for every vertex based on the number of vertices already added
+ * @param {Mesh} mesh The mesh to add the data to
+ * @param {Colour} colour The colour set the colour data
+ */
 function createColourNormalIndicesData (mesh, colour) {
     for (let i = 0; i < mesh.positions.length / 12; i++) {
         for (let v = 0; v < 4; v++) {
@@ -126,13 +182,22 @@ function createColourNormalIndicesData (mesh, colour) {
     }
 }
 
+/**
+ * Creates WebGL geometric data (inc VAOs and VBOs) based on 2D layout of the map for the paths
+ * @param {WebGLRenderContext} gl The WebGL Context
+ * @param {Number} scaleFactor Scale factor for how much to make the geometry smaller down from the actual geometric data
+ * @param {Number} gapSize The "opengl units" between each room (gap)
+ * @param {Object} pathData Object containing 2D data about each of the paths
+ */
 function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
     const paths = [];
+    const halfGap = gapSize / 2;
     for (const path of  pathData) {
         const mesh = new Mesh();
 
-        const x = path.x / scaleFactor + gapSize / 2;;
-        const z = path.y / scaleFactor + gapSize / 2;
+        //Scale the data down
+        const x = path.x / scaleFactor + halfGap;;
+        const z = path.y / scaleFactor + halfGap;
         const width = path.width / scaleFactor;
         const height = path.height / scaleFactor;
 
@@ -150,11 +215,20 @@ function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
     return paths;
 }
 
-
+/**
+ * 
+ * @param {WebGLRenderContext} gl The WebGL Context
+ * @param {Number} scaleFactor Scale factor for how much to make the geometry smaller down from the actual geometric data
+ * @param {Number} gapSize The "opengl units" between each room (gap)
+ * @param {Object} roomGeometry Object containing 2D data about each of the rooms
+ * @param {Object} roomsData Object containing information about the room ID and their assosiated store IDs
+ */
 async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsData) {
     const rooms = [];
     const roomHeight = 2;
+    const halfGap = gapSize / 2;
     for (const room of roomGeometry) {
+        //Scale the data down
         const x = room.x / scaleFactor + gapSize;
         const z = room.y / scaleFactor + gapSize;
         const roomWidth = room.width / scaleFactor - gapSize;
@@ -163,14 +237,34 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
         const mesh = new Mesh();
         //Calculate positions of the vertricies to make the floor and the room's outline
         mesh.positions.push(...createFloorQuadGeometry(x, roomHeight, z, roomWidth, roomDepth));
-        mesh.positions.push(...createFloorQuadGeometry(x - gapSize / 2, roomHeight, z - gapSize / 2, roomWidth + gapSize, gapSize / 2));
-        mesh.positions.push(...createFloorQuadGeometry(x - gapSize / 2, roomHeight, z + roomDepth, roomWidth + gapSize, gapSize / 2));
-        mesh.positions.push(...createFloorQuadGeometry(x - gapSize / 2, roomHeight, z - gapSize / 2, gapSize / 2, roomDepth + gapSize));
-        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, roomHeight, z - gapSize / 2, gapSize / 2, roomDepth + gapSize));
+
+        //Walls
+        mesh.positions.push(...createWallZPlane(x, 0, z, roomWidth, roomHeight, -halfGap));
+        mesh.positions.push(...createWallZPlane(x, 0, z, roomWidth, roomHeight, roomDepth + halfGap));
+        mesh.positions.push(...createWallXPlane(x, 0, z, roomDepth, roomHeight, -halfGap));
+        mesh.positions.push(...createWallXPlane(x, 0, z, roomDepth, roomHeight, roomWidth + halfGap));
+
+
+       //Outline of all walls
+        mesh.positions.push(...createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, roomDepth + halfGap));
+        mesh.positions.push(...createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, roomDepth + halfGap));
+        mesh.positions.push(...createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, -halfGap));
+        mesh.positions.push(...createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap));
+        mesh.positions.push(...createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap));
+        mesh.positions.push(...createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, -halfGap));
+        mesh.positions.push(...createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, roomWidth + halfGap));
+        mesh.positions.push(...createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, roomWidth + halfGap));
+
+        //Outline of the ceiling of each room
+        mesh.positions.push(...createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, roomWidth + gapSize, halfGap));
+        mesh.positions.push(...createFloorQuadGeometry(x - halfGap, roomHeight, z + roomDepth, roomWidth + gapSize, halfGap));
+        mesh.positions.push(...createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
+        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
 
         let colour;
         let storeid = -1;
-        //Colour in the rooms if the room is occupied
+
+        //Colour in the room if the room is occupied by a store
         if (roomsData[room.id]) {
             storeid = roomsData[room.id];
             const response = await fetch("api/stores/store-info?id=" + storeid);
@@ -182,8 +276,8 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
 
         createColourNormalIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
 
-        //Change colour of the inner-quad to be the store colour
-        for (let i = 0; i < 4; i++) {
+        //Change colour of the inner-quad and walls to be the store colour
+        for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 3; j++) {
                 mesh.colours[i * 3 + j] = colour[j];
             }
@@ -247,3 +341,27 @@ const fragmentShaderSource =
         colour = vec4(finalColour.xyz, 1.0);
     }
 `;
+
+//temp
+const keydown = {
+    "w": false,
+    "a": false,
+    "s": false,
+    "d": false
+};
+
+/**
+ * Sets the key down event for the key pressed to true
+ * @param {Event} event The key down event
+ */
+function handleKeyDown(event) {
+    keydown[event.key] = true;
+}
+
+/**
+ * Sets the key down event for the key pressed to false
+ * @param {Event} event The key down event
+ */
+function handleKeyUp(event) {
+    keydown[event.key] = false;
+}
