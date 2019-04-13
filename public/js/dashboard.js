@@ -26,7 +26,7 @@ async function main(canvas) {
     const projection = createProjectionMatrix(90, gl);
 
     const camera = {
-        position: new Vector3(0, 10, 20),
+        position: new Vector3(15, 10, 30),
         rotation: new Vector3(60, 0, 0)
     };
 
@@ -56,14 +56,19 @@ async function main(canvas) {
         gl.uniformMatrix4fv(projViewLocation, false, projectionViewMatrix);
 
         const modelMatrix = createModelMatrix(modelRotation, new Vector3(0, -5, 0));
-        modelRotation.y += 0.05;
         gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
 
-        for (const o of objects) {
-            gl.bindVertexArray(o);
-            gl.drawElements(gl.TRIANGLES, QUAD_COUNT * 6, gl.UNSIGNED_SHORT, 0);
+        //Render rooms
+        for (const room of objects.rooms) {
+            gl.bindVertexArray(room.VAO);
+            gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
         }
 
+        //Render paths
+        for (const path of objects.paths) {
+            gl.bindVertexArray(path.VAO);
+            gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
+        }
         window.requestAnimationFrame(mainloop);
     }
 }
@@ -76,35 +81,57 @@ function handleMessage(event) {
 
     }
 }
-const og = {};
-const QUAD_COUNT = 5;
+
 async function createMapMesh(gl) {
     const geometry = getMallLayout();
     const response = await fetch("/api/map/sect-data");
     const roomsJson = await response.json();
 
-    console.log(geometry);
-
-
-    const objects = [];
+    const objects = {
+        rooms: [],
+        paths: []
+    };
     const SCALE_FACTOR = 15;
-    const GAP_SIZE = 0.5;
+    const GAP_SIZE = 0.1;
 
-    og.x = geometry.bounds.maxX / SCALE_FACTOR / 2;
-    og.y = geometry.bounds.maxX / SCALE_FACTOR / 2;
+    for (const path of geometry.paths) {
+        const mesh = new Mesh();
+        const x = path.x / SCALE_FACTOR + GAP_SIZE / 2;;
+        const z = path.y / SCALE_FACTOR + GAP_SIZE / 2;
+        const width = path.width / SCALE_FACTOR;
+        const height = path.height / SCALE_FACTOR;
+        mesh.positions.push(...createFloorQuadGeometry(x, 0, z, width, height));
+        for (let i = 0; i < mesh.positions.length / 12; i++) {
+            for (let v = 0; v < 4; v++) {
+                mesh.colours.push(1, 1, 1);
+                mesh.normals.push(0, 1, 0);
+            }
+            mesh.indices.push(
+                i * 4, i * 4 + 1, i * 4 + 2,
+                i * 4 + 2, i * 4 + 3, i * 4
+            );
+
+            const buffers = mesh.createBuffers(gl);
+            objects.paths.push({
+                VAO: buffers.vao,
+                buffers: buffers.buffers,
+                indices: mesh.indices.length,
+            });
+        }
+    }
+
     for (const room of geometry.rooms) {
         const x = room.x / SCALE_FACTOR + GAP_SIZE;
         const z = room.y / SCALE_FACTOR + GAP_SIZE;
         const roomWidth = room.width / SCALE_FACTOR - GAP_SIZE;
         const roomDepth = room.height / SCALE_FACTOR - GAP_SIZE;
 
-        const positions = [];
-        positions.push(...createFloorQuadGeometry(x, 0, z, roomWidth, roomDepth));
-
-        positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, roomWidth + GAP_SIZE, GAP_SIZE / 2));
-        positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z + roomDepth, roomWidth + GAP_SIZE, GAP_SIZE / 2));
-        positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
-        positions.push(...createFloorQuadGeometry(x + roomWidth, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
+        const mesh = new Mesh();
+        mesh.positions.push(...createFloorQuadGeometry(x, 0, z, roomWidth, roomDepth));
+        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, roomWidth + GAP_SIZE, GAP_SIZE / 2));
+        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z + roomDepth, roomWidth + GAP_SIZE, GAP_SIZE / 2));
+        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
+        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
 
         let colour;
         if (roomsJson[room.id]) {
@@ -117,42 +144,71 @@ async function createMapMesh(gl) {
                 .asNormalised();
         }
 
-        const colours = [];
-        const indices = [];
-        const normals = [];
-        for (let i = 0; i < QUAD_COUNT; i++) {
-
+        for (let i = 0; i < mesh.positions.length / 12; i++) {
             if (i != 0) {
-                colour = new Colour(0.9, 0.9, 0.9);
+                colour = new Colour(0.1, 0.1, 0.1);
             }
             for (let v = 0; v < 4; v++) {
-                colours.push(colour.r, colour.g, colour.b);
-                normals.push(0, 1, 0);
+                mesh.colours.push(colour.r, colour.g, colour.b);
+                mesh.normals.push(0, 1, 0);
             }
-            indices.push(
+            mesh.indices.push(
                 i * 4, i * 4 + 1, i * 4 + 2,
                 i * 4 + 2, i * 4 + 3, i * 4
             );
         }
 
-        const vao = gl.createVertexArray();
-        gl.bindVertexArray(vao);
-        const posBuffer = createBuffer(gl, positions, 0, 3);
-        const colBuffer = createBuffer(gl, colours, 1, 3);
-        const norBuffer = createBuffer(gl, normals, 2, 3);
-        const eleBuffer = createElementBuffer(gl, indices);
-        objects.push(vao);
+        const buffers = mesh.createBuffers(gl);
+        objects.rooms.push({
+            VAO: buffers.vao,
+            buffers: buffers.buffers,
+            indices: mesh.indices.length,
+            center: {
+                x: x + roomWidth / 2,
+                z: z + roomDepth / 2
+            }
+        });
     }
     return objects;
 }
 
-/*
- * =========================================
- *
- *      WebGL Helper functions and classes
 
+
+/*
+ * ==========================================
+ * ==========================================
+ * 
+ *      WebGL Helper functions and classes
+ * 
+ * ==========================================
  * ==========================================
  */
+/**
+ * Class to just hold mesh information
+ */
+class Mesh {
+    constructor() {
+        this.positions = [];
+        this.colours = [];
+        this.indices = [];
+        this.normals = [];
+    }
+
+    createBuffers(gl) {
+        const buffers = [];
+        const vao = gl.createVertexArray();
+        gl.bindVertexArray(vao);
+        
+        buffers.push(
+            createBuffer(gl, this.positions, 0, 3), 
+            createBuffer(gl, this.colours, 1, 3),
+            createBuffer(gl, this.normals, 2, 3),
+            createElementBuffer(gl, this.indices),
+        );
+        return { vao, buffers }
+    }
+}
+
 /**
  * Class to represent a 3d position
  */
@@ -264,7 +320,7 @@ function createBuffer(gl, data, attribLocation, dataPerVertex) {
 /**
  * 
  * @param {WebGLContext} gl The OpenGL/WebGL2 rendering context
- * @param {*} data 
+ * @param {*} data The indices which make up this index buffer
  */
 function createElementBuffer(gl, data) {
     const buffer = gl.createBuffer();
@@ -286,7 +342,7 @@ function createModelMatrix(rotation, translation) {
     mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
-    mat4.translate(matrix, matrix, vec3.fromValues(-og.x, 0, -og.y));
+
     return matrix;
 }
 
