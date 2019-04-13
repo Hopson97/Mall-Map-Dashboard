@@ -81,6 +81,68 @@ class Vector3 {
  * ==========================================
  */
 /**
+ * Class to hold a WebGL shder program and
+ */
+class Shader {
+    /**
+     * Compiles a shader to construct this object
+     * @param {WebGLRenderContext} gl The WebGL context
+     * @param {String} vertexSource The source code of the vertex shader
+     * @param {String} fragmentSource The source code of the fragment shder
+     */
+    constructor(gl, vertexSource, fragmentSource) {
+        const vertexShader = createShader(gl, vertexSource, gl.VERTEX_SHADER);
+        const fragmentShader = createShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+
+        this.shaderId = createShaderProgram(gl, vertexShader, fragmentShader);
+        this.uniformLocations = {}; //Maps uniform names to uniform locations
+    }
+
+    /**
+     * Sets the WebGL state to use this shader program  
+     * @param {WebGLRenderContext} gl The WebGL context
+     */
+    use(gl) {
+        gl.useProgram(this.shaderId)
+    }
+
+    /**
+     * Gets the location of the uniform variable inside of a shader, and caches the result
+     * @param {WebGLRenderContext} gl The WebGL Context
+     * @param {String} name The name of the uniform variable in the shader source
+     */
+    getUniformLocation(gl, name) {
+        if (!this.uniformLocations[name]) {
+            this.uniformLocations[name] =
+                gl.getUniformLocation(this.shaderId, name); 
+        }
+        return this.uniformLocations[name];
+    }
+
+    /**
+     * Loads a matrix4 to a webgl uniform location of this shader
+     * @param {WebGLRenderContext} gl The WebGL Context
+     * @param {String} name The name of the uniform variable in the shader source
+     * @param {mat4} matrix The matrix to load to the webgl shader
+     */
+    loadUniformMatrix4(gl, name, matrix) {
+        const location = this.getUniformLocation(gl, name);
+        gl.uniformMatrix4fv(location, false, matrix);
+    }
+
+    /**
+     * Loads a vectpr3 to a webgl uniform location of this shader
+     * @param {WebGLRenderContext} gl The WebGL Context
+     * @param {String} name The name of the uniform variable in the shader source
+     * @param {mat4} matrix The matrix to load to the webgl shader
+     */
+    loadUniformVector3(gl, name, vector3) {
+        const location = this.getUniformLocation(gl, name);
+        gl.uniform3fv(location, vector3.toFloat32Array());
+    }
+}
+
+/**
  * Compiles and creates a shader
  * @param {WebGLRenderingContext} gl The openl/webgl rendering context
  * @param {String} source The source code of the shader

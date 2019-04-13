@@ -1,63 +1,59 @@
 "use strict";
 
+/**
+ * Dashboard.js
+ * JS file for the display board
+ */
+
 window.addEventListener("load", async e => {
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
 
     const canvas = document.getElementById("map-canvas");
-    canvas.width = window.innerWidth * 0.9;
-    canvas.height = window.innerHeight * 0.9;
+    canvas.width = window.innerWidth * 0.8;
+    canvas.height = window.innerHeight * 0.8;
 
     await main(canvas);
 });
 
-async function main(canvas) {
-    const gl = canvas.getContext("webgl2");
+function initGl(gl) {
     gl.clearColor(0.0, 0.0, 1.0, 1.0);
-    gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
     gl.depthMask(true);
+}  
 
-    //TEMP
-    const shader = createShaderFromSource(gl, vertexShaderSource, fragmentShaderSource);
-    gl.useProgram(shader);
-
-    const projection = createProjectionMatrix(90, gl);
+async function main(canvas) {
+    const gl = canvas.getContext("webgl2");
+    initGl(gl);
 
     const camera = {
         position: new Vector3(15, 10, 30),
         rotation: new Vector3(60, 0, 0)
     };
 
-    const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -5, 0));
-    const projectionViewMatrix = mat4.create();
+    const matrix = {
+        model: createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -5, 0)),
+        view: createViewMatrix(camera.rotation, camera.position),
+        perspective: createProjectionMatrix(90, gl),
+        projectionView: mat4.create()
+    };
+    mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
+
     const lightPosition = new Vector3(0, 10, 0);
+    const shader = new Shader(gl, vertexShaderSource, fragmentShaderSource);
+    shader.use(gl);
 
-    const projViewLocation = gl.getUniformLocation(shader, 'projViewMatrix');
-    const modelMatrixLocation = gl.getUniformLocation(shader, 'modelMatrix');
-    const lightPositionLocation = gl.getUniformLocation(shader, "lightPosition");
-
-
-    gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
-    gl.uniform3fv(lightPositionLocation, lightPosition.toFloat32Array());
+    shader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
+    shader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
+    shader.loadUniformVector3(gl, "lightPosition", lightPosition);
 
     const objects = await createMapMesh(gl);
-    const modelRotation = new Vector3(0, 0, 0);
-
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        const viewMatrix = createViewMatrix(camera.rotation, camera.position);
-        mat4.multiply(projectionViewMatrix, projection, viewMatrix);
-        gl.uniformMatrix4fv(projViewLocation, false, projectionViewMatrix);
-
-        const modelMatrix = createModelMatrix(modelRotation, new Vector3(0, -5, 0));
-        gl.uniformMatrix4fv(modelMatrixLocation, false, modelMatrix);
-
-        //modelRotation.y += 0.05;// 0.9;
 
         //Render rooms
         for (const room of objects.rooms) {
@@ -136,8 +132,6 @@ async function createMapMesh(gl) {
         const roomWidth = room.width / SCALE_FACTOR - GAP_SIZE;
         const roomDepth = room.height / SCALE_FACTOR - GAP_SIZE;
 
-        console.log(room);
-
         const mesh = new Mesh();
         //Calculate positions of the vertricies to make the floor and the room's outline
         mesh.positions.push(...createFloorQuadGeometry(x, HEIGHT, z, roomWidth, roomDepth));
@@ -181,11 +175,6 @@ async function createMapMesh(gl) {
     }
     return objects;
 }
-
-/**
- * Class to just hold mesh information
- */
-
 
 //GEOMETRY FUNCTIONS
 /**
