@@ -129,8 +129,6 @@ async function initMapData() {
             room.type = json[room.id].type;
         }
     }
-
-    console.log(json);
 }
 
 /**
@@ -155,8 +153,7 @@ function loop(canvas, context) {
             if (selectedStore.id == room.id) {
                 context.fillStyle = "lime";
             } else {
-                const colour = typeToColour(room.type);
-                context.fillStyle = `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`;
+                context.fillStyle = typeToColour(room.type).asCSSString();
             }
             renderer.renderRect(room.x, room.y, room.width, room.height);
         }

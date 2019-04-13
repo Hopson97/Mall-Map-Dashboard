@@ -11,15 +11,18 @@ function makeRoom(id, x, y, width, height) {
     }
 }
 
+/**
+ * Converts the room's type into a colour
+ * @param {String} type The type that the room is
+ */
 function typeToColour(type) {
-    const l = type.toLowerCase();
-    switch (l) {
+    const typeLowerCase = type.toLowerCase();
+    switch (typeLowerCase) {
         case "entertainment":
-            return [128, 0, 128];
-            
-        case "none":
+            return new Colour(128, 0, 128)
+
         default:
-            return [50, 50, 50];
+            return new Colour(50, 50, 50);
     }
 }
 

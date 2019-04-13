@@ -72,7 +72,6 @@ async function createMapMesh(gl) {
     const geometry = getMallLayout();
     const response = await fetch("/api/map/sect-data");
     const roomsJson = await response.json();
-    console.log(roomsJson);
 
     const objects = [];
     const scaleFactor = 15;
@@ -90,20 +89,14 @@ async function createMapMesh(gl) {
         ];
         let colour;
         if (roomsJson[room.id]) {
-            const rgb = typeToColour(roomsJson[room.id].type);
-            const r = rgb[0] / 100;
-            const g = rgb[1] / 100;
-            const b = rgb[2] / 100;
-            colour = {r, g, b};
+            colour = typeToColour(roomsJson[room.id].type)
+                .asNormalised();
         }
         else {
-            const rgb = typeToColour("none");
-            const r = rgb[0] / 100;
-            const g = rgb[1] / 100;
-            const b = rgb[2] / 100;
-            colour = {r, g, b};
+            colour = typeToColour("none")
+                .asNormalised();
         }
-        console.log(colour);
+
         const colours = [
             colour.r, colour.g, colour.b,
             colour.r, colour.g, colour.b,

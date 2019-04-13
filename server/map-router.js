@@ -20,7 +20,6 @@ router.post("/sect-data", (request, response) => {
         name, type
     };
 
-    console.log(rooms);
     response.send(true);
 });
 
