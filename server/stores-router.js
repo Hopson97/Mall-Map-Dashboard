@@ -47,8 +47,12 @@ function getStoreList(request, response) {
  */
 function getStoreInformation(request, response) {
     const id = request.query.id;
-    ///@TODO Handle invalid request
-    response.json(stores[id]);
+    if(!stores[id]) {
+        response.sendStatus(404);
+    }
+    else {
+        response.json(stores[id]);
+    }
 }
 
 

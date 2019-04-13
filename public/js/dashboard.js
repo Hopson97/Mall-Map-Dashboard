@@ -130,7 +130,7 @@ async function createMapMesh(gl) {
 
 //GEOMETRY FUNCTIONS
 /**
- * Creates vertex positions for a quad in the Y-plane
+ * Creates vertex positions and vertex normals for a quad in the Y-plane
  * @param {Number} x The x-coordinate to begin the floor
  * @param {Number} y The y-coordinate of the floor
  * @param {Number} z The z-coordinate to begin the floor
@@ -138,30 +138,54 @@ async function createMapMesh(gl) {
  * @param {Number} depth The height(depth) of the wall
  */
 function createFloorQuadGeometry(x, y, z, width, depth) {
-    return [
-        x, y, z,
-        x + width, y, z,
-        x + width, y, z + depth,
-        x, y, z + depth,
-    ];
+    return {
+        positions:[
+            x, y, z,
+            x + width, y, z,
+            x + width, y, z + depth,
+            x, y, z + depth
+        ],
+        normals: [
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0
+        ]
+    }
 }
 
-function createWallZPlane(x, y, z, width, height, zOffset) {
-    return [
-        x,          y,          z + zOffset,
-        x + width,  y,          z + zOffset,
-        x + width,  y + height, z + zOffset,
-        x,          y + height, z + zOffset
-    ];
+function createWallZPlane(x, y, z, width, height, zOffset, normalDirection) {
+    return {
+        positions:[
+            x,          y,          z + zOffset,
+            x + width,  y,          z + zOffset,
+            x + width,  y + height, z + zOffset,
+            x,          y + height, z + zOffset
+        ],
+        normals: [
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0
+        ]
+    };
 }
 
-function createWallXPlane(x, y, z, width, height, xOffset) {
-    return [
-        x + xOffset,    y,          z,
-        x + xOffset,    y,          z + width,
-        x + xOffset,    y + height, z + width,
-        x + xOffset,    y + height, z
-    ];
+function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
+    return {
+        positions:[
+            x + xOffset,    y,          z,
+            x + xOffset,    y,          z + width,
+            x + xOffset,    y + height, z + width,
+            x + xOffset,    y + height, z
+        ],
+        normals: [
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0,
+            0, 1, 0
+        ]
+    };
 }
 
 /**
@@ -173,7 +197,6 @@ function createColourNormalIndicesData (mesh, colour) {
     for (let i = 0; i < mesh.positions.length / 12; i++) {
         for (let v = 0; v < 4; v++) {
             mesh.colours.push(colour.r, colour.g, colour.b);
-            mesh.normals.push(0, 1, 0);
         }
         mesh.indices.push(
             i * 4, i * 4 + 1, i * 4 + 2,
@@ -201,7 +224,9 @@ function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
         const width = path.width / scaleFactor;
         const height = path.height / scaleFactor;
 
-        mesh.positions.push(...createFloorQuadGeometry(x, 0, z, width, height));
+        const geometry = createFloorQuadGeometry(x, 0, z, width, height);
+        mesh.positions.push(...geometry.positions);
+        mesh.normals.push(...geometry.normals);
         
         createColourNormalIndicesData(mesh, new Colour(1, 1, 1));
         const buffers = mesh.createBuffers(gl);
@@ -235,31 +260,37 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
         const roomDepth = room.height / scaleFactor - gapSize;
 
         const mesh = new Mesh();
+        function addMeshData(geometry) {
+            mesh.positions.push(...geometry.positions);
+            mesh.normals.push(...geometry.normals);
+        }
+
         //Calculate positions of the vertricies to make the floor and the room's outline
-        mesh.positions.push(...createFloorQuadGeometry(x, roomHeight, z, roomWidth, roomDepth));
 
-        //Walls
-        mesh.positions.push(...createWallZPlane(x, 0, z, roomWidth, roomHeight, -halfGap));
-        mesh.positions.push(...createWallZPlane(x, 0, z, roomWidth, roomHeight, roomDepth + halfGap));
-        mesh.positions.push(...createWallXPlane(x, 0, z, roomDepth, roomHeight, -halfGap));
-        mesh.positions.push(...createWallXPlane(x, 0, z, roomDepth, roomHeight, roomWidth + halfGap));
+        //Create ceiling geometry
+        addMeshData(createFloorQuadGeometry(x, roomHeight, z, roomWidth, roomDepth));
 
+        //Create inner-wall geometry
+        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, -halfGap));
+        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, roomDepth + halfGap));
+        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, -halfGap));
+        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, roomWidth + halfGap));
 
-       //Outline of all walls
-        mesh.positions.push(...createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, roomDepth + halfGap));
-        mesh.positions.push(...createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, roomDepth + halfGap));
-        mesh.positions.push(...createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, -halfGap));
-        mesh.positions.push(...createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap));
-        mesh.positions.push(...createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap));
-        mesh.positions.push(...createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, -halfGap));
-        mesh.positions.push(...createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, roomWidth + halfGap));
-        mesh.positions.push(...createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, roomWidth + halfGap));
+        //Calculate the outline wall geometry
+        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, roomDepth + halfGap));
+        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, roomDepth + halfGap));
+        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, -halfGap));
+        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap));
+        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap));
+        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, -halfGap));
+        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, roomWidth + halfGap));
+        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, roomWidth + halfGap));
 
-        //Outline of the ceiling of each room
-        mesh.positions.push(...createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, roomWidth + gapSize, halfGap));
-        mesh.positions.push(...createFloorQuadGeometry(x - halfGap, roomHeight, z + roomDepth, roomWidth + gapSize, halfGap));
-        mesh.positions.push(...createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
-        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
+        //Calculate outline of ceiling geometry
+        addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, roomWidth + gapSize, halfGap));
+        addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z + roomDepth, roomWidth + gapSize, halfGap));
+        addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
+        addMeshData(createFloorQuadGeometry(x + roomWidth, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
 
         let colour;
         let storeid = -1;
