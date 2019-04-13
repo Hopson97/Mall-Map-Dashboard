@@ -82,97 +82,16 @@ function handleMessage(event) {
 async function createMapMesh(gl) {
     const geometry = getMallLayout();
     const response = await fetch("/api/map/sect-data");
-    const roomsJson = await response.json();
+    const roomsData = await response.json();
 
-
-    const SCALE_FACTOR = 15;
-    const GAP_SIZE = 0.1;
-    const HEIGHT = 2;
-
+    const scaleFactor = 15;
+    const gapSize = 0.1;
     const objects = {
-        rooms: [],
-        paths: []
+        rooms: await buildRoomsGeometry(gl, scaleFactor, gapSize, geometry.rooms, roomsData),
+        paths: buildPathGeometry(gl, scaleFactor, gapSize, geometry.paths),
     };
 
-    const createColourNormalIndicesData = (mesh, colour) => {
-        for (let i = 0; i < mesh.positions.length / 12; i++) {
-            for (let v = 0; v < 4; v++) {
-                mesh.colours.push(colour.r, colour.g, colour.b);
-                mesh.normals.push(0, 1, 0);
-            }
-            mesh.indices.push(
-                i * 4, i * 4 + 1, i * 4 + 2,
-                i * 4 + 2, i * 4 + 3, i * 4
-            );
-        }
-    }
 
-    //Create geometry for the pathways
-    for (const path of geometry.paths) {
-        const mesh = new Mesh();
-        const x = path.x / SCALE_FACTOR + GAP_SIZE / 2;;
-        const z = path.y / SCALE_FACTOR + GAP_SIZE / 2;
-        const width = path.width / SCALE_FACTOR;
-        const height = path.height / SCALE_FACTOR;
-        mesh.positions.push(...createFloorQuadGeometry(x, 0, z, width, height));
-        
-        createColourNormalIndicesData(mesh, new Colour(1, 1, 1));
-        const buffers = mesh.createBuffers(gl);
-        objects.paths.push({
-            VAO: buffers.vao,
-            buffers: buffers.buffers,
-            indices: mesh.indices.length,
-        });
-    }
-
-    //Create geometry for the room's
-    for (const room of geometry.rooms) {
-        const x = room.x / SCALE_FACTOR + GAP_SIZE;
-        const z = room.y / SCALE_FACTOR + GAP_SIZE;
-        const roomWidth = room.width / SCALE_FACTOR - GAP_SIZE;
-        const roomDepth = room.height / SCALE_FACTOR - GAP_SIZE;
-
-        const mesh = new Mesh();
-        //Calculate positions of the vertricies to make the floor and the room's outline
-        mesh.positions.push(...createFloorQuadGeometry(x, HEIGHT, z, roomWidth, roomDepth));
-        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, HEIGHT, z - GAP_SIZE / 2, roomWidth + GAP_SIZE, GAP_SIZE / 2));
-        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, HEIGHT, z + roomDepth, roomWidth + GAP_SIZE, GAP_SIZE / 2));
-        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, HEIGHT, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
-        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, HEIGHT, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
-
-        let colour;
-        let storeid = -1;
-        //Colour in the rooms if the room is occupied
-        if (roomsJson[room.id]) {
-            storeid = roomsJson[room.id];
-            const response = await fetch("api/stores/store-info?id=" + storeid);
-            const info = await response.json();
-            colour = typeToColour(info.type).asNormalised().asArray();
-        } else {
-            colour = typeToColour("none").asNormalised().asArray();
-        }
-
-        createColourNormalIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
-
-        //Change colour of the inner-quad to be the store colour
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 3; j++) {
-                mesh.colours[i * 3 + j] = colour[j];
-            }
-        }
-        const buffers = mesh.createBuffers(gl);
-        objects.rooms.push({
-            VAO: buffers.vao,
-            buffers: buffers.buffers,
-            indices: mesh.indices.length,
-            roomid: room.id,
-            storeid: storeid,
-            center: {
-                x: x + roomWidth / 2,
-                z: z + roomDepth / 2
-            }
-        });
-    }
     return objects;
 }
 
@@ -193,6 +112,98 @@ function createFloorQuadGeometry(x, y, z, width, depth) {
         x, y, z + depth,
     ];
 }
+
+function createColourNormalIndicesData (mesh, colour) {
+    for (let i = 0; i < mesh.positions.length / 12; i++) {
+        for (let v = 0; v < 4; v++) {
+            mesh.colours.push(colour.r, colour.g, colour.b);
+            mesh.normals.push(0, 1, 0);
+        }
+        mesh.indices.push(
+            i * 4, i * 4 + 1, i * 4 + 2,
+            i * 4 + 2, i * 4 + 3, i * 4
+        );
+    }
+}
+
+function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
+    const paths = [];
+    for (const path of  pathData) {
+        const mesh = new Mesh();
+
+        const x = path.x / scaleFactor + gapSize / 2;;
+        const z = path.y / scaleFactor + gapSize / 2;
+        const width = path.width / scaleFactor;
+        const height = path.height / scaleFactor;
+
+        mesh.positions.push(...createFloorQuadGeometry(x, 0, z, width, height));
+        
+        createColourNormalIndicesData(mesh, new Colour(1, 1, 1));
+        const buffers = mesh.createBuffers(gl);
+
+        paths.push({
+            VAO: buffers.vao,
+            buffers: buffers.buffers,
+            indices: mesh.indices.length,
+        });
+    }
+    return paths;
+}
+
+
+async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsData) {
+    const rooms = [];
+    const roomHeight = 2;
+    for (const room of roomGeometry) {
+        const x = room.x / scaleFactor + gapSize;
+        const z = room.y / scaleFactor + gapSize;
+        const roomWidth = room.width / scaleFactor - gapSize;
+        const roomDepth = room.height / scaleFactor - gapSize;
+
+        const mesh = new Mesh();
+        //Calculate positions of the vertricies to make the floor and the room's outline
+        mesh.positions.push(...createFloorQuadGeometry(x, roomHeight, z, roomWidth, roomDepth));
+        mesh.positions.push(...createFloorQuadGeometry(x - gapSize / 2, roomHeight, z - gapSize / 2, roomWidth + gapSize, gapSize / 2));
+        mesh.positions.push(...createFloorQuadGeometry(x - gapSize / 2, roomHeight, z + roomDepth, roomWidth + gapSize, gapSize / 2));
+        mesh.positions.push(...createFloorQuadGeometry(x - gapSize / 2, roomHeight, z - gapSize / 2, gapSize / 2, roomDepth + gapSize));
+        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, roomHeight, z - gapSize / 2, gapSize / 2, roomDepth + gapSize));
+
+        let colour;
+        let storeid = -1;
+        //Colour in the rooms if the room is occupied
+        if (roomsData[room.id]) {
+            storeid = roomsData[room.id];
+            const response = await fetch("api/stores/store-info?id=" + storeid);
+            const info = await response.json();
+            colour = typeToColour(info.type).asNormalised().asArray();
+        } else {
+            colour = typeToColour("none").asNormalised().asArray();
+        }
+
+        createColourNormalIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
+
+        //Change colour of the inner-quad to be the store colour
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 3; j++) {
+                mesh.colours[i * 3 + j] = colour[j];
+            }
+        }
+        const buffers = mesh.createBuffers(gl);
+        rooms.push({
+            VAO: buffers.vao,
+            buffers: buffers.buffers,
+            indices: mesh.indices.length,
+            roomid: room.id,
+            storeid: storeid,
+            center: {
+                x: x + roomWidth / 2,
+                z: z + roomDepth / 2
+            }
+        });
+    }
+    return rooms;
+}
+
 
 //Shader programs
 const vertexShaderSource =
