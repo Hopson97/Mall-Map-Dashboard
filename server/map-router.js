@@ -37,7 +37,6 @@ function postSectionData(request, response) {
     response.send(true);
 }
 
-
 //========================
 //
 //   HTTP Get Requests
