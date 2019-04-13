@@ -9,13 +9,28 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 
-const stores = [
-    {name: "Game", type: "Entertainment"}
-];
+const stores = {
+    0: {
+        name: "Game",
+        type: "Entertainment"
+    }
+};
 
 router.get("/list", (req, res) => {
     res.json(stores);
 });
+
+router.get("/store-info", getStoreInformation);
+
+function getStoreInformation(request, response) {
+    const id = request.query.id;
+    console.log("Getting store information...");
+    console.log(id);
+    console.log(stores);
+    console.log(stores[id]);
+
+    response.json(stores[id]);
+}
 
 module.exports = {
     router: router,

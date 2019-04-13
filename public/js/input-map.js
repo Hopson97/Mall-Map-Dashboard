@@ -125,8 +125,10 @@ async function initMapData() {
 
     for (const room of mapData.rooms) {
         if (json[room.id]) {
-            room.name = json[room.id].name;
-            room.type = json[room.id].type;
+            const response = await fetch("api/stores/store-info?id="+json[room.id]);
+            const info = await response.json();
+            room.name = info.name;
+            room.type = info.type;
         }
     }
 }
@@ -226,24 +228,30 @@ function handleKeyUp(event) {
     keydown[event.key] = false;
 }
 
+///@TODO EWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+/**
+ * Builds DOM for the store selection popup
+ */
 async function buildStoreDOM() {
     const storeList = document.getElementById("store-list");
     const storeListSect = document.getElementById("store-list-section");
     const response = await fetch("/api/stores/list");
     const json = await response.json();
-    for (const store of json) {
+    for (const storeid in json) {
+        const name = json[storeid].name;
+        const type = json[storeid].type;
         const clone = document.importNode(storeListSect.content, true);
         const container = clone.querySelector("div");
         const contentElements = clone.querySelectorAll('p');
-        contentElements[0].textContent = store.name;
-        contentElements[2].textContent = store.type;
+        contentElements[0].textContent = name;
+        contentElements[2].textContent = type;
 
         //Listens for the click event on the buttons
         container.addEventListener("click", async () => {
+            console.log(selectedStore.id);
             const data = {
-                name: store.name,
-                type: store.type,
-                id: selectedStore.id
+                roomid: selectedStore.id,
+                storeid: storeid
             };
             const response = await fetch("api/map/sect-data", {
                 method: "POST",
@@ -254,7 +262,7 @@ async function buildStoreDOM() {
             });
             const success = await response.text();
             if (success) {
-                selectedStore.type = data.type;
+                selectedStore.type = type;
                 selectedStore = -1;
                 const popup = document.getElementById("popup");
                 popup.classList.add("hidden");

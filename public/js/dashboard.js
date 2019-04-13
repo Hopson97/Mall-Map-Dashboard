@@ -89,7 +89,9 @@ async function createMapMesh(gl) {
         ];
         let colour;
         if (roomsJson[room.id]) {
-            colour = typeToColour(roomsJson[room.id].type)
+            const response = await fetch("api/stores/store-info?id="+roomsJson[room.id]);
+            const info = await response.json();
+            colour = typeToColour(info.type)
                 .asNormalised();
         }
         else {
