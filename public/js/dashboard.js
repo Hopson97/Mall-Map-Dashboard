@@ -22,7 +22,7 @@ function initGl(gl) {
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
     gl.depthMask(true);
-}  
+}
 
 async function main(canvas) {
     const gl = canvas.getContext("webgl2");
@@ -30,7 +30,7 @@ async function main(canvas) {
 
     const camera = {
         position: new Vector3(15, 15, 35.5),
-        rotation: new Vector3(60, 0, 0)
+        rotation: new Vector3(45, 0, 0)
     };
 
     //TEMP
@@ -46,7 +46,7 @@ async function main(canvas) {
     };
     mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
 
-    const lightPosition = new Vector3(0, 10, 0);
+    const lightPosition = new Vector3(0, 2, 0);
     const shader = new Shader(gl, vertexShaderSource, fragmentShaderSource);
     shader.use(gl);
 
@@ -63,21 +63,21 @@ async function main(canvas) {
         if (keydown["s"]) {
             camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
             camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-        }
-        else if (keydown["w"]){
+        } else if (keydown["w"]) {
             camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
             camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
         }
         if (keydown["a"]) {
             camera.rotation.y -= 1;
-        }
-        else if (keydown["d"]) {
+        } else if (keydown["d"]) {
             camera.rotation.y += 1;
         }
         if (keydown["p"]) {
             console.log(camera);
         }
         //TEMP
+
+        shader.loadUniformVector3(gl, "lightPosition", camera.position);
 
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -139,7 +139,7 @@ async function createMapMesh(gl) {
  */
 function createFloorQuadGeometry(x, y, z, width, depth) {
     return {
-        positions:[
+        positions: [
             x, y, z,
             x + width, y, z,
             x + width, y, z + depth,
@@ -156,34 +156,34 @@ function createFloorQuadGeometry(x, y, z, width, depth) {
 
 function createWallZPlane(x, y, z, width, height, zOffset, normalDirection) {
     return {
-        positions:[
-            x,          y,          z + zOffset,
-            x + width,  y,          z + zOffset,
-            x + width,  y + height, z + zOffset,
-            x,          y + height, z + zOffset
+        positions: [
+            x, y, z + zOffset,
+            x + width, y, z + zOffset,
+            x + width, y + height, z + zOffset,
+            x, y + height, z + zOffset
         ],
         normals: [
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0
+            0, 0, normalDirection,
+            0, 0, normalDirection,
+            0, 0, normalDirection,
+            0, 0, normalDirection
         ]
     };
 }
 
 function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
     return {
-        positions:[
-            x + xOffset,    y,          z,
-            x + xOffset,    y,          z + width,
-            x + xOffset,    y + height, z + width,
-            x + xOffset,    y + height, z
+        positions: [
+            x + xOffset, y, z,
+            x + xOffset, y, z + width,
+            x + xOffset, y + height, z + width,
+            x + xOffset, y + height, z
         ],
         normals: [
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0,
-            0, 1, 0
+            normalDirection, 0, 0,
+            normalDirection, 0, 0,
+            normalDirection, 0, 0,
+            normalDirection, 0, 0
         ]
     };
 }
@@ -193,7 +193,7 @@ function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
  * @param {Mesh} mesh The mesh to add the data to
  * @param {Colour} colour The colour set the colour data
  */
-function createColourNormalIndicesData (mesh, colour) {
+function createColourNormalIndicesData(mesh, colour) {
     for (let i = 0; i < mesh.positions.length / 12; i++) {
         for (let v = 0; v < 4; v++) {
             mesh.colours.push(colour.r, colour.g, colour.b);
@@ -215,7 +215,7 @@ function createColourNormalIndicesData (mesh, colour) {
 function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
     const paths = [];
     const halfGap = gapSize / 2;
-    for (const path of  pathData) {
+    for (const path of pathData) {
         const mesh = new Mesh();
 
         //Scale the data down
@@ -227,7 +227,7 @@ function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
         const geometry = createFloorQuadGeometry(x, 0, z, width, height);
         mesh.positions.push(...geometry.positions);
         mesh.normals.push(...geometry.normals);
-        
+
         createColourNormalIndicesData(mesh, new Colour(1, 1, 1));
         const buffers = mesh.createBuffers(gl);
 
@@ -260,6 +260,7 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
         const roomDepth = room.height / scaleFactor - gapSize;
 
         const mesh = new Mesh();
+
         function addMeshData(geometry) {
             mesh.positions.push(...geometry.positions);
             mesh.normals.push(...geometry.normals);
@@ -271,20 +272,20 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
         addMeshData(createFloorQuadGeometry(x, roomHeight, z, roomWidth, roomDepth));
 
         //Create inner-wall geometry
-        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, -halfGap));
-        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, roomDepth + halfGap));
-        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, -halfGap));
-        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, roomWidth + halfGap));
+        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, -halfGap, -1));
+        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, roomDepth + halfGap, 1));
+        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, -halfGap, -1));
+        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, roomWidth + halfGap, 1));
 
         //Calculate the outline wall geometry
-        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, roomDepth + halfGap));
-        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, roomDepth + halfGap));
-        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, -halfGap));
-        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap));
-        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap));
-        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, -halfGap));
-        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, roomWidth + halfGap));
-        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, roomWidth + halfGap));
+        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, roomDepth + halfGap, 1));
+        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, roomDepth + halfGap, 1));
+        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, -halfGap, -1));
+        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap, -1));
+        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap, 1));
+        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, -halfGap, 1));
+        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, roomWidth + halfGap, -1));
+        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, roomWidth + halfGap, -1));
 
         //Calculate outline of ceiling geometry
         addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, roomWidth + gapSize, halfGap));
@@ -367,8 +368,8 @@ const fragmentShaderSource =
 
     void main() {
         vec3 lightDirection = normalize(lightPosition - passFragmentPosition);
-        float diff = max(dot(passNormal, lightDirection), 0.1);
-        vec3  finalColour = passColour * diff;
+        float diff = max(dot(passNormal, lightDirection), 0.2);
+        vec3  finalColour = passColour * diff * 2.0;
         colour = vec4(finalColour.xyz, 1.0);
     }
 `;
