@@ -15,9 +15,9 @@ async function main(canvas) {
     const gl = canvas.getContext("webgl2");
     gl.clearColor(0.0, 0.0, 1.0, 1.0);
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
-    //gl.enable(gl.DEPTH_TEST);
-    //gl.depthFunc(gl.LESS);
-    //gl.depthMask(true);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+    gl.depthMask(true);
 
     //TEMP
     const shader = createShaderFromSource(gl, vertexShaderSource, fragmentShaderSource);
@@ -34,8 +34,6 @@ async function main(canvas) {
     const projectionViewMatrix = mat4.create();
     const lightPosition = new Vector3(0, 10, 0);
 
-
-
     const projViewLocation = gl.getUniformLocation(shader, 'projViewMatrix');
     const modelMatrixLocation = gl.getUniformLocation(shader, 'modelMatrix');
     const lightPositionLocation = gl.getUniformLocation(shader, "lightPosition");
@@ -46,6 +44,7 @@ async function main(canvas) {
 
     const objects = await createMapMesh(gl);
     const modelRotation = new Vector3(0, 0, 0);
+
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
@@ -93,6 +92,7 @@ async function createMapMesh(gl) {
     };
     const SCALE_FACTOR = 15;
     const GAP_SIZE = 0.1;
+    const HEIGHT = 2;
 
     for (const path of geometry.paths) {
         const mesh = new Mesh();
@@ -127,21 +127,21 @@ async function createMapMesh(gl) {
         const roomDepth = room.height / SCALE_FACTOR - GAP_SIZE;
 
         const mesh = new Mesh();
-        mesh.positions.push(...createFloorQuadGeometry(x, 0, z, roomWidth, roomDepth));
-        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, roomWidth + GAP_SIZE, GAP_SIZE / 2));
-        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z + roomDepth, roomWidth + GAP_SIZE, GAP_SIZE / 2));
-        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
-        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, 0, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
+        mesh.positions.push(...createFloorQuadGeometry(x, HEIGHT, z, roomWidth, roomDepth));
+        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, HEIGHT, z - GAP_SIZE / 2, roomWidth + GAP_SIZE, GAP_SIZE / 2));
+        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, HEIGHT, z + roomDepth, roomWidth + GAP_SIZE, GAP_SIZE / 2));
+        mesh.positions.push(...createFloorQuadGeometry(x - GAP_SIZE / 2, HEIGHT, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
+        mesh.positions.push(...createFloorQuadGeometry(x + roomWidth, HEIGHT, z - GAP_SIZE / 2, GAP_SIZE / 2, roomDepth + GAP_SIZE));
 
         let colour;
+        let storeid = -1;
         if (roomsJson[room.id]) {
-            const response = await fetch("api/stores/store-info?id=" + roomsJson[room.id]);
+            storeid = roomsJson[room.id];
+            const response = await fetch("api/stores/store-info?id=" + storeid);
             const info = await response.json();
-            colour = typeToColour(info.type)
-                .asNormalised();
+            colour = typeToColour(info.type).asNormalised();
         } else {
-            colour = typeToColour("none")
-                .asNormalised();
+            colour = typeToColour("none").asNormalised();
         }
 
         for (let i = 0; i < mesh.positions.length / 12; i++) {
@@ -163,6 +163,7 @@ async function createMapMesh(gl) {
             VAO: buffers.vao,
             buffers: buffers.buffers,
             indices: mesh.indices.length,
+            storeid: storeid,
             center: {
                 x: x + roomWidth / 2,
                 z: z + roomDepth / 2
@@ -370,7 +371,7 @@ function createProjectionMatrix(fov, gl) {
         projection,
         toRadians(fov),
         gl.canvas.clientWidth / gl.canvas.clientHeight,
-        0.0,
+        0.1,
         100.0);
     return projection;
 }
