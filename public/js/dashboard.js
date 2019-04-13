@@ -15,6 +15,7 @@ async function main(canvas) {
     const gl = canvas.getContext("webgl2");
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.viewport(0, 0, canvas.clientWidth, canvas.clientHeight);
+    // gl.enable(gl.DEPTH_TEST);
 
     //TEMP
     const shader = createShaderFromSource(gl, vertexShaderSource, fragmentShaderSource);
@@ -23,7 +24,7 @@ async function main(canvas) {
     const projection = createProjectionMatrix(90, gl);
 
     const rot = new Vector3(0, 0, 0);
-    const pos = new Vector3(0,-1, 0);
+    const pos = new Vector3(0, -1, 0);
 
     const viewMatrix = createViewMatrix(
         new Vector3(30, 0, 0),
@@ -52,7 +53,7 @@ async function main(canvas) {
 
         for (const o of objects) {
             gl.bindVertexArray(o);
-            gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+            gl.drawElements(gl.TRIANGLES, 12, gl.UNSIGNED_SHORT, 0);
         }
 
         window.requestAnimationFrame(mainloop);
@@ -74,42 +75,50 @@ async function createMapMesh(gl) {
     const roomsJson = await response.json();
 
     const objects = [];
-    const scaleFactor = 15;
+    const SCALE_FACTOR = 15;
+    const GAP_SIZE = 0.2;
+    const WALL_HEIGHT = 1.5;
+    const QUAD_COUNT = 2;
     for (const room of geometry.rooms) {
-        const x = room.x / scaleFactor;
-        const z = room.y / scaleFactor;
-        const w = room.width / scaleFactor;
-        const d = room.height / scaleFactor;
+        const x = room.x / SCALE_FACTOR + GAP_SIZE;
+        const z = room.y / SCALE_FACTOR + GAP_SIZE;
+        const w = room.width / SCALE_FACTOR - GAP_SIZE;
+        const d = room.height / SCALE_FACTOR - GAP_SIZE;
 
         const positions = [
-            x,      0, z,
-            x + w,  0, z,
-            x + w,  0, z + d,
-            x,      0, z + d
+            x, 0, z,
+            x + w, 0, z,
+            x + w, 0, z + d,
+            x, 0, z + d,
+
+            x, 0, z,
+            x + w, 0, z,
+            x + w, WALL_HEIGHT, z,
+            x, WALL_HEIGHT, z
+
         ];
         let colour;
         if (roomsJson[room.id]) {
-            const response = await fetch("api/stores/store-info?id="+roomsJson[room.id]);
+            const response = await fetch("api/stores/store-info?id=" + roomsJson[room.id]);
             const info = await response.json();
             colour = typeToColour(info.type)
                 .asNormalised();
-        }
-        else {
+        } else {
             colour = typeToColour("none")
                 .asNormalised();
         }
 
-        const colours = [
-            colour.r, colour.g, colour.b,
-            colour.r, colour.g, colour.b,
-            colour.r, colour.g, colour.b,
-            colour.r, colour.g, colour.b,
-        ];
-    
-        const indices = [
-            0, 1, 2, 2, 3, 0
-        ]
-    
+        const colours = [];
+        const indices = [];
+        for (let i = 0; i < QUAD_COUNT; i++) {
+            for (let v = 0; v < 4; v++) {
+                colours.push(colour.r, colour.g, colour.b);
+            }
+            indices.push(
+                i * 4, i * 4 + 1, i * 4 + 2,
+                i * 4 + 2, i * 4 + 3, i * 4
+            );
+        }
 
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
