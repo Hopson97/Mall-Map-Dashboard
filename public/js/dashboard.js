@@ -69,10 +69,12 @@ async function main(canvas3d, canvas2d) {
 
     function mainloop() {
         inputStuff(camera);
-        //Clear
+        //Clear depth buffer and colour buffer
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        mapShader.use(gl);
+        
+        //TODO
+        //Temp?
         matrix.view = createViewMatrix(camera.rotation, camera.position)
         mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
         mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
@@ -303,8 +305,6 @@ function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
  */
 async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsData) {
     const rooms = [];
-    const roomHeight = 2;
-    const halfGap = gapSize / 2;
     for (const room of roomGeometry) {
         //Scale the data down
         const x = room.x / scaleFactor + gapSize;
@@ -312,80 +312,116 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
         const roomWidth = room.width / scaleFactor - gapSize;
         const roomDepth = room.height / scaleFactor - gapSize;
 
-        const mesh = new Mesh();
-
-        //Adds normal and vertex data to the mesh
-        function addMeshData(geometry) {
-            mesh.positions.push(...geometry.positions);
-            mesh.normals.push(...geometry.normals);
-        }
-
-        //Object that will be added onto in this function
-        //Contains information about this room
-        const roomObject = {
-            roomid: room.id,
-            center: {
-                x: x + roomWidth / 2,
-                z: z + roomDepth / 2
-            }
-        }
-
-        //Calculate positions of the vertricies to make the floor and the room's outline
-
-        //Create ceiling geometry
-        addMeshData(createFloorQuadGeometry(x, roomHeight, z, roomWidth, roomDepth));
-
-        //Create inner-wall geometry
-        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, -halfGap, -1));
-        addMeshData(createWallZPlane(x, 0, z, roomWidth, roomHeight, roomDepth + halfGap, 1));
-        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, -halfGap, -1));
-        addMeshData(createWallXPlane(x, 0, z, roomDepth, roomHeight, roomWidth + halfGap, 1));
-
-        //Calculate the outline wall geometry
-        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, roomDepth + halfGap, 1));
-        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, roomDepth + halfGap, 1));
-        addMeshData(createWallZPlane(x + roomWidth, 0, z, halfGap, roomHeight, -halfGap, -1));
-        addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap, -1));
-        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap, 1));
-        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, -halfGap, 1));
-        addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, roomWidth + halfGap, -1));
-        addMeshData(createWallXPlane(x, 0, z + roomDepth, halfGap, roomHeight, roomWidth + halfGap, -1));
-
-        //Calculate outline of ceiling geometry
-        addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, roomWidth + gapSize, halfGap));
-        addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z + roomDepth, roomWidth + gapSize, halfGap));
-        addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
-        addMeshData(createFloorQuadGeometry(x + roomWidth, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
-
-        let colour;
-        //Do extra things if the room has an assosiated store
-        if (roomsData[room.id]) {
-            roomObject.storeid = roomsData[room.id];
-            const response = await fetch("api/stores/store-info?id=" + roomObject.storeid);
-            const info = await response.json();
-            colour = typeToColour(info.type).asNormalised().asArray();
-            roomObject.billboard = makeRoomBillboard(gl, roomObject, info);
-        } else {
-            colour = typeToColour("none").asNormalised().asArray();
-        }
-
-        createColourIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
-
-        //Change colour of the inner-quad and walls to be the store colour
-        for (let i = 0; i < 20; i++) {
-            for (let j = 0; j < 3; j++) {
-                mesh.colours[i * 3 + j] = colour[j];
-            }
-        }
-        const buffers = mesh.createBuffers(gl);
-
-        roomObject.vao = buffers.vao;
-        roomObject.buffers = buffers.buffers;
-        roomObject.indices = mesh.indices.length;
-
-        rooms.push(roomObject);
+        rooms.push(await createRoomGeometry(gl, room, roomsData, x, z, roomWidth, roomDepth, gapSize));
     }
     return rooms;
+}
+
+/**
+ * 
+ * @param {WebGLRenderContext} gl The WebGL render context
+ * @param {Object} roomInfo Object to contain info about the room having geometry made for
+ * @param {Object} roomsData Object containing info about all rooms
+ * @param {Number} x X position of the room
+ * @param {Number} z Z position of the room
+ * @param {Number} width Width of the room
+ * @param {Number} depth Depth of the room
+ * @param {Number} gapSize WebGL units between each room
+ */
+async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth, gapSize) {
+    const roomHeight = 3;
+    const halfGap = gapSize / 2;
+
+    const mesh = new Mesh();
+
+
+    //Adds normal and vertex data to the mesh
+    function addMeshData(geometry) {
+        mesh.positions.push(...geometry.positions);
+        mesh.normals.push(...geometry.normals);
+    }
+
+    //Contains information about this room, also is return of this function
+    const roomObject = {
+        mesh: mesh,
+        roomid: roomInfo.id,
+        center: {
+            x: x + width / 2,
+            z: z + depth / 2
+        }
+    }
+
+    //Create ceiling geometry
+    addMeshData(createFloorQuadGeometry(x, roomHeight, z, width, depth));
+
+    //Create inner-wall geometry
+    addMeshData(createWallZPlane(x, 0, z, width, roomHeight, -halfGap, -1));
+    addMeshData(createWallZPlane(x, 0, z, width, roomHeight, depth + halfGap, 1));
+    addMeshData(createWallXPlane(x, 0, z, depth, roomHeight, -halfGap, -1));
+    addMeshData(createWallXPlane(x, 0, z, depth, roomHeight, width + halfGap, 1));
+
+    //Calculate the outline wall geometry
+    addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, depth + halfGap, 1));
+    addMeshData(createWallZPlane(x + width, 0, z, halfGap, roomHeight, depth + halfGap, 1));
+    addMeshData(createWallZPlane(x + width, 0, z, halfGap, roomHeight, -halfGap, -1));
+    addMeshData(createWallZPlane(x - halfGap, 0, z, halfGap, roomHeight, -halfGap, -1));
+    addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, -halfGap, 1));
+    addMeshData(createWallXPlane(x, 0, z + depth, halfGap, roomHeight, -halfGap, 1));
+    addMeshData(createWallXPlane(x, 0, z - halfGap, halfGap, roomHeight, width + halfGap, -1));
+    addMeshData(createWallXPlane(x, 0, z + depth, halfGap, roomHeight, width + halfGap, -1));
+
+    //Calculate outline of ceiling geometry
+    addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, width + gapSize, halfGap));
+    addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z + depth, width + gapSize, halfGap));
+    addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, depth + gapSize));
+    addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
+
+    createColourIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
+    
+    let colour;
+    //Do extra things if the room has an assosiated store
+    if (roomsData[roomInfo.id]) {
+        roomObject.storeid = roomsData[roomInfo.id];
+
+        const response = await fetch("api/stores/store-info?id=" + roomObject.storeid);
+        const info = await response.json();
+
+        roomObject.billboard = makeRoomBillboard(gl, roomObject, info);
+        colour = typeToColour(info.type).asNormalised().asArray();  
+    } else {
+        colour = typeToColour("none").asNormalised().asArray();
+    }
+
+    //Update the room's colour
+    updateRoom(roomObject, colour, true, gl);
+
+    return roomObject;
+}
+
+/**
+ * Updates room based on the store it has either already had or been updated to
+ * @param {Object} room Object containing info about room to update
+ * @param {Colour} colour Colour to change its colour to
+ * @param {boolean} buffer whether the function should update the buffer as well
+ * @param {WebGLContext} gl The webgl render context
+ */
+function updateRoom(room, colour, shouldBuffer, gl) {
+    const mesh = room.mesh;
+    //Change colour of the inner-quad and walls to be the store colour
+    //20 refers to 4 * 5 (5 faces * 4 verticies per face)
+    for (let i = 0; i < 20; i++) {
+        //Cycle RGB
+        for (let j = 0; j < 3; j++) {
+            mesh.colours[i * 3 + j] = colour[j];
+        }
+    }
+
+    if(shouldBuffer) {
+        const buffers   = mesh.createBuffers(gl);
+        room.vao        = buffers.vao;
+        room.buffers    = buffers.buffers;
+        room.indices    = mesh.indices.length;
+    }
 }
 
 function makeRoomBillboard(gl, roomObject, storeInfo) {
