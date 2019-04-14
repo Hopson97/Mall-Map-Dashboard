@@ -22,9 +22,9 @@ class Renderer {
         this.context = canvas2D.getContext("2d");
 
         //Set canvas size
-        canvas3D.width  = window.innerWidth * 0.8;
+        canvas3D.width = window.innerWidth * 0.8;
         canvas3D.height = window.innerHeight * 0.8;
-        canvas2D.width  = canvas3D.width;
+        canvas2D.width = canvas3D.width;
         canvas2D.height = canvas3D.height;
 
         //Initilise WebGL
@@ -44,10 +44,10 @@ class Renderer {
      */
     clear() {
         this.gl.clear(
-            this.gl.COLOR_BUFFER_BIT | 
+            this.gl.COLOR_BUFFER_BIT |
             this.gl.DEPTH_BUFFER_BIT);
         this.context.clearRect(
-            0, 0, 
+            0, 0,
             this.context.canvas.width, this.context.canvas.height);
     }
 }
@@ -115,25 +115,39 @@ class Camera extends Entity {
         //Reset matrices
         this.viewMatrix = createViewMatrix(this.rotation, this.position);
         mat4.multiply(
-            this.projectionViewmatrix, 
-            this.projectionMatrix, 
+            this.projectionViewmatrix,
+            this.projectionMatrix,
             this.viewMatrix);
     }
+}
+
+class Room {
 
 }
 
+class Path {
+
+}
+
+class Billboard {
+
+}
+
+/**
+ * Entry point for the dashboard
+ * 
+ */
 window.addEventListener("load", async e => {
     //Setup the websocket
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
-
-    const renderer = new Renderer();
-    const shitstain   = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
-
     //TEMP
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     //TEMP
+
+    const renderer = new Renderer();
+    const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
     //TODO do I really need this?
     const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0));
@@ -146,25 +160,27 @@ window.addEventListener("load", async e => {
     //Get lists of objects to render
     const objects = await createMapMesh(renderer.gl);
 
+    //Begin main rendering of stuff
     window.requestAnimationFrame(loop);
     function loop() {
-        inputStuff(shitstain); //VERY VERY TEMP TODO
+        inputStuff(camera); //VERY VERY TEMP TODO
         renderer.clear();
 
         //Orbit the camera around the map of the mall
         const speed = 0.125;
-        shitstain.update(
+        camera.update(
             new Vector3(
-                Math.cos(toRadians(shitstain.rotation.y)) * speed,
+                Math.cos(toRadians(camera.rotation.y)) * speed,
                 0,
-                Math.sin(toRadians(shitstain.rotation.y)) * speed),
+                Math.sin(toRadians(camera.rotation.y)) * speed),
             new Vector3(0, -0.1, 0)
         );
 
-        mapShader.loadUniformVector3(renderer.gl, "lightPosition", shitstain.position);
-        mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", shitstain.projectionViewmatrix);
+        //Load uniform variables to shader
+        mapShader.loadUniformVector3(renderer.gl, "lightPosition", camera.position);
+        mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewmatrix);
 
-        render(renderer.gl, renderer.context, objects, shitstain.projectionViewmatrix);
+        render(renderer.gl, renderer.context, objects, camera.projectionViewmatrix);
 
         window.requestAnimationFrame(loop);
     }
