@@ -1,5 +1,12 @@
 "use strict";
 
+//Scale down for the geometry
+const scaleFactor = 15;
+
+//Gap between rooms
+const gapSize = 0.1;
+const halfGap = gapSize / 2;
+
 /**
  * Dashboard.js
  * JS file for the display board
@@ -43,12 +50,24 @@ class Renderer {
      * Clears the canvas windows
      */
     clear() {
-        this.gl.clear(
-            this.gl.COLOR_BUFFER_BIT |
-            this.gl.DEPTH_BUFFER_BIT);
-        this.context.clearRect(
-            0, 0,
-            this.context.canvas.width, this.context.canvas.height);
+        //Shorthand aliases
+        const gl = this.gl;
+        const c  = this.context;
+
+        //Clear both canvases
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        c.clearRect(0, 0, c.canvas.width, c.canvas.height);
+    }
+
+    /**
+     * Draws a 3D object to canvas
+     * @param {Drawable3D} drawable The object to draw
+     */
+    draw(drawable) {
+        //Shorthand alias
+        const gl = this.gl;
+        gl.bindVertexArray(drawable.vao);
+        gl.drawElements(gl.TRIANGLES, drawable.indicesCount, gl.UNSIGNED_SHORT, 0);
     }
 }
 
@@ -121,16 +140,64 @@ class Camera extends Entity {
     }
 }
 
-class Room {
+/**
+ * Class to represent a drawable 3D object
+ */
+class Drawable3D {
+    constructor() {
+        this.vao = 0;
+        this.indicesCount = 0
+        this.bufferList = []
+        this.mesh = new Mesh();
+    }
 
+    buffer(gl) {
+        const buffers = this.mesh.createBuffers(gl);
+        this.vao = buffers.vao;
+        this.bufferList = buffers.buffers;
+        this.indicesCount = this.mesh.indices.length;
+    }
 }
 
-class Path {
-
+/**
+ * Class to hold data about a room that can be drawn
+ */
+class Room extends Drawable3D {
+    constructor(roomId, x, z, width, depth) {
+        super();
+        this.roomId = roomId;
+        this.storeId = 0;
+        this.billboard = 0;
+        this.x = x;
+        this.z = z;
+        this.width = width;
+        this.depth = depth;
+        this.centerX = x + width / 2;
+        this.centerZ = z + depth / 2;
+        this.billboard = null;
+    }
 }
+
+/**
+ * Class to to hold data about a pathway
+ */
+class Path extends Drawable3D {
+    constructor(x, z, width, depth) {
+        super();
+        this.x = x;
+        this.z = z;
+        this.width = width;
+        this.depth = depth;
+    }
+}
+
 
 class Billboard {
-
+    constructor(roomId, storeName, storeType) {
+        this.roomId = roomId
+        this.storeName = storeName
+        this.storeType = storeType
+    }
 }
 
 /**
@@ -180,7 +247,7 @@ window.addEventListener("load", async e => {
         mapShader.loadUniformVector3(renderer.gl, "lightPosition", camera.position);
         mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewmatrix);
 
-        render(renderer.gl, renderer.context, objects, camera.projectionViewmatrix);
+        render(renderer, renderer.gl, renderer.context, objects, camera.projectionViewmatrix);
 
         window.requestAnimationFrame(loop);
     }
@@ -193,20 +260,21 @@ window.addEventListener("load", async e => {
  * @param {Object} objects Object containing objects to draw    
  * @param {mat4} projectionViewMatrix Projection view matrix
  */
-function render(gl, ctx, objects, projectionViewMatrix) {
+function render(renderer, gl, ctx, objects, projectionViewMatrix) {
     //List to hold any billboards above rooms. This must be a defered render as they 
     //must be sorted by their z-distance to the camera
     const billboardRenderInfo = [];
     //Render rooms
     for (const room of objects.rooms) {
 
-        gl.bindVertexArray(room.vao);
-        gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
+        renderer.draw(room);
+       // gl.bindVertexArray(room.vao);
+       // gl.drawElements(gl.TRIANGLES, room.indicesCount, gl.UNSIGNED_SHORT, 0);
 
         if (room.billboard) {
             const modelMatrix = createModelMatrix(
                 new Vector3(0, 0, 0),
-                new Vector3(room.center.x, 3, room.center.z)
+                new Vector3(room.centerX, 3, room.centerZ)
             );
 
             //For rendering the text, use the matrices to calculate the screen coordinates to
@@ -238,8 +306,9 @@ function render(gl, ctx, objects, projectionViewMatrix) {
 
     //Render paths
     for (const path of objects.paths) {
-        gl.bindVertexArray(path.VAO);
-        gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
+        renderer.draw(path);
+        //gl.bindVertexArray(path.VAO);
+        //gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
     }
 
     //Sort the billboards by the Z-coordinates
@@ -275,7 +344,7 @@ function drawBillboard(ctx, board) {
     ctx.stroke();
     ctx.fill();
     ctx.fillStyle = "white";
-    ctx.fillText(`Room ${board.data.roomid}`, board.x, board.y - 24);
+    ctx.fillText(`Room ${board.data.roomId}`, board.x, board.y - 24);
     ctx.fillText(`Store: ${board.data.storeName}`, board.x, board.y - 12);
     ctx.fillText(`${board.data.storeType}`, board.x, board.y);
 }
@@ -297,15 +366,10 @@ async function createMapMesh(gl) {
     const response = await fetch("/api/map/sect-data");
     const roomsData = await response.json();
 
-    const scaleFactor = 15;
-    const gapSize = 0.1;
-    const objects = {
-        rooms: await buildRoomsGeometry(gl, scaleFactor, gapSize, geometry.rooms, roomsData),
-        paths: buildPathGeometry(gl, scaleFactor, gapSize, geometry.paths),
+    return {
+        rooms: await buildRoomsGeometry(gl, geometry.rooms, roomsData),
+        paths: buildPathGeometry(gl, geometry.paths),
     };
-
-
-    return objects;
 }
 
 //GEOMETRY FUNCTIONS
@@ -407,34 +471,27 @@ function createColourIndicesData(mesh, colour) {
 /**
  * Creates WebGL geometric data (inc VAOs and VBOs) based on 2D layout of the map for the paths
  * @param {WebGLRenderContext} gl The WebGL Context
- * @param {Number} scaleFactor Scale factor for how much to make the geometry smaller down from the actual geometric data
- * @param {Number} gapSize The "opengl units" between each room (gap)
  * @param {Object} pathData Object containing 2D data about each of the paths
  */
-function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
+function buildPathGeometry(gl, pathData) {
     const paths = [];
-    const halfGap = gapSize / 2;
-    for (const path of pathData) {
-        const mesh = new Mesh();
 
-        //Scale the data down
-        const x = path.x / scaleFactor + halfGap;;
-        const z = path.y / scaleFactor + halfGap;
-        const width = path.width / scaleFactor;
-        const height = path.height / scaleFactor;
+    for (const pathLayout of pathData) {
+        const path = new Path(
+            pathLayout.x / scaleFactor + halfGap,
+            pathLayout.y / scaleFactor + halfGap,
+            pathLayout.width / scaleFactor,
+            pathLayout.height / scaleFactor
+        );
 
-        const geometry = createFloorQuadGeometry(x, 0, z, width, height);
-        mesh.positions.push(...geometry.positions);
-        mesh.normals.push(...geometry.normals);
+        const geometry = createFloorQuadGeometry(path.x, 0, path.z, path.width, path.depth);
+        path.mesh.positions.push(...geometry.positions);
+        path.mesh.normals.push(...geometry.normals);
 
-        createColourIndicesData(mesh, new Colour(1, 1, 1));
-        const buffers = mesh.createBuffers(gl);
-
-        paths.push({
-            VAO: buffers.vao,
-            buffers: buffers.buffers,
-            indices: mesh.indices.length,
-        });
+        createColourIndicesData(path.mesh, new Colour(1, 1, 1));
+        
+        path.buffer(gl);
+        paths.push(path);
     }
     return paths;
 }
@@ -442,12 +499,10 @@ function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
 /**
  * 
  * @param {WebGLRenderContext} gl The WebGL Context
- * @param {Number} scaleFactor Scale factor for how much to make the geometry smaller down from the actual geometric data
- * @param {Number} gapSize The "opengl units" between each room (gap)
  * @param {Object} roomGeometry Object containing 2D data about each of the rooms
  * @param {Object} roomsData Object containing information about the room ID and their assosiated store IDs
  */
-async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsData) {
+async function buildRoomsGeometry(gl, roomGeometry, roomsData) {
     const rooms = [];
     for (const room of roomGeometry) {
         //Scale the data down
@@ -470,29 +525,18 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
  * @param {Number} z Z position of the room
  * @param {Number} width Width of the room
  * @param {Number} depth Depth of the room
- * @param {Number} gapSize WebGL units between each room
  */
-async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth, gapSize) {
+async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     const roomHeight = 3;
-    const halfGap = gapSize / 2;
 
-    const mesh = new Mesh();
 
+    //Contains information about this room, also is return of this function
+    const room = new Room(roomInfo.id, x, z, width, depth);
 
     //Adds normal and vertex data to the mesh
     function addMeshData(geometry) {
-        mesh.positions.push(...geometry.positions);
-        mesh.normals.push(...geometry.normals);
-    }
-
-    //Contains information about this room, also is return of this function
-    const roomObject = {
-        mesh: mesh,
-        roomid: roomInfo.id,
-        center: {
-            x: x + width / 2,
-            z: z + depth / 2
-        }
+        room.mesh.positions.push(...geometry.positions);
+        room.mesh.normals.push(...geometry.normals);
     }
 
     //Create ceiling geometry
@@ -520,26 +564,30 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth, g
     addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, depth + gapSize));
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
-    createColourIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
+    createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
 
     let colour;
     //Do extra things if the room has an assosiated store
     if (roomsData[roomInfo.id]) {
-        roomObject.storeid = roomsData[roomInfo.id];
+        room.storeId = roomsData[roomInfo.id];
 
-        const response = await fetch("api/stores/store-info?id=" + roomObject.storeid);
+        const response = await fetch("api/stores/store-info?id=" + room.storeId);
         const info = await response.json();
 
-        roomObject.billboard = makeRoomBillboard(gl, roomObject, info);
+        room.billboard = new Billboard(
+            room.roomId, 
+            info.name, 
+            info.type);
+
         colour = typeToColour(info.type).asNormalised().asArray();
     } else {
         colour = typeToColour("none").asNormalised().asArray();
     }
 
     //Update the room's colour
-    updateRoom(roomObject, colour, true, gl);
+    updateRoom(room, colour, true, gl);
 
-    return roomObject;
+    return room;
 }
 
 /**
@@ -561,22 +609,8 @@ function updateRoom(room, colour, shouldBuffer, gl) {
     }
 
     if (shouldBuffer) {
-        const buffers = mesh.createBuffers(gl);
-        room.vao = buffers.vao;
-        room.buffers = buffers.buffers;
-        room.indices = mesh.indices.length;
+        room.buffer(gl);
     }
-}
-
-function makeRoomBillboard(gl, roomObject, storeInfo) {
-    const billboard = {};
-
-    billboard.height = 3;
-    billboard.roomid = roomObject.roomid;
-    billboard.storeName = storeInfo.name;
-    billboard.storeType = storeInfo.type;
-
-    return billboard;
 }
 
 //Shader programs

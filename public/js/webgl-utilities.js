@@ -284,10 +284,13 @@ function createViewMatrix(rotation, translation) {
     return matrix;
 }
 
+/**
+ * Creates a perspective projection matrix
+ * @param {Number} fov Field of version
+ * @param {WebGLRenderingContext} gl The OpenGL/WebGL rendering context
+ */
 function createProjectionMatrix(fov, gl) {
     const projection = mat4.create();
-
-
     mat4.perspective(
         projection,
         toRadians(fov),
@@ -311,15 +314,4 @@ function toRadians(degrees) {
  */
 function toDegrees(degrees) {
     return degrees * 180 / Math.PI;
-}
-
-function transformVector(matrix, vector) {
-    const result = new Float32Array(4);
-    for (let y = 0; y < 4; y++) {
-        result[y] = 0.0;
-        for (let x = 0; x < 4; x++) {
-            result[y] += vector[x] * matrix[x * 4 + y];
-        }
-    }
-    return result;
 }
