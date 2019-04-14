@@ -21,7 +21,7 @@ window.addEventListener("load", async e => {
 });
 
 function initGl(gl) {
-    gl.clearColor(0.0, 0.0, 1.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
 
     gl.enable(gl.DEPTH_TEST);
@@ -31,7 +31,7 @@ function initGl(gl) {
 
 function initCtx(ctx) {
     ctx.fillStyle = "white";
-    ctx.font = `bold 9.25px sans-serif`;
+    ctx.font = `bold 9.5 sans-serif`;
 }
 
 async function main(canvas3d, canvas2d) {
@@ -41,7 +41,7 @@ async function main(canvas3d, canvas2d) {
     initCtx(ctx);
 
     const camera = {
-        position: new Vector3(37, 25, 40.5),
+        position: new Vector3(65, 25, 140),
         rotation: new Vector3(50, 0, 0)
     };
 
@@ -62,17 +62,27 @@ async function main(canvas3d, canvas2d) {
     mapShader.use(gl);
     mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
     mapShader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
-    mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(37, 15, 15));
+    mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(64, 25, 90));
 
     const objects = await createMapMesh(gl);
     window.requestAnimationFrame(mainloop);
 
+    /**
+     * The main rendering loop
+     */
     function mainloop() {
         inputStuff(camera);
         //Clear depth buffer and colour buffer
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        
+
+
+        //Orbit the camera around the map of the mall
+        const speed = 0.125;
+        camera.rotation.y -= 0.1;
+        camera.position.x += Math.cos(toRadians(camera.rotation.y)) * speed;
+        camera.position.z += Math.sin(toRadians(camera.rotation.y)) * speed;
+        mapShader.loadUniformVector3(gl, "lightPosition", camera.position);
         //TODO
         //Temp?
         matrix.view = createViewMatrix(camera.rotation, camera.position)
@@ -80,16 +90,15 @@ async function main(canvas3d, canvas2d) {
         mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
 
         //Render rooms
+        const billboardRenderInfo = [];
         for (const room of objects.rooms) {
             mapShader.use(gl);
             gl.bindVertexArray(room.vao);
             gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
 
             if (room.billboard) {
-                const board = room.billboard;
-
                 const modelMatrix = createModelMatrix(
-                    new Vector3(0, 0, 0), 
+                    new Vector3(0, 0, 0),
                     new Vector3(room.center.x, 3, room.center.z)
                 );
 
@@ -97,44 +106,61 @@ async function main(canvas3d, canvas2d) {
                 //render it to
                 const pos = mat4.create();
                 mat4.mul(pos, matrix.projectionView, modelMatrix);
-                
+
                 //Transform world coordinates into screen coordinates
-                const x = ((pos[12] / pos[15]) * 0.5 + 0.5)  * gl.canvas.width - 25;
+                const x = ((pos[12] / pos[15]) * 0.5 + 0.5) * gl.canvas.width - 25;
                 const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - 10;
-
                 const z = pos[14];
-            
-                //TODO Use billboard store stats to fit the billboard size accordingly
-                //Draw billboard thing
-                ctx.strokeStyle = "white";
-                ctx.fillStyle   = "black";
-                ctx.beginPath();
-                ctx.moveTo(x + 25, y + 25);
-                ctx.lineTo(x + 10, y + 10);
-                ctx.lineTo(x - 10, y + 5);
-                ctx.lineTo(x - 10, y - 32);
-                ctx.lineTo(x + 70, y - 32);
-                ctx.lineTo(x + 70, y + 5);
-                ctx.lineTo(x + 35, y + 10);
-                ctx.lineTo(x + 25, y + 25);
-                ctx.stroke();  
-                ctx.fill();        
+                    
+                //Don't bother rendering the billboards that are very far away
+                if (z > 60) {
+                    continue;
+                }
 
-                //ctx.fillRect(x + 25, y + 25, 5, 5);
-
-                ctx.fillStyle = "white";
-                ctx.fillText(`Room ${board.roomid}`, x, y - 24);
-                ctx.fillText(`Store: ${board.storeName}`, x, y - 12);
-                ctx.fillText(`${board.storeType}`, x, y);                
+                billboardRenderInfo.push({
+                    x,
+                    y,
+                    z,
+                    data: room.billboard
+                });
             }
         }
 
-        mapShader.use(gl);
         //Render paths
         for (const path of objects.paths) {
             gl.bindVertexArray(path.VAO);
             gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
         }
+
+        //Sort the billboards by the Z-coordinates
+        billboardRenderInfo.sort((a, b) => {
+            return b.z - a.z;
+        });
+
+        //Render the boards
+        for (const board of billboardRenderInfo) {
+
+            //TODO Use billboard store stats to fit the billboard size accordingly
+            //Draw billboard thing
+            ctx.strokeStyle = "white";
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.moveTo(board.x + 25, board.y + 25);
+            ctx.lineTo(board.x + 10, board.y + 10);
+            ctx.lineTo(board.x - 10, board.y + 5);
+            ctx.lineTo(board.x - 10, board.y - 32);
+            ctx.lineTo(board.x + 70, board.y - 32);
+            ctx.lineTo(board.x + 70, board.y + 5);
+            ctx.lineTo(board.x + 35, board.y + 10);
+            ctx.lineTo(board.x + 25, board.y + 25);
+            ctx.stroke();
+            ctx.fill();
+            ctx.fillStyle = "white";
+            ctx.fillText(`Room ${board.data.roomid}`, board.x, board.y - 24);
+            ctx.fillText(`Store: ${board.data.storeName}`, board.x, board.y - 12);
+            ctx.fillText(`${board.data.storeType}`, board.x, board.y);
+        }
+
         window.requestAnimationFrame(mainloop);
     }
 }
@@ -377,7 +403,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth, g
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
     createColourIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
-    
+
     let colour;
     //Do extra things if the room has an assosiated store
     if (roomsData[roomInfo.id]) {
@@ -387,7 +413,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth, g
         const info = await response.json();
 
         roomObject.billboard = makeRoomBillboard(gl, roomObject, info);
-        colour = typeToColour(info.type).asNormalised().asArray();  
+        colour = typeToColour(info.type).asNormalised().asArray();
     } else {
         colour = typeToColour("none").asNormalised().asArray();
     }
@@ -416,17 +442,17 @@ function updateRoom(room, colour, shouldBuffer, gl) {
         }
     }
 
-    if(shouldBuffer) {
-        const buffers   = mesh.createBuffers(gl);
-        room.vao        = buffers.vao;
-        room.buffers    = buffers.buffers;
-        room.indices    = mesh.indices.length;
+    if (shouldBuffer) {
+        const buffers = mesh.createBuffers(gl);
+        room.vao = buffers.vao;
+        room.buffers = buffers.buffers;
+        room.indices = mesh.indices.length;
     }
 }
 
 function makeRoomBillboard(gl, roomObject, storeInfo) {
-    const billboard = { };
-    
+    const billboard = {};
+
     billboard.height = 3;
     billboard.roomid = roomObject.roomid;
     billboard.storeName = storeInfo.name;
@@ -438,8 +464,7 @@ function makeRoomBillboard(gl, roomObject, storeInfo) {
 //Shader programs
 const shaders = {
     //Verex and fragment shader for the map
-    mapVertex:
-    `#version 300 es
+    mapVertex: `#version 300 es
     in vec3 inVertexPosition;
     in vec3 inColour;
     in vec3 inNormal;
@@ -458,8 +483,7 @@ const shaders = {
         passNormal = inNormal;
         passFragmentPosition = vec3(modelMatrix * vec4(inVertexPosition, 1.0));
     }`,
-    mapFragment:
-    `#version 300 es
+    mapFragment: `#version 300 es
     precision highp float;
 
     in vec3 passColour;
@@ -494,24 +518,24 @@ const shaders = {
 //temp
 
 function inputStuff(camera) {
-        //TEMP
-        const speed = 0.1;
-        if (keydown["s"]) {
-            camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
-            camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-        } else if (keydown["w"]) {
-            camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
-            camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-        }
-        if (keydown["a"]) {
-            camera.rotation.y -= 1;
-        } else if (keydown["d"]) {
-            camera.rotation.y += 1;
-        }
-        if (keydown["p"]) {
-            console.log(camera);
-        }
-        //TEMP
+    //TEMP
+    const speed = 0.1;
+    if (keydown["s"]) {
+        camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
+        camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
+    } else if (keydown["w"]) {
+        camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
+        camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
+    }
+    if (keydown["a"]) {
+        camera.rotation.y -= 1;
+    } else if (keydown["d"]) {
+        camera.rotation.y += 1;
+    }
+    if (keydown["p"]) {
+        console.log(camera);
+    }
+    //TEMP
 }
 
 

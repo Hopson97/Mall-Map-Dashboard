@@ -40,31 +40,39 @@ function getMallLayout() {
     const paths = [];
     let id = 0;
     
+    //Generates the x, y, width, and height values for all rooms and paths
+    rooms.push(makeRoom(++id, 1100, 900, 200, 200));
+    rooms.push(makeRoom(++id, 1300, 900, 200, 200));
+    rooms.push(makeRoom(++id, 1500, 900, 200, 200));
+    rooms.push(makeRoom(++id, 1700, 900, 200, 200));
+    rooms.push(makeRoom(++id, 50, 900, 200, 200));
+    rooms.push(makeRoom(++id, 250, 900, 200, 200));
+    rooms.push(makeRoom(++id, 450, 900, 200, 200));
+    rooms.push(makeRoom(++id, 650, 900, 200, 200));
+    rooms.push(makeRoom(++id, 650, 1100, 200, 200));
+    rooms.push(makeRoom(++id, 50, 1100, 600, 200));
+    rooms.push(makeRoom(++id, 50, 1500, 600, 200));
+    rooms.push(makeRoom(++id, 1300, 1100, 600, 200));
+    rooms.push(makeRoom(++id, 1300, 1500, 600, 200));
+    rooms.push(makeRoom(++id, 1100, 1500, 200, 450));
+    rooms.push(makeRoom(++id, 650, 1500, 200, 450));
+    rooms.push(makeRoom(++id, 1700, 1300, 200, 200));
+    rooms.push(makeRoom(++id, 50, 1300, 200, 200));
+    rooms.push(makeRoom(++id, 750, 0, 450, 450));
+    rooms.push(makeRoom(++id, 1200, 300, 200, 200));
+    rooms.push(makeRoom(++id, 1400, 350, 200, 200));
+    rooms.push(makeRoom(++id, 1600, 400, 200, 200));
+    rooms.push(makeRoom(++id, 1800, 550, 150, 150));
+    rooms.push(makeRoom(++id, 550, 300, 200, 200));
+    rooms.push(makeRoom(++id, 350, 350, 200, 200));
+    rooms.push(makeRoom(++id, 150, 400, 200, 200));
+    rooms.push(makeRoom(++id, 0, 550, 150, 150));
+    rooms.push(makeRoom(++id, 1100, 1100, 200, 200));
 
-    //Top
-    rooms.push(makeRoom(++id, 0, 0, 150, 150));
-    rooms.push(makeRoom(++id, 150, 0, 150, 150));
-    rooms.push(makeRoom(++id, 300, 0, 250, 100));
-    rooms.push(makeRoom(++id, 550, 0, 250, 100));
-    rooms.push(makeRoom(++id, 800, 0, 150, 150));
-    rooms.push(makeRoom(++id, 950, 0, 150, 150));
-
-    //Middle left
-    rooms.push(makeRoom(++id, 0, 250, 150, 150));
-    rooms.push(makeRoom(++id, 150, 250, 150, 150));
-    rooms.push(makeRoom(++id, 300, 250, 150, 150));
-
-    //Middle right
-    rooms.push(makeRoom(++id, 650, 250, 150, 150));
-    rooms.push(makeRoom(++id, 800, 250, 150, 150));
-    rooms.push(makeRoom(++id, 950, 250, 150, 150));
-
-    //Bottom
-    rooms.push(makeRoom(++id, 300, 400, 150, 150));
-    rooms.push(makeRoom(++id, 650, 400, 150, 150));
-
-    paths.push(makeCorridor(0, 100, 1100, 150));
-    paths.push(makeCorridor(450, 250, 200, 300));
+    paths.push(makeCorridor(150, 450, 1650, 250));
+    paths.push(makeCorridor(0, 700, 1950, 200));
+    paths.push(makeCorridor(250, 900, 1450, 800));
+    paths.push(makeCorridor(850, 1700, 250, 250));
 
     let minX = 0xFFFFFFF;
     let maxX = -0xFFFFFFF;

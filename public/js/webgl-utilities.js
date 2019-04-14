@@ -282,8 +282,8 @@ function createProjectionMatrix(fov, gl) {
         projection,
         toRadians(fov),
         gl.canvas.clientWidth / gl.canvas.clientHeight,
-        0.1,
-        100.0);
+        5,
+        150.0);
     return projection;
 }
 

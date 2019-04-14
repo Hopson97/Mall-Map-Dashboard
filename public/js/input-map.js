@@ -151,6 +151,11 @@ function loop(canvas, context) {
         handleInput();
         renderer.clear();
 
+        context.fillStyle = "white";
+        for (const path of mapData.paths) {
+            renderer.renderRect(path.x, path.y, path.width, path.height);
+        }
+
         for (const room of mapData.rooms) {
             if (selectedStore.id == room.id) {
                 context.fillStyle = "lime";
@@ -159,10 +164,7 @@ function loop(canvas, context) {
             }
             renderer.renderRect(room.x, room.y, room.width, room.height);
         }
-        context.fillStyle = "white";
-        for (const path of mapData.paths) {
-            renderer.renderRect(path.x, path.y, path.width, path.height);
-        }
+
         context.stroke();
         context.fill();
         window.requestAnimationFrame(mainloop);
@@ -174,15 +176,15 @@ function loop(canvas, context) {
  */
 function handleInput() {
     if (keydown["w"] || buttonPressed.up) {
-        offsetY -= PAN_SPEED;
-    } else if (keydown["s"] || buttonPressed.down) {
         offsetY += PAN_SPEED;
+    } else if (keydown["s"] || buttonPressed.down) {
+        offsetY -= PAN_SPEED;
     }
 
     if (keydown["a"] || buttonPressed.left) {
-        offsetX -= PAN_SPEED;
-    } else if (keydown["d"] || buttonPressed.right) {
         offsetX += PAN_SPEED;
+    } else if (keydown["d"] || buttonPressed.right) {
+        offsetX -= PAN_SPEED;
     }
 
     //Prevent out of bounds of world
