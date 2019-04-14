@@ -41,8 +41,8 @@ async function main(canvas3d, canvas2d) {
     initCtx(ctx);
 
     const camera = {
-        position: new Vector3(15, 10, 30.5),
-        rotation: new Vector3(30, 0, 0)
+        position: new Vector3(37, 25, 40.5),
+        rotation: new Vector3(50, 0, 0)
     };
 
     //TEMP
@@ -62,7 +62,7 @@ async function main(canvas3d, canvas2d) {
     mapShader.use(gl);
     mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
     mapShader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
-    mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(15, 10, 15));
+    mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(37, 15, 15));
 
     const basicShader = new Shader(gl, shaders.basicVertex, shaders.basicFragment);
     basicShader.use(gl);
