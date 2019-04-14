@@ -16,3 +16,14 @@ body {
 canvas {
     border: solid white;
 }
+
+.render-container {
+    position: relative;
+}
+
+.canvas2d {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 1;
+}

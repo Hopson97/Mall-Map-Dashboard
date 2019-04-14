@@ -13,7 +13,11 @@ window.addEventListener("load", async e => {
     canvas.width = window.innerWidth * 0.8;
     canvas.height = window.innerHeight * 0.8;
 
-    await main(canvas);
+    const textCanvas = document.getElementById("text-canvas");
+    textCanvas.width = canvas.width;
+    textCanvas.height = canvas.height;
+
+    await main(canvas, textCanvas);
 });
 
 function initGl(gl) {
@@ -24,8 +28,9 @@ function initGl(gl) {
     gl.depthMask(true);
 }
 
-async function main(canvas) {
-    const gl = canvas.getContext("webgl2");
+async function main(canvas3d, canvas2d) {
+    const gl = canvas3d.getContext("webgl2");
+    const ctx = canvas2d.getContext("2d");
     initGl(gl);
 
     const camera = {
@@ -78,8 +83,9 @@ async function main(canvas) {
             console.log(camera);
         }
         //TEMP
-
+        //Clear
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         mapShader.use(gl);
         matrix.view = createViewMatrix(camera.rotation, camera.position)
         mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
@@ -95,11 +101,22 @@ async function main(canvas) {
                 basicShader.use(gl);
                 basicShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
                 const modelMatrix = createModelMatrix(
-                    new Vector3(0, 0, 0), new Vector3(room.center.x, 3, room.center.z)
+                    new Vector3(0, -camera.rotation.y, 0), 
+                    new Vector3(room.center.x, 3, room.center.z)
                 );
                 basicShader.loadUniformMatrix4(gl, "modelMatrix", modelMatrix);
+
                 gl.bindVertexArray(room.billboard.vao);
                 gl.drawElements(gl.TRIANGLES, room.billboard.indices, gl.UNSIGNED_SHORT, 0);
+                
+                //For rendering the text, use the matrices to calculate the screen coordinates to
+                //render it to
+                const pos = mat4.create();
+                mat4.mul(pos, matrix.projectionView, modelMatrix);
+                const x = ((pos[12] / pos[15]) * 0.5 + 0.5)  * gl.canvas.width;
+                const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height;
+                
+                ctx.fillText("Hello world", x, y);
             }
         }
 

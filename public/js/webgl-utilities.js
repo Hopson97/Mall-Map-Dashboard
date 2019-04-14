@@ -4,9 +4,9 @@
  * File for general WebGL functions
  */
 
- /**
-  * Holds general information about a mesh
-  */
+/**
+ * Holds general information about a mesh
+ */
 class Mesh {
     /**
      * Initialises the mesh arrays
@@ -26,14 +26,17 @@ class Mesh {
         const buffers = [];
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
-        
+
         buffers.push(
-            createBuffer(gl, this.positions, 0, 3), 
+            createBuffer(gl, this.positions, 0, 3),
             createBuffer(gl, this.colours, 1, 3),
             createBuffer(gl, this.normals, 2, 3),
             createElementBuffer(gl, this.indices),
         );
-        return { vao, buffers }
+        return {
+            vao,
+            buffers
+        }
     }
 }
 
@@ -114,7 +117,7 @@ class Shader {
     getUniformLocation(gl, name) {
         if (!this.uniformLocations[name]) {
             this.uniformLocations[name] =
-                gl.getUniformLocation(this.shaderId, name); 
+                gl.getUniformLocation(this.shaderId, name);
         }
         return this.uniformLocations[name];
     }
@@ -261,6 +264,7 @@ function createModelMatrix(rotation, translation) {
  */
 function createViewMatrix(rotation, translation) {
     const matrix = mat4.create();
+
     mat4.rotate(matrix, matrix, toRadians(rotation.x), [1, 0, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.y), [0, 1, 0]);
     mat4.rotate(matrix, matrix, toRadians(rotation.z), [0, 0, 1]);
@@ -289,4 +293,15 @@ function createProjectionMatrix(fov, gl) {
  */
 function toRadians(degrees) {
     return degrees * Math.PI / 180.0;
+}
+
+function transformVector(matrix, vector) {
+    const result = new Float32Array(4);
+    for (let y = 0; y < 4; y++) {
+        result[y] = 0.0;
+        for (let x = 0; x < 4; x++) {
+            result[y] += vector[x] * matrix[x * 4 + y];
+        }
+    }
+    return result;
 }
