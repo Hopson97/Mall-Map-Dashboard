@@ -29,8 +29,8 @@ async function main(canvas) {
     initGl(gl);
 
     const camera = {
-        position: new Vector3(15, 15, 35.5),
-        rotation: new Vector3(45, 0, 0)
+        position: new Vector3(15, 10, 30.5),
+        rotation: new Vector3(30, 0, 0)
     };
 
     //TEMP
@@ -46,13 +46,15 @@ async function main(canvas) {
     };
     mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
 
-    const lightPosition = new Vector3(15, 10, 15);
-    const shader = new Shader(gl, shaders.mapVertex, shaders.mapFragment);
-    shader.use(gl);
+    const mapShader = new Shader(gl, shaders.mapVertex, shaders.mapFragment);
+    mapShader.use(gl);
+    mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
+    mapShader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
+    mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(15, 10, 15));
 
-    shader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
-    shader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
-    shader.loadUniformVector3(gl, "lightPosition", lightPosition);
+    const basicShader = new Shader(gl, shaders.basicVertex, shaders.basicFragment);
+    basicShader.use(gl);
+    basicShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
 
     const objects = await createMapMesh(gl);
     window.requestAnimationFrame(mainloop);
@@ -78,21 +80,30 @@ async function main(canvas) {
         //TEMP
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
+        mapShader.use(gl);
         matrix.view = createViewMatrix(camera.rotation, camera.position)
         mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
-        shader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
+        mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
 
         //Render rooms
         for (const room of objects.rooms) {
+            mapShader.use(gl);
             gl.bindVertexArray(room.vao);
             gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
 
             if (room.billboard) {
-                
+                basicShader.use(gl);
+                basicShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
+                const modelMatrix = createModelMatrix(
+                    new Vector3(0, 0, 0), new Vector3(room.center.x, 3, room.center.z)
+                );
+                basicShader.loadUniformMatrix4(gl, "modelMatrix", modelMatrix);
+                gl.bindVertexArray(room.billboard.vao);
+                gl.drawElements(gl.TRIANGLES, room.billboard.indices, gl.UNSIGNED_SHORT, 0);
             }
         }
 
+        mapShader.use(gl);
         //Render paths
         for (const path of objects.paths) {
             gl.bindVertexArray(path.VAO);
@@ -371,12 +382,13 @@ function makeRoomBillboard(gl, roomObject) {
     const billboard = { };
     
     const billboardMesh = new Mesh();
-    billboardMesh.positions = createQuadPositions(2, 2);
+    billboardMesh.positions = createQuadPositions(4, 3);
     billboardMesh.indices   = [0, 1, 2, 2, 3, 0];
 
     const buffers = billboardMesh.createBuffers(gl);
     billboard.vao     = buffers.vao;
     billboard.buffers = buffers.buffers;
+    billboard.indices = billboardMesh.indices.length;
 
     return billboard;
 }
