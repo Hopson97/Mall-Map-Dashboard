@@ -4,46 +4,74 @@
  * Dashboard.js
  * JS file for the display board
  */
+class Renderer {
+    constructor() {
+        //Get canvas objects
+        const canvas3D = document.getElementById("map-canvas");
+        const canvas2D = document.getElementById("text-canvas");
+
+        //Get rendering contexts
+        this.gl = canvas3D.getContext("webgl2");
+        this.context = canvas2D.getContext("2d");
+
+        //Set canvas size
+        canvas3D.width  = window.innerWidth * 0.8;
+        canvas3D.height = window.innerHeight * 0.8;
+        canvas2D.width  = canvas3D.width;
+        canvas2D.height = canvas3D.height;
+
+        //Initilise WebGL
+        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.viewport(0, 0, this.gl.canvas.clientWidth, this.gl.canvas.clientHeight);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.depthFunc(this.gl.LESS);
+        this.gl.depthMask(true);
+
+        //Initilise the context
+        this.context.fillStyle = "white";
+        this.context.font = `bold 9.5 sans-serif`;
+    }
+
+    clear() {
+        this.gl.clear(
+            this.gl.COLOR_BUFFER_BIT | 
+            this.gl.DEPTH_BUFFER_BIT);
+        this.context.clearRect(
+            0, 0, 
+            this.context.canvas.width, this.context.canvas.height);
+    }
+}
+
+class Entity {
+    constructor(position, rotation) {
+        this.position = position;
+        this.rotation = rotation;
+    }
+
+    move(offset) {
+        this.position.add(offset);
+    }
+
+    rotate(rotation) {
+        this.rotation.add(offset);
+        if (this.rotation.x > 360) {
+            this.rotation = 0;
+        }
+    }
+}
 
 window.addEventListener("load", async e => {
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
 
-    const canvas = document.getElementById("map-canvas");
-    canvas.width = window.innerWidth * 0.8;
-    canvas.height = window.innerHeight * 0.8;
-
-    const textCanvas = document.getElementById("text-canvas");
-    textCanvas.width = canvas.width;
-    textCanvas.height = canvas.height;
-
-    await main(canvas, textCanvas);
+    await main();
 });
 
-function initGl(gl) {
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+async function main() {
+    const renderer = new Renderer();
+    const camera   = new Entity(new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LESS);
-    gl.depthMask(true);
-}
-
-function initCtx(ctx) {
-    ctx.fillStyle = "white";
-    ctx.font = `bold 9.5 sans-serif`;
-}
-
-async function main(canvas3d, canvas2d) {
-    const gl = canvas3d.getContext("webgl2");
-    const ctx = canvas2d.getContext("2d");
-    initGl(gl);
-    initCtx(ctx);
-
-    const camera = {
-        position: new Vector3(65, 25, 140),
-        rotation: new Vector3(50, 0, 0)
-    };
+    const gl = renderer.gl;
 
     //TEMP
     window.addEventListener("keydown", handleKeyDown);
@@ -70,10 +98,8 @@ async function main(canvas3d, canvas2d) {
      * The main rendering loop
      */
     function mainloop() {
-        inputStuff(camera);
-        //Clear depth buffer and colour buffer
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        inputStuff(camera); //VERY VERY TEMP TODO
+        renderer.clear();
 
 
         //Orbit the camera around the map of the mall
@@ -88,7 +114,7 @@ async function main(canvas3d, canvas2d) {
         mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
         mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
 
-        render(gl, ctx, objects, matrix.projectionView);
+        render(gl, renderer.context, objects, matrix.projectionView);
 
         window.requestAnimationFrame(mainloop);
     }

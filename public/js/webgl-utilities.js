@@ -76,6 +76,16 @@ class Vector3 {
     toFloat32Array() {
         return new Float32Array([this.x, this.y, this.z]);
     }
+
+    /**
+     * Adds this vector together with another one
+     * @param {Vector3} vec Vector to add this one to
+     */
+    add(vec) {
+        this.x += vec.x;
+        this.y += vec.y;
+        this.z += vec.z;
+    }
 }
 
 /*
