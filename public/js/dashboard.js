@@ -12,6 +12,9 @@ const halfGap = gapSize / 2;
  * JS file for the display board
  */
 
+
+ 
+
 /**
  * Renderer to assist with rendering 3D and 2D objects to browser window
  */
@@ -33,6 +36,8 @@ class Renderer {
         canvas3D.height = window.innerHeight * 0.8;
         canvas2D.width = canvas3D.width;
         canvas2D.height = canvas3D.height;
+        this.width = canvas3D.width;
+        this.height = canvas3D.height;
 
         //Initilise WebGL
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -52,7 +57,7 @@ class Renderer {
     clear() {
         //Shorthand aliases
         const gl = this.gl;
-        const c  = this.context;
+        const c = this.context;
 
         //Clear both canvases
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -117,7 +122,7 @@ class Camera extends Entity {
         super(position, rotation);
         this.projectionMatrix = createProjectionMatrix(90, gl);
         this.viewMatrix = mat4.create();
-        this.projectionViewmatrix = mat4.create();
+        this.projectionViewMatrix = mat4.create();
         this.update(new Vector3(), new Vector3());
     }
 
@@ -134,7 +139,7 @@ class Camera extends Entity {
         //Reset matrices
         this.viewMatrix = createViewMatrix(this.rotation, this.position);
         mat4.multiply(
-            this.projectionViewmatrix,
+            this.projectionViewMatrix,
             this.projectionMatrix,
             this.viewMatrix);
     }
@@ -200,6 +205,52 @@ class Billboard {
     }
 }
 
+class RenderableBillboard {
+    constructor(renderer, camera, room) {
+        const modelMatrix = createModelMatrix(
+            new Vector3(0, 0, 0),
+            new Vector3(room.centerX, 3, room.centerZ)
+        );
+        const transform = mat4.create();
+        mat4.mul(transform, camera.projectionViewMatrix, modelMatrix);
+
+        //Convert transform to clip space
+        const clipX = transform[12] / transform[15]; //X divide W
+        const clipY = transform[13] / transform[15]; //Y divide W
+
+        //Convert clip space to screen space
+        this.x = (clipX * 0.5 + 0.5) * renderer.width - 25;
+        this.y = (clipY * -0.5 + 0.5) * renderer.height - 10;
+        this.z = transform[14];
+
+        //get data
+        this.billboardData = room.billboard;
+    }
+
+    draw(renderer) {
+        //TODO Use billboard store stats to fit the billboard size accordingly
+        //Draw billboard thing
+        const c = renderer.context;
+        c.strokeStyle = "white";
+        c.fillStyle = "black";
+        c.beginPath();
+        c.moveTo(this.x + 25, this.y + 25);
+        c.lineTo(this.x + 10, this.y + 10);
+        c.lineTo(this.x - 10, this.y + 5);
+        c.lineTo(this.x - 10, this.y - 35);
+        c.lineTo(this.x + 70, this.y - 35);
+        c.lineTo(this.x + 70, this.y + 5);
+        c.lineTo(this.x + 35, this.y + 10);
+        c.lineTo(this.x + 25, this.y + 25);
+        c.stroke();
+        c.fill();
+        c.fillStyle = "white";
+        c.fillText(`Room ${this.billboardData.roomId}`, this.x, this.y - 24);
+        c.fillText(`Store: ${this.billboardData.storeName}`, this.x, this.y - 12);
+        c.fillText(`${this.billboardData.storeType}`, this.x, this.y);
+    }
+}
+
 /**
  * Entry point for the dashboard
  * 
@@ -229,6 +280,7 @@ window.addEventListener("load", async e => {
 
     //Begin main rendering of stuff
     window.requestAnimationFrame(loop);
+
     function loop() {
         inputStuff(camera); //VERY VERY TEMP TODO
         renderer.clear();
@@ -245,9 +297,9 @@ window.addEventListener("load", async e => {
 
         //Load uniform variables to shader
         mapShader.loadUniformVector3(renderer.gl, "lightPosition", camera.position);
-        mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewmatrix);
+        mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewMatrix);
 
-        render(renderer, renderer.gl, renderer.context, objects, camera.projectionViewmatrix);
+        render(renderer, renderer.gl, renderer.context, objects, camera);
 
         window.requestAnimationFrame(loop);
     }
@@ -260,7 +312,7 @@ window.addEventListener("load", async e => {
  * @param {Object} objects Object containing objects to draw    
  * @param {mat4} projectionViewMatrix Projection view matrix
  */
-function render(renderer, gl, ctx, objects, projectionViewMatrix) {
+function render(renderer, gl, ctx, objects, camera) {
     //List to hold any billboards above rooms. This must be a defered render as they 
     //must be sorted by their z-distance to the camera
     const billboardRenderInfo = [];
@@ -268,47 +320,18 @@ function render(renderer, gl, ctx, objects, projectionViewMatrix) {
     for (const room of objects.rooms) {
 
         renderer.draw(room);
-       // gl.bindVertexArray(room.vao);
-       // gl.drawElements(gl.TRIANGLES, room.indicesCount, gl.UNSIGNED_SHORT, 0);
-
         if (room.billboard) {
-            const modelMatrix = createModelMatrix(
-                new Vector3(0, 0, 0),
-                new Vector3(room.centerX, 3, room.centerZ)
-            );
-
-            //For rendering the text, use the matrices to calculate the screen coordinates to
-            //render it to
-            const pos = mat4.create();
-            mat4.mul(pos, projectionViewMatrix, modelMatrix);
-
-            //Transform world coordinates into screen coordinates
-            const offsetX = 25;
-            const offsetY = 10;
-            const x = ((pos[12] / pos[15]) * 0.5 + 0.5) * gl.canvas.width - offsetX;
-            const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - offsetY;
-            const z = pos[14];
-
-            //Don't bother rendering the billboards that are very far away
-            if (z > 60) {
-                continue;
+            const renderableBillboard 
+                = new RenderableBillboard(renderer, camera, room);
+            if (renderableBillboard.z < 60) {
+                billboardRenderInfo.push(renderableBillboard);
             }
-
-            //Add the billboard to the list
-            billboardRenderInfo.push({
-                x,
-                y,
-                z,
-                data: room.billboard
-            });
         }
     }
 
     //Render paths
     for (const path of objects.paths) {
         renderer.draw(path);
-        //gl.bindVertexArray(path.VAO);
-        //gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
     }
 
     //Sort the billboards by the Z-coordinates
@@ -318,35 +341,8 @@ function render(renderer, gl, ctx, objects, projectionViewMatrix) {
 
     //Render the boards
     for (const board of billboardRenderInfo) {
-        drawBillboard(ctx, board);
+        board.draw(renderer);
     }
-}
-
-/**
- * Renders a billboard
- * @param {RenderContext2D} ctx The 2D rendering context to render board to
- * @param {Object} board The board to render
- */
-function drawBillboard(ctx, board) {
-    //TODO Use billboard store stats to fit the billboard size accordingly
-    //Draw billboard thing
-    ctx.strokeStyle = "white";
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    ctx.moveTo(board.x + 25, board.y + 25);
-    ctx.lineTo(board.x + 10, board.y + 10);
-    ctx.lineTo(board.x - 10, board.y + 5);
-    ctx.lineTo(board.x - 10, board.y - 35);
-    ctx.lineTo(board.x + 70, board.y - 35);
-    ctx.lineTo(board.x + 70, board.y + 5);
-    ctx.lineTo(board.x + 35, board.y + 10);
-    ctx.lineTo(board.x + 25, board.y + 25);
-    ctx.stroke();
-    ctx.fill();
-    ctx.fillStyle = "white";
-    ctx.fillText(`Room ${board.data.roomId}`, board.x, board.y - 24);
-    ctx.fillText(`Store: ${board.data.storeName}`, board.x, board.y - 12);
-    ctx.fillText(`${board.data.storeType}`, board.x, board.y);
 }
 
 /**
@@ -489,7 +485,7 @@ function buildPathGeometry(gl, pathData) {
         path.mesh.normals.push(...geometry.normals);
 
         createColourIndicesData(path.mesh, new Colour(1, 1, 1));
-        
+
         path.buffer(gl);
         paths.push(path);
     }
@@ -575,8 +571,8 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
         const info = await response.json();
 
         room.billboard = new Billboard(
-            room.roomId, 
-            info.name, 
+            room.roomId,
+            info.name,
             info.type);
 
         colour = typeToColour(info.type).asNormalised().asArray();
