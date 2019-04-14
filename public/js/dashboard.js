@@ -64,32 +64,11 @@ async function main(canvas3d, canvas2d) {
     mapShader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
     mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(37, 15, 15));
 
-    const basicShader = new Shader(gl, shaders.basicVertex, shaders.basicFragment);
-    basicShader.use(gl);
-    basicShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
-
     const objects = await createMapMesh(gl);
     window.requestAnimationFrame(mainloop);
 
     function mainloop() {
-        //TEMP
-        const speed = 0.1;
-        if (keydown["s"]) {
-            camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
-            camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-        } else if (keydown["w"]) {
-            camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
-            camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-        }
-        if (keydown["a"]) {
-            camera.rotation.y -= 1;
-        } else if (keydown["d"]) {
-            camera.rotation.y += 1;
-        }
-        if (keydown["p"]) {
-            console.log(camera);
-        }
-        //TEMP
+        inputStuff(camera);
         //Clear
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -106,45 +85,45 @@ async function main(canvas3d, canvas2d) {
 
             if (room.billboard) {
                 const board = room.billboard;
-                basicShader.use(gl);
-                basicShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
-
-                const rx = (room.center.x + 2);
-                const rz = (room.center.z + 2);
-                const dx = rx - camera.position.x;
-                const dz = rz - camera.position.z;
-                const rot = 180 + toDegrees(Math.atan2(dx, dz));
 
                 const modelMatrix = createModelMatrix(
-                    new Vector3(0, rot, 0), 
+                    new Vector3(0, 0, 0), 
                     new Vector3(room.center.x, 3, room.center.z)
                 );
-                basicShader.loadUniformMatrix4(gl, "modelMatrix", modelMatrix);
 
-                gl.bindVertexArray(board.vao);
-                gl.drawElements(gl.TRIANGLES, board.indices, gl.UNSIGNED_SHORT, 0);
-                
                 //For rendering the text, use the matrices to calculate the screen coordinates to
                 //render it to
                 const pos = mat4.create();
                 mat4.mul(pos, matrix.projectionView, modelMatrix);
-
-                //Convert from opengl coords to screen coords
-                const x = ((pos[12] / pos[15]) * 0.5 + 0.5)  * gl.canvas.width + (1 / pos[14]) * 256;
-                const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - (1 / pos[14]) * 512;
+                
+                //Transform world coordinates into screen coordinates
+                const x = ((pos[12] / pos[15]) * 0.5 + 0.5)  * gl.canvas.width - 25;
+                const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - 10;
 
                 const z = pos[14];
-                if (z < 25) {
+            
+                //TODO Use billboard store stats to fit the billboard size accordingly
+                //Draw billboard thing
+                ctx.strokeStyle = "white";
+                ctx.fillStyle   = "black";
+                ctx.beginPath();
+                ctx.moveTo(x + 25, y + 25);
+                ctx.lineTo(x + 10, y + 10);
+                ctx.lineTo(x - 10, y + 5);
+                ctx.lineTo(x - 10, y - 32);
+                ctx.lineTo(x + 70, y - 32);
+                ctx.lineTo(x + 70, y + 5);
+                ctx.lineTo(x + 35, y + 10);
+                ctx.lineTo(x + 25, y + 25);
+                ctx.stroke();  
+                ctx.fill();        
 
-                
+                //ctx.fillRect(x + 25, y + 25, 5, 5);
 
-
-
-                
-                ctx.fillText(`Room ${board.roomid}`, x, y);
-                ctx.fillText(`Store: ${board.storeName}`, x, y + 12);
-                ctx.fillText(`${board.storeType}`, x, y + 24);
-                }
+                ctx.fillStyle = "white";
+                ctx.fillText(`Room ${board.roomid}`, x, y - 24);
+                ctx.fillText(`Store: ${board.storeName}`, x, y - 12);
+                ctx.fillText(`${board.storeType}`, x, y);                
             }
         }
 
@@ -260,20 +239,6 @@ function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
             normalDirection, 0, 0
         ]
     };
-}
-
-/**
- * Creates vertex positions and normals of a basic quad shape
- * @param {Number} width The width of the quad
- * @param {Number} height The height of the quad
- */
-function createQuadPositions(width, height) {
-    return [
-        0, -1, 0,
-        width, 0, 0,
-        width, height, 0,
-        0, height, 0
-    ]
 }
 
 /**
@@ -426,16 +391,7 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
 function makeRoomBillboard(gl, roomObject, storeInfo) {
     const billboard = { };
     
-    const billboardMesh = new Mesh();
-    billboardMesh.positions = createQuadPositions(4, 3);
-    billboardMesh.indices   = [0, 1, 2, 2, 3, 0];
-
-    const buffers = billboardMesh.createBuffers(gl);
-    billboard.vao     = buffers.vao;
-    billboard.buffers = buffers.buffers;
-    billboard.indices = billboardMesh.indices.length;
     billboard.height = 3;
-
     billboard.roomid = roomObject.roomid;
     billboard.storeName = storeInfo.name;
     billboard.storeType = storeInfo.type;
@@ -484,31 +440,6 @@ const shaders = {
         vec3  finalColour = passColour * diff * 2.0;
         colour = vec4(finalColour.xyz, 1.0);
     }`,
-
-    basicVertex:
-    `#version 300 es
-    in vec3 inVertexPosition;
-
-    out float y;
-
-    uniform mat4 modelMatrix;
-    uniform mat4 projViewMatrix;
-
-    void main() {
-        gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
-        y = inVertexPosition.y + 5.0;
-    }`,
-
-    basicFragment:
-    `#version 300 es
-    precision highp float;
-
-    out vec4 colour;
-    in float y;
-
-    void main() {
-        colour = vec4(1.0/y, 1.0/y, (1.0/y) * 2.0, 1.0);
-    }`,
 }
 
 
@@ -525,6 +456,30 @@ const shaders = {
 
 
 //temp
+
+function inputStuff(camera) {
+        //TEMP
+        const speed = 0.1;
+        if (keydown["s"]) {
+            camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
+            camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
+        } else if (keydown["w"]) {
+            camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
+            camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
+        }
+        if (keydown["a"]) {
+            camera.rotation.y -= 1;
+        } else if (keydown["d"]) {
+            camera.rotation.y += 1;
+        }
+        if (keydown["p"]) {
+            console.log(camera);
+        }
+        //TEMP
+}
+
+
+
 const keydown = {
     "w": false,
     "a": false,
