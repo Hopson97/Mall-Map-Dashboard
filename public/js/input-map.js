@@ -1,8 +1,9 @@
 "use strict"
 
-let offsetX = 10;
-let offsetY = 10;
+let offsetX = 0;
+let offsetY = 0;
 const PAN_SPEED = 4;
+let scaleFactor = 2;
 
 //Keys currently pressed
 const keydown = {
@@ -75,6 +76,7 @@ window.addEventListener("load", async () => {
     } else {
         canvas.width = window.innerWidth * 0.6;
         canvas.height = canvas.width;
+        scaleFactor = 4;
     }
 
     /*
@@ -103,6 +105,12 @@ window.addEventListener("load", async () => {
     setUpButton(document.getElementById("right-arrow"), 'right');
     setUpButton(document.getElementById("down-arrow"), 'down');
 
+    document.getElementById("btn-zoom-in")
+        .addEventListener("click", handleZoomInClick);
+
+    document.getElementById("btn-zoom-out")
+        .addEventListener("click", handleZoomOutClick);
+
     //Build various DOM sections and initilize some data
     buildStoreDOM();
     await initMapData();
@@ -125,7 +133,7 @@ async function initMapData() {
 
     for (const room of mapData.rooms) {
         if (json[room.id]) {
-            const response = await fetch("api/stores/store-info?id="+json[room.id]);
+            const response = await fetch("api/stores/store-info?id=" + json[room.id]);
             const info = await response.json();
             room.name = info.name;
             room.type = info.type;
@@ -153,7 +161,9 @@ function loop(canvas, context) {
 
         context.fillStyle = "white";
         for (const path of mapData.paths) {
-            renderer.renderRect(path.x, path.y, path.width, path.height);
+            renderer.renderRect(
+                path.x / scaleFactor, path.y / scaleFactor,
+                path.width / scaleFactor, path.height / scaleFactor);
         }
 
         for (const room of mapData.rooms) {
@@ -162,7 +172,9 @@ function loop(canvas, context) {
             } else {
                 context.fillStyle = typeToColour(room.type).asCSSString();
             }
-            renderer.renderRect(room.x, room.y, room.width, room.height);
+            renderer.renderRect(
+                room.x / scaleFactor, room.y / scaleFactor,
+                room.width / scaleFactor, room.height / scaleFactor);
         }
 
         context.stroke();
@@ -202,10 +214,14 @@ function handleInput() {
  */
 function handleCanvasClick(event) {
     //Convert the browser coordinates to canvas/world coordinates
-    const x = event.clientX - event.target.offsetLeft - offsetX;
-    const y = event.clientY - event.target.offsetTop - offsetY;
+    const x = (event.clientX - event.target.offsetLeft - offsetX);
+    const y = (event.clientY - event.target.offsetTop - offsetY);
+    console.log(x + " " + y);
     for (const room of mapData.rooms) {
-        if (x > room.x && x < room.x + room.width && y > room.y && y < room.y + room.height) {
+        if (x > room.x / scaleFactor &&
+            x < room.x / scaleFactor + room.width / scaleFactor &&
+            y > room.y / scaleFactor &&
+            y < room.y / scaleFactor + room.height / scaleFactor) {
             console.log(`Room clicked: ${room.id}`);
             const popup = document.getElementById("popup");
             popup.classList.remove("hidden");
@@ -229,6 +245,21 @@ function handleKeyDown(event) {
 function handleKeyUp(event) {
     keydown[event.key] = false;
 }
+
+function handleZoomInClick() {
+    scaleFactor--;
+    if (scaleFactor < 1) {
+        scaleFactor = 1;
+    }
+}
+
+function handleZoomOutClick() {
+    scaleFactor++;
+    if (scaleFactor > 6) {
+        scaleFactor = 6;
+    }
+}
+
 
 ///@TODO EWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 /**
