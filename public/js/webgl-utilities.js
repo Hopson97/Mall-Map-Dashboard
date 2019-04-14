@@ -295,6 +295,14 @@ function toRadians(degrees) {
     return degrees * Math.PI / 180.0;
 }
 
+/**
+ * Converts radians to degrees
+ * @param {Number} radians The number to convert in radians
+ */
+function toDegrees(degrees) {
+    return degrees * 180 / Math.PI;
+}
+
 function transformVector(matrix, vector) {
     const result = new Float32Array(4);
     for (let y = 0; y < 4; y++) {

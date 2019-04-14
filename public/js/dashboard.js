@@ -23,15 +23,22 @@ window.addEventListener("load", async e => {
 function initGl(gl) {
     gl.clearColor(0.0, 0.0, 1.0, 1.0);
     gl.viewport(0, 0, gl.canvas.clientWidth, gl.canvas.clientHeight);
+
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LESS);
     gl.depthMask(true);
+}
+
+function initCtx(ctx) {
+    ctx.fillStyle = "white";
+    ctx.font = `bold 9.25px sans-serif`;
 }
 
 async function main(canvas3d, canvas2d) {
     const gl = canvas3d.getContext("webgl2");
     const ctx = canvas2d.getContext("2d");
     initGl(gl);
+    initCtx(ctx);
 
     const camera = {
         position: new Vector3(15, 10, 30.5),
@@ -98,25 +105,46 @@ async function main(canvas3d, canvas2d) {
             gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
 
             if (room.billboard) {
+                const board = room.billboard;
                 basicShader.use(gl);
                 basicShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
+
+                const rx = (room.center.x + 2);
+                const rz = (room.center.z + 2);
+                const dx = rx - camera.position.x;
+                const dz = rz - camera.position.z;
+                const rot = 180 + toDegrees(Math.atan2(dx, dz));
+
                 const modelMatrix = createModelMatrix(
-                    new Vector3(0, -camera.rotation.y, 0), 
+                    new Vector3(0, rot, 0), 
                     new Vector3(room.center.x, 3, room.center.z)
                 );
                 basicShader.loadUniformMatrix4(gl, "modelMatrix", modelMatrix);
 
-                gl.bindVertexArray(room.billboard.vao);
-                gl.drawElements(gl.TRIANGLES, room.billboard.indices, gl.UNSIGNED_SHORT, 0);
+                gl.bindVertexArray(board.vao);
+                gl.drawElements(gl.TRIANGLES, board.indices, gl.UNSIGNED_SHORT, 0);
                 
                 //For rendering the text, use the matrices to calculate the screen coordinates to
                 //render it to
                 const pos = mat4.create();
                 mat4.mul(pos, matrix.projectionView, modelMatrix);
-                const x = ((pos[12] / pos[15]) * 0.5 + 0.5)  * gl.canvas.width;
-                const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height;
+
+                //Convert from opengl coords to screen coords
+                const x = ((pos[12] / pos[15]) * 0.5 + 0.5)  * gl.canvas.width + (1 / pos[14]) * 256;
+                const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - (1 / pos[14]) * 512;
+
+                const z = pos[14];
+                if (z < 25) {
+
                 
-                ctx.fillText("Hello world", x, y);
+
+
+
+                
+                ctx.fillText(`Room ${board.roomid}`, x, y);
+                ctx.fillText(`Store: ${board.storeName}`, x, y + 12);
+                ctx.fillText(`${board.storeType}`, x, y + 24);
+                }
             }
         }
 
@@ -235,13 +263,13 @@ function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
 }
 
 /**
- * Creates vertex positions of a basic quad shape
+ * Creates vertex positions and normals of a basic quad shape
  * @param {Number} width The width of the quad
  * @param {Number} height The height of the quad
  */
 function createQuadPositions(width, height) {
     return [
-        0, 0, 0,
+        0, -1, 0,
         width, 0, 0,
         width, height, 0,
         0, height, 0
@@ -371,7 +399,7 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
             const response = await fetch("api/stores/store-info?id=" + roomObject.storeid);
             const info = await response.json();
             colour = typeToColour(info.type).asNormalised().asArray();
-            roomObject.billboard = makeRoomBillboard(gl, roomObject);
+            roomObject.billboard = makeRoomBillboard(gl, roomObject, info);
         } else {
             colour = typeToColour("none").asNormalised().asArray();
         }
@@ -395,7 +423,7 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
     return rooms;
 }
 
-function makeRoomBillboard(gl, roomObject) {
+function makeRoomBillboard(gl, roomObject, storeInfo) {
     const billboard = { };
     
     const billboardMesh = new Mesh();
@@ -406,6 +434,11 @@ function makeRoomBillboard(gl, roomObject) {
     billboard.vao     = buffers.vao;
     billboard.buffers = buffers.buffers;
     billboard.indices = billboardMesh.indices.length;
+    billboard.height = 3;
+
+    billboard.roomid = roomObject.roomid;
+    billboard.storeName = storeInfo.name;
+    billboard.storeType = storeInfo.type;
 
     return billboard;
 }
@@ -456,11 +489,14 @@ const shaders = {
     `#version 300 es
     in vec3 inVertexPosition;
 
+    out float y;
+
     uniform mat4 modelMatrix;
     uniform mat4 projViewMatrix;
 
     void main() {
         gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
+        y = inVertexPosition.y + 5.0;
     }`,
 
     basicFragment:
@@ -468,9 +504,10 @@ const shaders = {
     precision highp float;
 
     out vec4 colour;
+    in float y;
 
     void main() {
-        colour = vec4(0.5, 0.5, 0.5, 1.0);
+        colour = vec4(1.0/y, 1.0/y, (1.0/y) * 2.0, 1.0);
     }`,
 }
 
