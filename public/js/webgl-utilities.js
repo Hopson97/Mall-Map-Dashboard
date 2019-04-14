@@ -209,13 +209,16 @@ function createShaderFromSource(gl, vertexSource, fragmentSource) {
  * @param {Number} dataPerVertex The amount of data per vertex (2d/3d/4d etc)
  */
 function createBuffer(gl, data, attribLocation, dataPerVertex) {
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-    gl.vertexAttribPointer(
-        attribLocation, dataPerVertex, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(attribLocation);
-    return buffer;
+    if (data.length > 0) {
+        const buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+        gl.vertexAttribPointer(
+            attribLocation, dataPerVertex, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribLocation);
+        return buffer;
+    }
+    return 0;
 }
 
 /**

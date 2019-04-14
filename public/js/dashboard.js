@@ -46,8 +46,8 @@ async function main(canvas) {
     };
     mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
 
-    const lightPosition = new Vector3(0, 2, 0);
-    const shader = new Shader(gl, vertexShaderSource, fragmentShaderSource);
+    const lightPosition = new Vector3(15, 10, 15);
+    const shader = new Shader(gl, shaders.mapVertex, shaders.mapFragment);
     shader.use(gl);
 
     shader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
@@ -77,12 +77,7 @@ async function main(canvas) {
         }
         //TEMP
 
-        shader.loadUniformVector3(gl, "lightPosition", camera.position);
-
-
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        //camera.rotation.y += 0.25;
 
         matrix.view = createViewMatrix(camera.rotation, camera.position)
         mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
@@ -90,8 +85,12 @@ async function main(canvas) {
 
         //Render rooms
         for (const room of objects.rooms) {
-            gl.bindVertexArray(room.VAO);
+            gl.bindVertexArray(room.vao);
             gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
+
+            if (room.billboard) {
+                
+            }
         }
 
         //Render paths
@@ -154,6 +153,16 @@ function createFloorQuadGeometry(x, y, z, width, depth) {
     }
 }
 
+/**
+ * Creates the vertex positions and normals for a wall in the Z-Plane
+ * @param {Number} x X-Coordinate to start wall at
+ * @param {Number} y Y-Coordinate to start wall at
+ * @param {Number} z Z-Coordinate to start wall at
+ * @param {Number} width The width of the walls
+ * @param {Number} height The height of the wall
+ * @param {Number} zOffset How far along the Z-Axis to offset the wall
+ * @param {Number} normalDirection The direction that the face normal is
+ */
 function createWallZPlane(x, y, z, width, height, zOffset, normalDirection) {
     return {
         positions: [
@@ -170,7 +179,16 @@ function createWallZPlane(x, y, z, width, height, zOffset, normalDirection) {
         ]
     };
 }
-
+/**
+ * Creates the vertex positions and normals for a wall in the X-Plane
+ * @param {Number} x X-Coordinate to start wall at
+ * @param {Number} y Y-Coordinate to start wall at
+ * @param {Number} z Z-Coordinate to start wall at
+ * @param {Number} width The width of the walls
+ * @param {Number} height The height of the wall
+ * @param {Number} xOffset How far along the X-Axis to offset the wall
+ * @param {Number} normalDirection The direction that the face normal is
+ */
 function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
     return {
         positions: [
@@ -189,11 +207,25 @@ function createWallXPlane(x, y, z, width, height, xOffset, normalDirection) {
 }
 
 /**
+ * Creates vertex positions of a basic quad shape
+ * @param {Number} width The width of the quad
+ * @param {Number} height The height of the quad
+ */
+function createQuadPositions(width, height) {
+    return [
+        0, 0, 0,
+        width, 0, 0,
+        width, height, 0,
+        0, height, 0
+    ]
+}
+
+/**
  * Fills the mesh data with the same basic data for every vertex based on the number of vertices already added
  * @param {Mesh} mesh The mesh to add the data to
  * @param {Colour} colour The colour set the colour data
  */
-function createColourNormalIndicesData(mesh, colour) {
+function createColourIndicesData(mesh, colour) {
     for (let i = 0; i < mesh.positions.length / 12; i++) {
         for (let v = 0; v < 4; v++) {
             mesh.colours.push(colour.r, colour.g, colour.b);
@@ -228,7 +260,7 @@ function buildPathGeometry(gl, scaleFactor, gapSize, pathData) {
         mesh.positions.push(...geometry.positions);
         mesh.normals.push(...geometry.normals);
 
-        createColourNormalIndicesData(mesh, new Colour(1, 1, 1));
+        createColourIndicesData(mesh, new Colour(1, 1, 1));
         const buffers = mesh.createBuffers(gl);
 
         paths.push({
@@ -261,9 +293,20 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
 
         const mesh = new Mesh();
 
+        //Adds normal and vertex data to the mesh
         function addMeshData(geometry) {
             mesh.positions.push(...geometry.positions);
             mesh.normals.push(...geometry.normals);
+        }
+
+        //Object that will be added onto in this function
+        //Contains information about this room
+        const roomObject = {
+            roomid: room.id,
+            center: {
+                x: x + roomWidth / 2,
+                z: z + roomDepth / 2
+            }
         }
 
         //Calculate positions of the vertricies to make the floor and the room's outline
@@ -294,19 +337,18 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
         addMeshData(createFloorQuadGeometry(x + roomWidth, roomHeight, z - halfGap, halfGap, roomDepth + gapSize));
 
         let colour;
-        let storeid = -1;
-
-        //Colour in the room if the room is occupied by a store
+        //Do extra things if the room has an assosiated store
         if (roomsData[room.id]) {
-            storeid = roomsData[room.id];
-            const response = await fetch("api/stores/store-info?id=" + storeid);
+            roomObject.storeid = roomsData[room.id];
+            const response = await fetch("api/stores/store-info?id=" + roomObject.storeid);
             const info = await response.json();
             colour = typeToColour(info.type).asNormalised().asArray();
+            roomObject.billboard = makeRoomBillboard(gl, roomObject);
         } else {
             colour = typeToColour("none").asNormalised().asArray();
         }
 
-        createColourNormalIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
+        createColourIndicesData(mesh, new Colour(0.8, 0.8, 0.8));
 
         //Change colour of the inner-quad and walls to be the store colour
         for (let i = 0; i < 20; i++) {
@@ -315,24 +357,34 @@ async function buildRoomsGeometry(gl, scaleFactor, gapSize, roomGeometry, roomsD
             }
         }
         const buffers = mesh.createBuffers(gl);
-        rooms.push({
-            VAO: buffers.vao,
-            buffers: buffers.buffers,
-            indices: mesh.indices.length,
-            roomid: room.id,
-            storeid: storeid,
-            center: {
-                x: x + roomWidth / 2,
-                z: z + roomDepth / 2
-            }
-        });
+
+        roomObject.vao = buffers.vao;
+        roomObject.buffers = buffers.buffers;
+        roomObject.indices = mesh.indices.length;
+
+        rooms.push(roomObject);
     }
     return rooms;
 }
 
+function makeRoomBillboard(gl, roomObject) {
+    const billboard = { };
+    
+    const billboardMesh = new Mesh();
+    billboardMesh.positions = createQuadPositions(2, 2);
+    billboardMesh.indices   = [0, 1, 2, 2, 3, 0];
+
+    const buffers = billboardMesh.createBuffers(gl);
+    billboard.vao     = buffers.vao;
+    billboard.buffers = buffers.buffers;
+
+    return billboard;
+}
 
 //Shader programs
-const vertexShaderSource =
+const shaders = {
+    //Verex and fragment shader for the map
+    mapVertex:
     `#version 300 es
     in vec3 inVertexPosition;
     in vec3 inColour;
@@ -351,10 +403,8 @@ const vertexShaderSource =
         passColour = inColour;
         passNormal = inNormal;
         passFragmentPosition = vec3(modelMatrix * vec4(inVertexPosition, 1.0));
-    }
-`;
-
-const fragmentShaderSource =
+    }`,
+    mapFragment:
     `#version 300 es
     precision highp float;
 
@@ -371,8 +421,42 @@ const fragmentShaderSource =
         float diff = max(dot(passNormal, lightDirection), 0.2);
         vec3  finalColour = passColour * diff * 2.0;
         colour = vec4(finalColour.xyz, 1.0);
-    }
-`;
+    }`,
+
+    basicVertex:
+    `#version 300 es
+    in vec3 inVertexPosition;
+
+    uniform mat4 modelMatrix;
+    uniform mat4 projViewMatrix;
+
+    void main() {
+        gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
+    }`,
+
+    basicFragment:
+    `#version 300 es
+    precision highp float;
+
+    out vec4 colour;
+
+    void main() {
+        colour = vec4(0.5, 0.5, 0.5, 1.0);
+    }`,
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //temp
 const keydown = {
