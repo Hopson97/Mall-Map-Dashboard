@@ -130,8 +130,6 @@ window.addEventListener("load", async e => {
     const renderer = new Renderer();
     const shitstain   = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
-    const gl = renderer.gl;
-
     //TEMP
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
@@ -141,12 +139,12 @@ window.addEventListener("load", async e => {
     const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0));
 
     //Create shader for rendering the map
-    const mapShader = new Shader(gl, shaders.mapVertex, shaders.mapFragment);
-    mapShader.use(gl);
-    mapShader.loadUniformMatrix4(gl, "modelMatrix", modelMatrix);
+    const mapShader = new Shader(renderer.gl, shaders.mapVertex, shaders.mapFragment);
+    mapShader.use(renderer.gl);
+    mapShader.loadUniformMatrix4(renderer.gl, "modelMatrix", modelMatrix);
 
     //Get lists of objects to render
-    const objects = await createMapMesh(gl);
+    const objects = await createMapMesh(renderer.gl);
 
     window.requestAnimationFrame(loop);
     function loop() {
@@ -163,10 +161,10 @@ window.addEventListener("load", async e => {
             new Vector3(0, -0.1, 0)
         );
 
-        mapShader.loadUniformVector3(gl, "lightPosition", shitstain.position);
-        mapShader.loadUniformMatrix4(gl, "projViewMatrix", shitstain.projectionViewmatrix);
+        mapShader.loadUniformVector3(renderer.gl, "lightPosition", shitstain.position);
+        mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", shitstain.projectionViewmatrix);
 
-        render(gl, renderer.context, objects, shitstain.projectionViewmatrix);
+        render(renderer.gl, renderer.context, objects, shitstain.projectionViewmatrix);
 
         window.requestAnimationFrame(loop);
     }
