@@ -4,7 +4,14 @@
  * Dashboard.js
  * JS file for the display board
  */
+
+/**
+ * Renderer to assist with rendering 3D and 2D objects to browser window
+ */
 class Renderer {
+    /**
+     * Initilises WebGL and the 2D context
+     */
     constructor() {
         //Get canvas objects
         const canvas3D = document.getElementById("map-canvas");
@@ -32,6 +39,9 @@ class Renderer {
         this.context.font = `bold 9.5 sans-serif`;
     }
 
+    /**
+     * Clears the canvas windows
+     */
     clear() {
         this.gl.clear(
             this.gl.COLOR_BUFFER_BIT | 
@@ -42,34 +52,83 @@ class Renderer {
     }
 }
 
+/**
+ * Represents an object in the world
+ */
 class Entity {
+    //Private fields
+
+    /**
+     * Construct the entity
+     * @param {Vector3} position The position of the entity
+     * @param {Vector3} rotation The roation of the entity
+     */
     constructor(position, rotation) {
         this.position = position;
         this.rotation = rotation;
     }
 
+    /**
+     * Moves the entity's position by an offset
+     * @param {Vector3} offset The amount to move the entity
+     */
     move(offset) {
         this.position.add(offset);
     }
 
+    /**
+     * Rotates the entity by an offset
+     * @param {Vector3} rotation The amount to rotate the entity
+     */
     rotate(rotation) {
-        this.rotation.add(offset);
-        if (this.rotation.x > 360) {
-            this.rotation = 0;
-        }
+        this.rotation.add(rotation);
     }
 }
 
+/**
+ * Represents a camera in the world, where the world should be rendered from
+ */
+class Camera extends Entity {
+    /**
+     * Construct the camera and the matrices
+     * @param {Vector3} position The position of the entity
+     * @param {Vector3} rotation The roation of the entity
+     */
+    constructor(gl, position, rotation) {
+        super(position, rotation);
+        this.projectionMatrix = createProjectionMatrix(90, gl);
+        this.viewMatrix = mat4.create();
+        this.projectionViewmatrix = mat4.create();
+        this.update(new Vector3(), new Vector3());
+    }
+
+    /**
+     * Moves the entity's position by an offset
+     * @param {Vector3} offset The amount to move the entity
+     * @param {Vector3} rotation The amount to rotate the entity
+     */
+    update(offset, rotation) {
+        //Move and rotate camera
+        super.move(offset);
+        super.rotate(rotation);
+
+        //Reset matrices
+        this.viewMatrix = createViewMatrix(this.rotation, this.position);
+        mat4.multiply(
+            this.projectionViewmatrix, 
+            this.projectionMatrix, 
+            this.viewMatrix);
+    }
+
+}
+
 window.addEventListener("load", async e => {
+    //Setup the websocket
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
 
-    await main();
-});
-
-async function main() {
     const renderer = new Renderer();
-    const camera   = new Entity(new Vector3(65, 25, 140), new Vector3(50, 0, 0))
+    const shitstain   = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
     const gl = renderer.gl;
 
@@ -78,47 +137,40 @@ async function main() {
     window.addEventListener("keyup", handleKeyUp);
     //TEMP
 
-    const matrix = {
-        model: createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0)),
-        view: createViewMatrix(camera.rotation, camera.position),
-        perspective: createProjectionMatrix(90, gl),
-        projectionView: mat4.create()
-    };
-    mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
+    //TODO do I really need this?
+    const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0));
 
-    //Create shader for rendering the map and
+    //Create shader for rendering the map
     const mapShader = new Shader(gl, shaders.mapVertex, shaders.mapFragment);
     mapShader.use(gl);
-    mapShader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
+    mapShader.loadUniformMatrix4(gl, "modelMatrix", modelMatrix);
 
+    //Get lists of objects to render
     const objects = await createMapMesh(gl);
-    window.requestAnimationFrame(mainloop);
 
-    /**
-     * The main rendering loop
-     */
-    function mainloop() {
-        inputStuff(camera); //VERY VERY TEMP TODO
+    window.requestAnimationFrame(loop);
+    function loop() {
+        inputStuff(shitstain); //VERY VERY TEMP TODO
         renderer.clear();
-
 
         //Orbit the camera around the map of the mall
         const speed = 0.125;
-        camera.rotation.y -= 0.1;
-        camera.position.x += Math.cos(toRadians(camera.rotation.y)) * speed;
-        camera.position.z += Math.sin(toRadians(camera.rotation.y)) * speed;
-        mapShader.loadUniformVector3(gl, "lightPosition", camera.position);
-        //TODO
-        //Temp?
-        matrix.view = createViewMatrix(camera.rotation, camera.position)
-        mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
-        mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
+        shitstain.update(
+            new Vector3(
+                Math.cos(toRadians(shitstain.rotation.y)) * speed,
+                0,
+                Math.sin(toRadians(shitstain.rotation.y)) * speed),
+            new Vector3(0, -0.1, 0)
+        );
 
-        render(gl, renderer.context, objects, matrix.projectionView);
+        mapShader.loadUniformVector3(gl, "lightPosition", shitstain.position);
+        mapShader.loadUniformMatrix4(gl, "projViewMatrix", shitstain.projectionViewmatrix);
 
-        window.requestAnimationFrame(mainloop);
+        render(gl, renderer.context, objects, shitstain.projectionViewmatrix);
+
+        window.requestAnimationFrame(loop);
     }
-}
+});
 
 /**
  * Renders the map
