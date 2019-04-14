@@ -128,9 +128,6 @@ async function initMapData() {
     const response = await fetch("api/map/sect-data");
     const json = await response.json();
 
-    console.log(json);
-
-
     for (const room of mapData.rooms) {
         if (json[room.id]) {
             const response = await fetch("api/stores/store-info?id=" + json[room.id]);

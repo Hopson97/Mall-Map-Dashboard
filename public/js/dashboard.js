@@ -58,11 +58,10 @@ async function main(canvas3d, canvas2d) {
     };
     mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
 
+    //Create shader for rendering the map and
     const mapShader = new Shader(gl, shaders.mapVertex, shaders.mapFragment);
     mapShader.use(gl);
-    mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
     mapShader.loadUniformMatrix4(gl, "modelMatrix", matrix.model);
-    mapShader.loadUniformVector3(gl, "lightPosition", new Vector3(64, 25, 90));
 
     const objects = await createMapMesh(gl);
     window.requestAnimationFrame(mainloop);
@@ -89,83 +88,110 @@ async function main(canvas3d, canvas2d) {
         mat4.multiply(matrix.projectionView, matrix.perspective, matrix.view);
         mapShader.loadUniformMatrix4(gl, "projViewMatrix", matrix.projectionView);
 
-        //Render rooms
-        const billboardRenderInfo = [];
-        for (const room of objects.rooms) {
-            mapShader.use(gl);
-            gl.bindVertexArray(room.vao);
-            gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
-
-            if (room.billboard) {
-                const modelMatrix = createModelMatrix(
-                    new Vector3(0, 0, 0),
-                    new Vector3(room.center.x, 3, room.center.z)
-                );
-
-                //For rendering the text, use the matrices to calculate the screen coordinates to
-                //render it to
-                const pos = mat4.create();
-                mat4.mul(pos, matrix.projectionView, modelMatrix);
-
-                //Transform world coordinates into screen coordinates
-                const x = ((pos[12] / pos[15]) * 0.5 + 0.5) * gl.canvas.width - 25;
-                const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - 10;
-                const z = pos[14];
-                    
-                //Don't bother rendering the billboards that are very far away
-                if (z > 60) {
-                    continue;
-                }
-
-                billboardRenderInfo.push({
-                    x,
-                    y,
-                    z,
-                    data: room.billboard
-                });
-            }
-        }
-
-        //Render paths
-        for (const path of objects.paths) {
-            gl.bindVertexArray(path.VAO);
-            gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
-        }
-
-        //Sort the billboards by the Z-coordinates
-        billboardRenderInfo.sort((a, b) => {
-            return b.z - a.z;
-        });
-
-        //Render the boards
-        for (const board of billboardRenderInfo) {
-
-            //TODO Use billboard store stats to fit the billboard size accordingly
-            //Draw billboard thing
-            ctx.strokeStyle = "white";
-            ctx.fillStyle = "black";
-            ctx.beginPath();
-            ctx.moveTo(board.x + 25, board.y + 25);
-            ctx.lineTo(board.x + 10, board.y + 10);
-            ctx.lineTo(board.x - 10, board.y + 5);
-            ctx.lineTo(board.x - 10, board.y - 32);
-            ctx.lineTo(board.x + 70, board.y - 32);
-            ctx.lineTo(board.x + 70, board.y + 5);
-            ctx.lineTo(board.x + 35, board.y + 10);
-            ctx.lineTo(board.x + 25, board.y + 25);
-            ctx.stroke();
-            ctx.fill();
-            ctx.fillStyle = "white";
-            ctx.fillText(`Room ${board.data.roomid}`, board.x, board.y - 24);
-            ctx.fillText(`Store: ${board.data.storeName}`, board.x, board.y - 12);
-            ctx.fillText(`${board.data.storeType}`, board.x, board.y);
-        }
+        render(gl, ctx, objects, matrix.projectionView);
 
         window.requestAnimationFrame(mainloop);
     }
 }
 
+/**
+ * Renders the map
+ * @param {WebGLRenderContext} gl The WebGL rendering context
+ * @param {Context} ctx The context for rendering 2D
+ * @param {Object} objects Object containing objects to draw    
+ * @param {mat4} projectionViewMatrix Projection view matrix
+ */
+function render(gl, ctx, objects, projectionViewMatrix) {
+    //List to hold any billboards above rooms. This must be a defered render as they 
+    //must be sorted by their z-distance to the camera
+    const billboardRenderInfo = [];
+    //Render rooms
+    for (const room of objects.rooms) {
 
+        gl.bindVertexArray(room.vao);
+        gl.drawElements(gl.TRIANGLES, room.indices, gl.UNSIGNED_SHORT, 0);
+
+        if (room.billboard) {
+            const modelMatrix = createModelMatrix(
+                new Vector3(0, 0, 0),
+                new Vector3(room.center.x, 3, room.center.z)
+            );
+
+            //For rendering the text, use the matrices to calculate the screen coordinates to
+            //render it to
+            const pos = mat4.create();
+            mat4.mul(pos, projectionViewMatrix, modelMatrix);
+
+            //Transform world coordinates into screen coordinates
+            const offsetX = 25;
+            const offsetY = 10;
+            const x = ((pos[12] / pos[15]) * 0.5 + 0.5) * gl.canvas.width - offsetX;
+            const y = ((pos[13] / pos[15]) * -0.5 + 0.5) * gl.canvas.height - offsetY;
+            const z = pos[14];
+
+            //Don't bother rendering the billboards that are very far away
+            if (z > 60) {
+                continue;
+            }
+
+            //Add the billboard to the list
+            billboardRenderInfo.push({
+                x,
+                y,
+                z,
+                data: room.billboard
+            });
+        }
+    }
+
+    //Render paths
+    for (const path of objects.paths) {
+        gl.bindVertexArray(path.VAO);
+        gl.drawElements(gl.TRIANGLES, path.indices, gl.UNSIGNED_SHORT, 0);
+    }
+
+    //Sort the billboards by the Z-coordinates
+    billboardRenderInfo.sort((a, b) => {
+        return b.z - a.z;
+    });
+
+    //Render the boards
+    for (const board of billboardRenderInfo) {
+        drawBillboard(ctx, board);
+    }
+}
+
+/**
+ * Renders a billboard
+ * @param {RenderContext2D} ctx The 2D rendering context to render board to
+ * @param {Object} board The board to render
+ */
+function drawBillboard(ctx, board) {
+    //TODO Use billboard store stats to fit the billboard size accordingly
+    //Draw billboard thing
+    ctx.strokeStyle = "white";
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.moveTo(board.x + 25, board.y + 25);
+    ctx.lineTo(board.x + 10, board.y + 10);
+    ctx.lineTo(board.x - 10, board.y + 5);
+    ctx.lineTo(board.x - 10, board.y - 35);
+    ctx.lineTo(board.x + 70, board.y - 35);
+    ctx.lineTo(board.x + 70, board.y + 5);
+    ctx.lineTo(board.x + 35, board.y + 10);
+    ctx.lineTo(board.x + 25, board.y + 25);
+    ctx.stroke();
+    ctx.fill();
+    ctx.fillStyle = "white";
+    ctx.fillText(`Room ${board.data.roomid}`, board.x, board.y - 24);
+    ctx.fillText(`Store: ${board.data.storeName}`, board.x, board.y - 12);
+    ctx.fillText(`${board.data.storeType}`, board.x, board.y);
+}
+
+/**
+ * Handles incoming messages from web socket
+ * @param {Event} event The event to handle
+ */
 function handleMessage(event) {
     const data = JSON.parse(event.data);
     console.log(data);
