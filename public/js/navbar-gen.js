@@ -3,18 +3,27 @@
 window.addEventListener("load", e => {
     const nav = document.getElementById("navbar");
 
-    const addButton = (name, url, image) => {
+    let count = 0;
+    const addButton = (name, url, isLast, image) => {
         const sect = document.getElementById("nav-section");
         const clone = document.importNode(sect.content, true);
-        clone.querySelector('a').href = url;
-        clone.querySelectorAll('div')[1].textContent = name;
-
+        const anchor = clone.querySelector('a');
+        const divs = clone.querySelectorAll('div');
+        anchor.href = url;
+        divs[1].textContent = name;
+        if (count == 0) {
+            anchor.classList.add("left-most");
+        }
+        else if (isLast) {
+            anchor.classList.add("right-most");
+        }
+        count++;
         nav.appendChild(clone);
     };
 
-    addButton("Edit Map", 'input-map');
-    addButton("Announcements", 'input-announcements');
-    addButton("Add Stores", 'input-stores');
-    addButton("Add Adverts", 'input-adverts');
-    addButton("Dashboard", 'dashboard');
+    addButton("Map Editor", 'input-map', false);
+    addButton("Store Editor", 'input-stores', false);
+    addButton("Advert Edtior", 'input-adverts', false);
+    addButton("Announcement Editor", 'input-announcements', false);
+    addButton("View Dashboard", 'dashboard', true);
 });

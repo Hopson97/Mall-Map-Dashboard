@@ -12,8 +12,6 @@ const halfGap = gapSize / 2;
  * JS file for the display board
  */
 
-
-
 /*
  * ==================
  *      Classes

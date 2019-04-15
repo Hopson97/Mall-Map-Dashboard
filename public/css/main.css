@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
+:root {
+    --header-colour: #05668D;
+    --nav-hover-colour: rgb(83, 133, 143);
+    --title-bg-colour: #028090;
+    --background-colour-light: #EEEEEE;
+    --background-colour-dark: #DDDDDD;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -15,7 +23,7 @@
 */
 
 body {
-    background-color: rgba(182, 216, 224, 0.933);
+    background-color: var(--background-colour);
     color: white;
     font-family: 'Open Sans', serif;
 }
@@ -27,66 +35,113 @@ body {
 */
 header {
     width: 100%;
-    background-color: rgb(100, 100, 100);
-    border-bottom: solid white;
+    background-color: var(--header-colour);
+    box-shadow: 0px 10px 10px rgb(34, 51, 54);
+    position: relative;
+    z-index: 1;  
 }
 
 header .header-container {
-    width: 90%;
-    padding: 15px;
+    display: flex;
+    justify-content: space-around;
+    
+    width: 95%;
     margin: auto;
 }
 
+header h1{
+    text-align: center;
+    padding-right: 10px;
+}
+
 /*
-=====================================
-    Main selectors and classes
-=====================================
+------------------------------------
+    Navbar selectors and classes
+------------------------------------
 */
-main {
-    background-color: rgb(50, 50, 50);
-    height: 100%;
+header nav {
+    width: 80%;
+    display: flex;
+    justify-content: space-evenly;
 }
 
-
-
-main nav {
-    background-color: rgb(75, 75, 75);
-    padding: 2px;
-    border-right: solid white;
-}
-
-main nav .nav-button {
-    padding-left: 5px;
-}
-
-
-main nav a {
-    display: block;
-    padding: 10px;
+header nav a {
     text-decoration: none;
     color: white;
+    flex: 1;
+    padding-bottom: 5px;
+}
+
+header nav a {
     transition: 1s;
+    border-right: solid white 1px;
+    border-left: solid white 1px;
+}
+
+header nav .left-most {
+    border-left: solid white 2px;
+}
+
+header nav .right-most {
+    border-right: solid white 2px;
+}
+
+header nav a:hover {
+    background-color: var(--nav-hover-colour);
 }
 
 .nav-button-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-main nav a:hover {
-    background-color: rgb(125, 125, 125);
+.nav-button-container img {
+    padding: 5px;
 }
 
+
+/*
+=====================================
+    Main Content
+=====================================
+*/
+main {
+    background-color: var(--background-colour-light);
+}
+
+main .page-title {
+    border-bottom: solid black;
+    padding: 2vh;
+    background-color: var(--title-bg-colour);
+}
+
+main .page-title h2 {
+    text-align: center;
+}
+
+main .main-content {
+    width: 70%;
+    margin: auto;
+    color: black;
+    background-color: var(--background-colour-dark);
+}
+
+
+
+/*
 canvas {
     border: 2px solid white;
-}
+}*/
 
 /*
 ===================
   General classes
 ===================
 */
+/*
 .main-content {
-    background-color: rgb(100, 100, 100);
+    background-color: var(--background-colour);
     width: 100%;
 }
 
@@ -125,11 +180,11 @@ canvas {
 .flex-even {
     display: flex;
     justify-content: space-around;
-}
+}*/
 
 /*
     map input stuff
-*/
+
 .input-map-flex {
     display: flex;
     margin: 10px;
@@ -138,15 +193,24 @@ canvas {
 .arrows {
     color: white;
 }
-
+/*
+/*
+===================
+  Table
+===================
+*/
 table {
     width: 80%;
     margin: auto;
 }
 
+th {
+    border-bottom: solid black;
+}
+
 th,
 td {
-    text-align: left;
+    text-align: center;
     padding: 10px;
 }
 
@@ -158,6 +222,11 @@ td {
     background-color: rgb(125, 125, 125);
 }
 
+/*
+===================
+  Popups
+===================
+*/
 .popup-bg {
     width: 100%;
     height: 100%;
@@ -194,7 +263,7 @@ td {
 
 
 @media screen and (max-width: 1280px) {
-    main nav {
+    header nav {
         display: none;
     }
 
