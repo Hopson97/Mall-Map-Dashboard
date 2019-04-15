@@ -8,9 +8,9 @@ window.addEventListener("load", async e => {
     console.log(storeList);
 
     const tableRowTemplate = document.getElementById("row");
-    for (const storeid in storeList) {
-        const name = storeList[storeid].name;
-        const type = storeList[storeid].type;
+    for (const store of storeList) {
+        const name = store.name;
+        const type = store.type;
 
         const clone = document.importNode(tableRowTemplate.content, true);
         const cells = clone.querySelectorAll("td");

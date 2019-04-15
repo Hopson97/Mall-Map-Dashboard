@@ -9,7 +9,7 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 /**
- * Contains data about each room, eg roomid and the assosiated storeid
+ * Contains data about each room, eg roomId and the assosiated storeId
  */
 const rooms = {  
 };
@@ -28,8 +28,8 @@ router.get("/sect-data", getSectionData);
  * @param {express.Response} response The HTTP response. Response is true on success.
  */
 function postSectionData(request, response) {
-    const roomId   = request.body.roomid;
-    const storeId  = request.body.storeid;
+    const roomId   = request.body.roomId;
+    const storeId  = request.body.storeId;
     rooms[roomId] = storeId;;
 
     //Send info to all clients about the updated room

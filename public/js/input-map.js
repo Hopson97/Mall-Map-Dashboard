@@ -127,7 +127,7 @@ async function initMapData() {
 
     const response = await fetch("api/map/sect-data");
     const json = await response.json();
-
+    //TODO BEtter variable nbame other than json
     for (const room of mapData.rooms) {
         if (json[room.id]) {
             const response = await fetch("api/stores/store-info?id=" + json[room.id]);
@@ -267,9 +267,10 @@ async function buildStoreDOM() {
     const storeListSect = document.getElementById("store-list-section");
     const response = await fetch("/api/stores/list");
     const json = await response.json();
-    for (const storeid in json) {
-        const name = json[storeid].name;
-        const type = json[storeid].type;
+
+    for (const store of json) {
+        const name = store.name;
+        const type = store.type;
         const clone = document.importNode(storeListSect.content, true);
         const container = clone.querySelector("div");
         const contentElements = clone.querySelectorAll('p');
@@ -280,8 +281,8 @@ async function buildStoreDOM() {
         container.addEventListener("click", async () => {
             console.log(selectedStore.id);
             const data = {
-                roomid: selectedStore.id,
-                storeid: storeid
+                roomId: selectedStore.id,
+                storeId: store.id
             };
             const response = await fetch("api/map/sect-data", {
                 method: "POST",
