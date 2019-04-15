@@ -21,6 +21,21 @@ class Mesh {
         this.colours = [];
         this.indices = [];
         this.normals = [];
+        this.buffers = [];
+        this.buffered = false;
+    }
+
+    /**
+     * Deletes the mesh's vertex buffer objects
+     * @param {WebGL2RenderingContext} gl The webgl context
+     */
+    deleteBuffers(gl) {
+        if (this.buffered) {
+            this.buffered = false;
+            for (const buffer of this.buffers) {
+                gl.deleteBuffer(buffer);
+            }
+        }
     }
 
     /**
@@ -28,19 +43,21 @@ class Mesh {
      * @param {WebGL2RenderingContext} gl The WebGL context
      */
     createBuffers(gl) {
-        const buffers = [];
+        this.deleteBuffers(gl);
+
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
 
-        buffers.push(
+        this.buffers.push(
             createBuffer(gl, this.positions, 0, 3),
             createBuffer(gl, this.colours, 1, 3),
             createBuffer(gl, this.normals, 2, 3),
             createElementBuffer(gl, this.indices),
         );
+        this.buffered = true;
         return {
             vao,
-            buffers
+            buffers: this.buffers
         }
     }
 }
@@ -242,7 +259,7 @@ function createBuffer(gl, data, attribLocation, dataPerVertex) {
 /**
  * 
  * @param {WebGLContext} gl The OpenGL/WebGL2 rendering context
- * @param {*} data The indices which make up this index buffer
+ * @param {Array} data The indices which make up this index buffer
  */
 function createElementBuffer(gl, data) {
     const buffer = gl.createBuffer();

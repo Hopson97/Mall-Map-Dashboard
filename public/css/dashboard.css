@@ -14,25 +14,6 @@ body {
     font-family: 'Open Sans', serif;
 }
 
-.content {
-    display: flex;
-    flex-direction: column;
-}
-
-.flex-row {
-    display: flex;
-}
-
-.flex-fill-right {
-    flex-grow : 1;
-    background-color: green;
-}
-
-.flex-fill-bottom {
-    background-color: red;
-    flex: 1;
-}
-
 canvas {
     border: 3px solid white;
 }
