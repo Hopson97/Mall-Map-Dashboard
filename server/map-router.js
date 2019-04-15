@@ -28,11 +28,22 @@ router.get("/sect-data", getSectionData);
  * @param {express.Response} response The HTTP response. Response is true on success.
  */
 function postSectionData(request, response) {
-    const roomid   = request.body.roomid;
-    const storeid  = request.body.storeid;
-    console.log(roomid);
-    rooms[roomid] = storeid;
+    const roomId   = request.body.roomid;
+    const storeId  = request.body.storeid;
+    console.log(roomId);
+    rooms[roomId] = storeId;
     console.log(rooms);
+
+    //console.log(wss);
+
+    for (const client of wss.clients) {
+        console.log("Sending data");
+        client.send(JSON.stringify({
+            type: "RoomUpdate",
+            roomId,
+            storeId
+        }));
+    }
 
     response.send(true);
 }

@@ -13,8 +13,12 @@ const halfGap = gapSize / 2;
  */
 
 
- 
 
+/*
+ * ==================
+ *      Classes
+ * ==================
+ */
 /**
  * Renderer to assist with rendering 3D and 2D objects to browser window
  */
@@ -168,11 +172,20 @@ class Drawable3D {
  * Class to hold data about a room that can be drawn
  */
 class Room extends Drawable3D {
-    constructor(roomId, x, z, width, depth) {
+    /**
+     * Constructs the room data
+     * @param {Number} roomId The ID of this room
+     * @param {Number} x The X-Coordinate of this room
+     * @param {Number} z The Z-Coordinate of this room
+     * @param {Number} width The width of this room
+     * @param {Number} depth The depth of this room
+     */
+    constructor(gl, roomId, x, z, width, depth) {
         super();
+        this.gl = gl;
         this.roomId = roomId;
-        this.storeId = 0;
-        this.billboard = 0;
+        this.storeId = -1;
+        this.billboard = null;
         this.x = x;
         this.z = z;
         this.width = width;
@@ -181,7 +194,85 @@ class Room extends Drawable3D {
         this.centerZ = z + depth / 2;
         this.billboard = null;
     }
+
+    async update() {
+        let colour;
+        if (this.storeId >= 0) {
+            //Get information about the store
+            const response = await fetch("api/stores/store-info?id=" + this.storeId);
+            const shopInformation = await response.json();
+            this.billboard = new Billboard(this.roomId, shopInformation.name, shopInformation.type);
+            colour = typeToColour(shopInformation.type).asNormalised().asArray();
+        }
+        else {
+            colour = typeToColour("none").asNormalised().asArray();
+        }
+        //Loop through the 60 colours (5 faces * 4 vertex per face * 3 colour per vertex) 
+        //to update it's colour to be that of the new store
+        for (let i = 0; i < 20; i++) {
+            for (let j = 0; j < 3; j++) {
+                this.mesh.colours[i * 3 + j] = colour[j];
+            }
+        }
+        this.buffer(this.gl);
+    }
+
+    /*
+        //Do extra things if the room has an assosiated store
+    if (roomsData[roomInfo.id]) {
+        room.storeId = roomsData[roomInfo.id];
+
+        const response = await fetch("api/stores/store-info?id=" + room.storeId);
+        const info = await response.json();
+
+        room.billboard = new Billboard(
+            room.roomId,
+            info.name,
+            info.type);
+
+        colour = typeToColour(info.type).asNormalised().asArray();
+    } else {
+        colour = typeToColour("none").asNormalised().asArray();
+    }
+
+    //Update the room's colour
+        for (let i = 0; i < 20; i++) {
+        //Cycle RGB
+        for (let j = 0; j < 3; j++) {
+            mesh.colours[i * 3 + j] = colour[j];
+        }
+    }
+
+    if (shouldBuffer) {
+        room.buffer(gl);
+    }
+    */
 }
+
+/**
+ * Updates room based on the store it has either already had or been updated to
+ * @param {Object} room Object containing info about room to update
+ * @param {Colour} colour Colour to change its colour to
+ * @param {boolean} buffer whether the function should update the buffer as well
+ * @param {WebGLContext} gl The webgl render context
+ */
+function updateRoom(room, colour, shouldBuffer, gl) {
+    const mesh = room.mesh;
+    //Change colour of the inner-quad and walls to be the store colour
+    //20 refers to 4 * 5 (5 faces * 4 verticies per face)
+    for (let i = 0; i < 20; i++) {
+        //Cycle RGB
+        for (let j = 0; j < 3; j++) {
+            mesh.colours[i * 3 + j] = colour[j];
+        }
+    }
+
+    if (shouldBuffer) {
+        room.buffer(gl);
+    }
+}
+
+
 
 /**
  * Class to to hold data about a pathway
@@ -251,10 +342,16 @@ class RenderableBillboard {
     }
 }
 
+/*
+ * ==================
+ *      Functions
+ * ==================
+ */
 /**
  * Entry point for the dashboard
  * 
  */
+let objects;
 window.addEventListener("load", async e => {
     //Setup the websocket
     const socket = new WebSocket("ws://localhost:8080");
@@ -276,7 +373,7 @@ window.addEventListener("load", async e => {
     mapShader.loadUniformMatrix4(renderer.gl, "modelMatrix", modelMatrix);
 
     //Get lists of objects to render
-    const objects = await createMapMesh(renderer.gl);
+    objects = await createMapMesh(renderer.gl);
 
     //Begin main rendering of stuff
     window.requestAnimationFrame(loop);
@@ -321,8 +418,7 @@ function render(renderer, gl, ctx, objects, camera) {
 
         renderer.draw(room);
         if (room.billboard) {
-            const renderableBillboard 
-                = new RenderableBillboard(renderer, camera, room);
+            const renderableBillboard = new RenderableBillboard(renderer, camera, room);
             if (renderableBillboard.z < 60) {
                 billboardRenderInfo.push(renderableBillboard);
             }
@@ -353,22 +449,33 @@ function handleMessage(event) {
     const data = JSON.parse(event.data);
     console.log(data);
     switch (data.type) {
-
+        case "RoomUpdate":
+            console.log("Updating room");
+            console.log("room: " + data.roomId);
+            console.log("store: " + data.storeId);
+            for (const room of objects.rooms) {
+                if (room.roomId === data.roomId) {
+                    room.storeId = data.storeId;
+                    room.update();
+                }
+            }
     }
 }
 
 async function createMapMesh(gl) {
     const geometry = getMallLayout();
-    const response = await fetch("/api/map/sect-data");
-    const roomsData = await response.json();
 
     return {
-        rooms: await buildRoomsGeometry(gl, geometry.rooms, roomsData),
+        rooms: await buildRoomsGeometry(gl, geometry.rooms),
         paths: buildPathGeometry(gl, geometry.paths),
     };
 }
 
-//GEOMETRY FUNCTIONS
+/*
+ * =======================================
+ *      Geometry Generation Functions
+ * =======================================
+ */
 /**
  * Creates vertex positions and vertex normals for a quad in the Y-plane
  * @param {Number} x The x-coordinate to begin the floor
@@ -498,8 +605,10 @@ function buildPathGeometry(gl, pathData) {
  * @param {Object} roomGeometry Object containing 2D data about each of the rooms
  * @param {Object} roomsData Object containing information about the room ID and their assosiated store IDs
  */
-async function buildRoomsGeometry(gl, roomGeometry, roomsData) {
+async function buildRoomsGeometry(gl, roomGeometry) {
     const rooms = [];
+    const response = await fetch("/api/map/sect-data");
+    const roomsData = await response.json();
     for (const room of roomGeometry) {
         //Scale the data down
         const x = room.x / scaleFactor + gapSize;
@@ -527,7 +636,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
 
 
     //Contains information about this room, also is return of this function
-    const room = new Room(roomInfo.id, x, z, width, depth);
+    const room = new Room(gl, roomInfo.id, x, z, width, depth);
 
     //Adds normal and vertex data to the mesh
     function addMeshData(geometry) {
@@ -566,7 +675,9 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     //Do extra things if the room has an assosiated store
     if (roomsData[roomInfo.id]) {
         room.storeId = roomsData[roomInfo.id];
-
+    }
+        await room.update();
+/*
         const response = await fetch("api/stores/store-info?id=" + room.storeId);
         const info = await response.json();
 
@@ -575,41 +686,22 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
             info.name,
             info.type);
 
-        colour = typeToColour(info.type).asNormalised().asArray();
+       // colour = typeToColour(info.type).asNormalised().asArray();
     } else {
         colour = typeToColour("none").asNormalised().asArray();
     }
 
     //Update the room's colour
     updateRoom(room, colour, true, gl);
-
+*/
     return room;
 }
 
-/**
- * Updates room based on the store it has either already had or been updated to
- * @param {Object} room Object containing info about room to update
- * @param {Colour} colour Colour to change its colour to
- * @param {boolean} buffer whether the function should update the buffer as well
- * @param {WebGLContext} gl The webgl render context
+/*
+ * =======================
+ *      Shader Programs
+ * =======================
  */
-function updateRoom(room, colour, shouldBuffer, gl) {
-    const mesh = room.mesh;
-    //Change colour of the inner-quad and walls to be the store colour
-    //20 refers to 4 * 5 (5 faces * 4 verticies per face)
-    for (let i = 0; i < 20; i++) {
-        //Cycle RGB
-        for (let j = 0; j < 3; j++) {
-            mesh.colours[i * 3 + j] = colour[j];
-        }
-    }
-
-    if (shouldBuffer) {
-        room.buffer(gl);
-    }
-}
-
-//Shader programs
 const shaders = {
     //Verex and fragment shader for the map
     mapVertex: `#version 300 es

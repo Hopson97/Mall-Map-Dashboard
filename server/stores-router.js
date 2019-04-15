@@ -9,10 +9,15 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 
+//Temp, TODO
 const stores = {
     0: {
         name: "Game",
         type: "Entertainment"
+    },
+    1: {
+        name: "Greggs",
+        type: "Food/Drink"
     }
 };
 

@@ -4,6 +4,11 @@
  * File for general WebGL functions
  */
 
+/*
+ * ==================
+ *      Classes
+ * ==================
+ */
 /**
  * Holds general information about a mesh
  */

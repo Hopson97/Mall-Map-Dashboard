@@ -19,7 +19,10 @@ function typeToColour(type) {
     const typeLowerCase = type.toLowerCase();
     switch (typeLowerCase) {
         case "entertainment":
-            return new Colour(128, 0, 128)
+            return new Colour(128, 0, 128);
+
+        case "food/drink":
+            return new Colour(0, 128, 100);
 
         default:
             return new Colour(50, 50, 50);
