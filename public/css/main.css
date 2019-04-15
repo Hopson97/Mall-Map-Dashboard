@@ -100,7 +100,6 @@ header nav a:hover {
     padding: 5px;
 }
 
-
 /*
 =====================================
     Main Content
@@ -127,6 +126,16 @@ main .main-content {
     background-color: var(--background-colour-dark);
 }
 
+
+/*
+------------------------------------
+    Map Input Screen
+------------------------------------
+*/
+canvas {
+    width: 95%;
+    margin: auto;
+}
 
 
 /*
@@ -262,12 +271,31 @@ td {
 }
 
 
-@media screen and (max-width: 1280px) {
-    header nav {
-        display: none;
+@media screen and (max-width: 1200px) {
+    main .main-content {
+        width: 90%;
+        margin: auto;
     }
 
     .popup {
         width: 50%; 
+    }
+}
+
+@media screen and (max-width: 1140px) {
+    main .main-content {
+        width: 98%;
+        margin: auto;
+    }
+    header nav {
+        display: none;
+    }
+
+    header .header-container {
+        display: block;
+        justify-content: space-evenly;
+        
+        width: 95%;
+        margin: auto;
     }
 }

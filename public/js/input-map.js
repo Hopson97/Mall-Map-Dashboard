@@ -68,16 +68,23 @@ class Renderer {
 window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
     const ctx = canvas.getContext("2d");
-    //Set canvas size based on the size of the device
-    if (window.innerWidth >= 1280) {
-        //Canvas fills 70% of window
-        canvas.width = window.innerWidth * 0.7;
-        canvas.height = window.innerHeight * 0.7;
-    } else {
-        canvas.width = window.innerWidth * 0.6;
-        canvas.height = canvas.width;
-        scaleFactor = 4;
+
+    //Give canvas 16/9 aspect ratio
+    canvas.height = canvas.clientWidth / (16 / 9);
+
+
+    if (getBrowserWidth() < 1140) {
+        //Give larger view on mobile
+        scaleFactor = 5;
+        canvas.height = canvas.clientWidth;
     }
+    else {
+        //Give canvas 16/9 aspect ratio on bigger displays
+        canvas.height = canvas.clientWidth / (16 / 9);
+    }
+
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
 
     /*
         Event listener setup
