@@ -346,17 +346,20 @@ async function begin3DRenderer() {
     window.requestAnimationFrame(loop);
 
     function loop() {
+        //TEMP
         inputStuff(camera); //VERY VERY TEMP TODO
+        //TEMP
+
         renderer.clear();
 
         //Orbit the camera around the map of the mall
-        const speed = 0.125;
+        const speed = 0.065;
         camera.update(
             new Vector3(
                 Math.cos(toRadians(camera.rotation.y)) * speed,
                 0,
                 Math.sin(toRadians(camera.rotation.y)) * speed),
-            new Vector3(0, -0.1, 0)
+            new Vector3(0, -0.05, 0)
         );
 
         //Load uniform variables to shader
@@ -365,7 +368,7 @@ async function begin3DRenderer() {
 
         render(renderer, camera);
 
-        //window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     }
 };
 
