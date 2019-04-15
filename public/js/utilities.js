@@ -4,9 +4,9 @@
  * This file is for general common utility functions and classes
  */
 
- /**
-  * Represents a RGB colour value
-  */
+/**
+ * Represents a RGB colour value
+ */
 class Colour {
     constructor(r, g, b) {
         this.r = r;
@@ -27,9 +27,9 @@ class Colour {
      * Normalises the colours so they are between 0.0 and 1.0
      * This is for use with WebGL2
      */
-    asNormalised(){
+    asNormalised() {
         return new Colour(
-            this.r / 255, this.g / 255, this.b /255
+            this.r / 255, this.g / 255, this.b / 255
         );
     }
 
@@ -41,23 +41,28 @@ class Colour {
     }
 }
 
+/**
+ * Gets the width of the browser's inner window 
+ */
 function getBrowserWidth() {
     return Math.max(
-      document.body.scrollWidth,
-      document.documentElement.scrollWidth,
-      document.body.offsetWidth,
-      document.documentElement.offsetWidth,
-      document.documentElement.clientWidth
+        document.body.scrollWidth,
+        document.documentElement.scrollWidth,
+        document.body.offsetWidth,
+        document.documentElement.offsetWidth,
+        document.documentElement.clientWidth
     );
-  }
-  
-  function getBrowserHeight() {
+}
+
+/**
+ * Gets the height of the browser's inner window 
+ */
+function getBrowserHeight() {
     return Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.offsetHeight,
-      document.documentElement.clientHeight
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.documentElement.clientHeight
     );
-  }
-  
+}
