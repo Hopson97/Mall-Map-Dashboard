@@ -6,7 +6,7 @@
     <title>Stores Input</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="css/main.css">
-    <script src="js/input.js"></script>
+    <script src="js/input-store.js"></script>
     <script src="js/navbar-gen.js"></script>
 </head>
 
@@ -22,18 +22,11 @@
             <nav id="navbar"></nav>
             <div class="main-content">
                 <div class="store-table-container">
-                    <table>
+                    <table id = "store-table">
                         <tr>
                             <th>Store Name</th>
                             <th>Store Type</th>
-                            <th>Date Added</th>
                             <th>Delete Store</th>
-                        </tr>
-                        <tr class="table-data">
-                            <td>Game</td>
-                            <td>Entertainment</td>
-                            <td>10/04/19</td>
-                            <td>DELETE</td>
                         </tr>
                     </table>
                 </div>
@@ -44,6 +37,12 @@
 
     </footer>
 </body>
+<template id = "row">
+    <tr class = "table-data">
+        <td class = "store-name"></td>
+        <td class = "store-type"></td>
+    </tr>
+</template>
 <template id="nav-section">
     <a>
         <div class="nav-button-container">

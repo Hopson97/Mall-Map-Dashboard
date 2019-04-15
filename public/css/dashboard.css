@@ -8,17 +8,38 @@
     vertical-align: baseline;
 }
 
-
 body {
     background-color: black;
+    color: white;
+    font-family: 'Open Sans', serif;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+}
+
+.flex-fill-right {
+    flex-grow : 1;
+    background-color: green;
+}
+
+.flex-fill-bottom {
+    background-color: red;
+    flex: 1;
 }
 
 canvas {
-    border: solid white;
+    border: 3px solid white;
 }
 
 .render-container {
     position: relative;
+    height: 100%;
 }
 
 .canvas2d {
@@ -27,3 +48,4 @@ canvas {
     top: 0px;
     z-index: 1;
 }
+

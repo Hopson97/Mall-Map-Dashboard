@@ -30,12 +30,9 @@ router.get("/sect-data", getSectionData);
 function postSectionData(request, response) {
     const roomId   = request.body.roomid;
     const storeId  = request.body.storeid;
-    console.log(roomId);
-    rooms[roomId] = storeId;
-    console.log(rooms);
+    rooms[roomId] = storeId;;
 
-    //console.log(wss);
-
+    //Send info to all clients about the updated room
     for (const client of wss.clients) {
         console.log("Sending data");
         client.send(JSON.stringify({

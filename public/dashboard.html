@@ -7,6 +7,7 @@
     <title>Mall Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="css/dashboard.css">
+    <!--Load in the scripts-->
     <script src="js/utilities.js"></script>
     <script src="js/map.js"></script>
     <script src="js/gl-matrix-min.js"></script>
@@ -17,14 +18,26 @@
 
 <body>
     <main>
-        <div class="render-container">
-            <canvas id="map-canvas"></canvas>
-            <canvas id="text-canvas" class="canvas2d"></canvas>
+        <h1>Twin Pines Mall Map</h1>
+        <div class="content">
+            <div class="flex-row">
+                <div class="render-container">
+                    <canvas id="map-canvas"></canvas>
+                    <canvas id="text-canvas" class="canvas2d"></canvas>
+                </div>
+                <div class="flex-fill-right">
+                    <p>
+                        TEST
+                    </p>
+                </div>
+            </div>
+            <div class="flex-fill-bottom">
+                <p>
+                    TEST
+                </p>
+            </div>
         </div>
     </main>
-    <footer>
-
-    </footer>
 </body>
 
 </html>

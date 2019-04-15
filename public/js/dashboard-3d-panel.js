@@ -4,7 +4,7 @@
 const scaleFactor = 15;
 
 //Gap between rooms
-const gapSize = 0.1;
+const gapSize = 0.5;
 const halfGap = gapSize / 2;
 
 /**
@@ -37,14 +37,15 @@ class Renderer {
 
         //Set canvas size
         canvas3D.width = window.innerWidth * 0.8;
-        canvas3D.height = window.innerHeight * 0.8;
+        canvas3D.height = window.innerHeight * 0.7;
         canvas2D.width = canvas3D.width;
         canvas2D.height = canvas3D.height;
         this.width = canvas3D.width;
         this.height = canvas3D.height;
 
+
         //Initilise WebGL
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        this.gl.clearColor(0.05, 0.0, 0.1, 1.0);
         this.gl.viewport(0, 0, this.gl.canvas.clientWidth, this.gl.canvas.clientHeight);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.depthFunc(this.gl.LESS);
@@ -52,6 +53,7 @@ class Renderer {
 
         //Initilise the context
         this.context.fillStyle = "white";
+        this.context.lineWidth = 3;
         this.context.font = `bold 9.5 sans-serif`;
     }
 
@@ -277,7 +279,7 @@ class RenderableBillboard {
 
         //Convert clip space to screen space
         this.x = (clipX * 0.5 + 0.5) * renderer.width - 25;
-        this.y = (clipY * -0.5 + 0.5) * renderer.height - 10;
+        this.y = (clipY * -0.5 + 0.5) * renderer.height - 15;
         this.z = transform[14];
 
         //get data
@@ -363,9 +365,9 @@ async function begin3DRenderer() {
         mapShader.loadUniformVector3(renderer.gl, "lightPosition", camera.position);
         mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewMatrix);
 
-        render(renderer, renderer.gl, renderer.context, objects, camera);
+        render(renderer, camera);
 
-        window.requestAnimationFrame(loop);
+        //window.requestAnimationFrame(loop);
     }
 };
 
@@ -376,7 +378,7 @@ async function begin3DRenderer() {
  * @param {Object} objects Object containing objects to draw    
  * @param {mat4} projectionViewMatrix Projection view matrix
  */
-function render(renderer, gl, ctx, objects, camera) {
+function render(renderer, camera) {
     //List to hold any billboards above rooms. This must be a defered render as they 
     //must be sorted by their z-distance to the camera
     const billboardRenderInfo = [];
@@ -581,7 +583,7 @@ async function buildRoomsGeometry(gl, roomGeometry) {
  * @param {Number} depth Depth of the room
  */
 async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
-    const roomHeight = 3;
+    const roomHeight = Math.random() * 2 + 2;
 
 
     //Contains information about this room, also is return of this function
