@@ -23,6 +23,11 @@ const stores = [
         id: 2,
         name: "Greggs",
         type: "Food/Drink"
+    },
+    {
+        id: 3,
+        name: "Next",
+        type: "Clothes"
     }
 ];
 

@@ -24,6 +24,9 @@ function typeToColour(type) {
         case "food/drink":
             return new Colour(0, 128, 100);
 
+        case "clothes":
+            return new Colour(250, 100, 75);
+
         default:
             return new Colour(50, 50, 50);
     }

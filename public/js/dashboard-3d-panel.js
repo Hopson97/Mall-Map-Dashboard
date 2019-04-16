@@ -72,11 +72,11 @@ class Renderer {
      * Draws a 3D object to canvas
      * @param {Drawable3D} drawable The object to draw
      */
-    draw(drawable) {
+    draw(drawable, mode = this.gl.TRIANGLES) {
         //Shorthand alias
         const gl = this.gl;
         gl.bindVertexArray(drawable.vao);
-        gl.drawElements(gl.TRIANGLES, drawable.indicesCount, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(mode, drawable.indicesCount, gl.UNSIGNED_SHORT, 0);
     }
 }
 
@@ -342,6 +342,9 @@ async function begin3DRenderer() {
     //Get lists of objects to render
     objects = await createMapMesh(renderer.gl);
 
+    //Terrain
+    const terrain = makeTerrainMesh(renderer.gl, 50, 50, 20, 20, 12);
+
     //Begin main rendering of stuff
     window.requestAnimationFrame(loop);
 
@@ -367,6 +370,7 @@ async function begin3DRenderer() {
         mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewMatrix);
 
         render(renderer, camera);
+        renderer.draw(terrain, renderer.gl.LINES);
 
         window.requestAnimationFrame(loop);
     }
@@ -552,7 +556,7 @@ function buildPathGeometry(gl, pathData) {
 }
 
 /**
- * 
+ * Creates WebGL geometric data (inc VAOs and VBOs) based on 2D layout of the map for the rooms/shops
  * @param {WebGLRenderContext} gl The WebGL Context
  * @param {Object} roomGeometry Object containing 2D data about each of the rooms
  * @param {Object} roomsData Object containing information about the room ID and their assosiated store IDs
@@ -574,7 +578,7 @@ async function buildRoomsGeometry(gl, roomGeometry) {
 }
 
 /**
- * 
+ * Creates WebGL geometric data for a single room of the map
  * @param {WebGLRenderContext} gl The WebGL render context
  * @param {Object} roomInfo Object to contain info about the room having geometry made for
  * @param {Object} roomsData Object containing info about all rooms
@@ -631,6 +635,33 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     await room.update();
 
     return room;
+}
+
+function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
+    const terrain = new Drawable3D();
+    const y = -10;
+    for (let z = 0; z < depth; z++) {
+        for (let x = 0; x < width; x++) {
+            terrain.mesh.positions.push(
+                x * quadSize - xBegin, 
+                y - Math.random() * 3 + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 20 : 1), 
+                z * quadSize - zBegin);
+            terrain.mesh.colours.push(128, 0, 128);
+            terrain.mesh.normals.push(0, 1, 0);
+        }
+    }
+
+    for (let z = 0; z < depth - 1; z++) {
+        for (let x = 0; x < width - 1; x++) {
+            const i = x + z * width;
+            terrain.mesh.indices.push(
+                i, i + width, i + width + 1,
+                i + width + 1, i + 1, i
+            );
+        }
+    }
+    terrain.buffer(gl);
+    return terrain;
 }
 
 /*

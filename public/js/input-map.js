@@ -73,7 +73,7 @@ window.addEventListener("load", async () => {
     canvas.height = canvas.clientWidth / (16 / 9);
 
 
-    if (getBrowserWidth() < 1140) {
+    if (getBrowserWidth() < 800) {
         //Give larger view on mobile
         scaleFactor = 5;
         canvas.height = canvas.clientWidth;
@@ -163,6 +163,7 @@ function loop(canvas, context) {
         handleInput();
         renderer.clear();
 
+        //Draw the paths
         context.fillStyle = "white";
         for (const path of mapData.paths) {
             renderer.renderRect(
@@ -170,6 +171,7 @@ function loop(canvas, context) {
                 path.width / scaleFactor, path.height / scaleFactor);
         }
 
+        //Draw the rooms
         for (const room of mapData.rooms) {
             if (selectedStore.id == room.id) {
                 context.fillStyle = "lime";
@@ -225,8 +227,8 @@ function handleCanvasClick(event) {
         if (x > room.x / scaleFactor &&
             x < room.x / scaleFactor + room.width / scaleFactor &&
             y > room.y / scaleFactor &&
-            y < room.y / scaleFactor + room.height / scaleFactor) {
-            console.log(`Room clicked: ${room.id}`);
+            y < room.y / scaleFactor + room.height / scaleFactor) 
+        {
             const popup = document.getElementById("popup");
             popup.classList.remove("hidden");
             selectedStore = room;
@@ -250,6 +252,9 @@ function handleKeyUp(event) {
     keydown[event.key] = false;
 }
 
+/**
+ * Zoom in the view of the map
+ */
 function handleZoomInClick() {
     scaleFactor--;
     if (scaleFactor < 1) {
@@ -257,6 +262,9 @@ function handleZoomInClick() {
     }
 }
 
+/**
+ * Zoom out the view of the map
+ */
 function handleZoomOutClick() {
     scaleFactor++;
     if (scaleFactor > 6) {
