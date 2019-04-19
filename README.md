@@ -21,19 +21,21 @@ The input is spit across multiple pages....
 
 Gets information about the rooms in JSON format, with the format:
 
-```json
+```
 {
     <roomId>: <storeId>,
     <roomId>: <storeId>,
     <roomId>: <storeId>,
 }
-
-eg
+```
+For example, if store ID of 2 was assosiated with the store with an ID of 5:
+```
 {
-    0: 5,
-    2: 1,
+    2: 5,
 }
+```
 
+___
 
 ## Libraries Used
 
