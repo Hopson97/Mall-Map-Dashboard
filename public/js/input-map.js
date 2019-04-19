@@ -169,7 +169,7 @@ function loop(canvas, context) {
         for (const path of mapData.paths) {
             renderer.renderRect(
                 path.x / scaleFactor, path.y / scaleFactor,
-                path.width / scaleFactor, path.width / scaleFactor);
+                path.width / scaleFactor, path.depth / scaleFactor);
         }
 
         //Draw the rooms

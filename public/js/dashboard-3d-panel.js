@@ -589,7 +589,7 @@ async function buildRoomsGeometry(gl, roomGeometry) {
  * @param {Number} depth Depth of the room
  */
 async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
-    const roomHeight = Math.random() * 2 + 2;
+    const roomHeight = roomInfo.height;
 
 
     //Contains information about this room, also is return of this function
