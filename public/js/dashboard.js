@@ -17,9 +17,6 @@ async function handleMessage(event) {
     console.log(data);
     switch (data.type) {
         case "RoomUpdate":
-            console.log("Updating room");
-            console.log("room: " + data.roomId);
-            console.log("store: " + data.storeId);
             for (const room of objects.rooms) {
                 if (room.roomId === data.roomId) {
                     room.storeId = data.storeId;

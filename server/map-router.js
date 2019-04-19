@@ -15,8 +15,8 @@ router.use(bodyParser.json());
 const rooms = {  
 };
 
-router.post("/sect-data", postSectionData);
-router.get("/sect-data", getSectionData);
+router.post("/section-data", postSectionData);
+router.get("/section-data", getSectionData);
 router.get("/layout", getLayout);
 
 //========================
@@ -32,7 +32,7 @@ router.get("/layout", getLayout);
 function postSectionData(request, response) {
     const roomId   = request.body.roomId;
     const storeId  = request.body.storeId;
-    rooms[roomId] = storeId;;
+    rooms[roomId] = storeId;
 
     //Send info to all clients about the updated room
     for (const client of wss.clients) {
@@ -53,7 +53,7 @@ function postSectionData(request, response) {
 //
 //========================
 /**
- * 
+ * Gets the data about the rooms, eg what their assosiated store is
  * @param {express.Request} request The HTTP request. 
  * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what store is assosiated with it)
  */
@@ -61,6 +61,11 @@ function getSectionData(request, response) {
     response.json(rooms);
 }
 
+/**
+ * Gets the x, y, width, depth, height etc information about all the rooms, and the x, y, width and depth data about all paths
+ * @param {express.Request} request The HTTP request. 
+ * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what store is assosiated with it)
+ */
 function getLayout(request, response) {
     fs.readFile('./server/data/map-layout.json', (err, json) => {
         const layout = JSON.parse(json);

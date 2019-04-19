@@ -9,6 +9,31 @@ The information is designed to be shown in multiple public spaces in ageneric sh
 
 The input is spit across multiple pages....
 
+## The Dashboard
+
+...
+
+## API
+
+### Map API
+
+`GET api/map/section-data`
+
+Gets information about the rooms in JSON format, with the format:
+
+```json
+{
+    <roomId>: <storeId>,
+    <roomId>: <storeId>,
+    <roomId>: <storeId>,
+}
+
+eg
+{
+    0: 5,
+    2: 1,
+}
+
 
 ## Libraries Used
 

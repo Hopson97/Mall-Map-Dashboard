@@ -84,8 +84,6 @@ class Renderer {
  * Represents an object in the world
  */
 class Entity {
-    //Private fields
-
     /**
      * Construct the entity
      * @param {Vector3} position The position of the entity
@@ -564,7 +562,7 @@ function buildPathGeometry(gl, pathData) {
  */
 async function buildRoomsGeometry(gl, roomGeometry) {
     const rooms = [];
-    const response = await fetch("/api/map/sect-data");
+    const response = await fetch("/api/map/section-data");
     const roomsData = await response.json();
     for (const room of roomGeometry) {
         //Scale the data down
@@ -653,10 +651,10 @@ function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
         for (let x = 0; x < width; x++) {
             terrain.mesh.positions.push(
                 x * quadSize - xBegin, 
-                y + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 20 : 1), 
+                y + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1), 
                 z * quadSize - zBegin);
             terrain.mesh.colours.push(0.2, 0, 0.4);
-            terrain.mesh.normals.push(Math.random(), Math.random(), Math.random());
+            terrain.mesh.normals.push(0, 1, 0);
         }
     }
 

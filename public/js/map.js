@@ -21,6 +21,9 @@ function typeToColour(type) {
     }
 }
 
+/**
+ * Gets the map layout from the server and calculats the maximum X and Y values of it before returning it
+ */
 async function getMallLayout() {
     const response = await fetch("/api/map/layout");
     const {rooms, paths} = await response.json();

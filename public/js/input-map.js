@@ -132,7 +132,7 @@ async function initMapData() {
     mapData.paths = geometry.paths;
     mapData.bounds = geometry.bounds;
 
-    const response = await fetch("api/map/sect-data");
+    const response = await fetch("api/map/section-data");
     const json = await response.json();
     //TODO BEtter variable nbame other than json
     for (const room of mapData.rooms) {
@@ -301,7 +301,7 @@ async function buildStoreDOM() {
                 roomId: selectedStore.id,
                 storeId: store.id
             };
-            const response = await fetch("api/map/sect-data", {
+            const response = await fetch("api/map/section-data", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
