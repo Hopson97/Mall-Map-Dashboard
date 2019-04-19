@@ -23,4 +23,4 @@ https://www.npmjs.com/package/express-ws
 ### Frontend
 
 gl-matrix: To assist with the matrix maths operations that are needed to effectively use WebGL
-https://www.npmjs.com/package/express-ws
+http://glmatrix.net/

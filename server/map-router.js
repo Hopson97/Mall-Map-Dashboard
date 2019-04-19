@@ -1,5 +1,6 @@
 "use strict"
 
+const fs = require('fs')
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -16,6 +17,7 @@ const rooms = {
 
 router.post("/sect-data", postSectionData);
 router.get("/sect-data", getSectionData);
+router.get("/layout", getLayout);
 
 //========================
 //
@@ -58,6 +60,14 @@ function postSectionData(request, response) {
 function getSectionData(request, response) {
     response.json(rooms);
 }
+
+function getLayout(request, response) {
+    fs.readFile('./server/data/map-layout.json', (err, json) => {
+        const layout = JSON.parse(json);
+        response.json(layout);
+    });
+}
+
 
 module.exports = {
     router: router,

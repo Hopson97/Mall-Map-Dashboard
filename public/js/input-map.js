@@ -127,7 +127,7 @@ window.addEventListener("load", async () => {
 });
 
 async function initMapData() {
-    const geometry = getMallLayout();
+    const geometry = await getMallLayout();
     mapData.rooms = geometry.rooms;
     mapData.paths = geometry.paths;
     mapData.bounds = geometry.bounds;
@@ -153,7 +153,7 @@ async function initMapData() {
 function loop(canvas, context) {
     const renderer = new Renderer(canvas, context);
     context.lineWidth = 2;
-    context.strokeStyle = "white";
+
     mapData.width = canvas.width;
     mapData.height = canvas.height;
 
@@ -164,14 +164,16 @@ function loop(canvas, context) {
         renderer.clear();
 
         //Draw the paths
-        context.fillStyle = "white";
+        context.fillStyle = '#CCCCCC'
+        context.strokeStyle = '#CCCCCC';
         for (const path of mapData.paths) {
             renderer.renderRect(
                 path.x / scaleFactor, path.y / scaleFactor,
-                path.width / scaleFactor, path.height / scaleFactor);
+                path.width / scaleFactor, path.width / scaleFactor);
         }
 
         //Draw the rooms
+        context.strokeStyle = "white";
         for (const room of mapData.rooms) {
             if (selectedStore.id == room.id) {
                 context.fillStyle = "lime";
@@ -180,7 +182,7 @@ function loop(canvas, context) {
             }
             renderer.renderRect(
                 room.x / scaleFactor, room.y / scaleFactor,
-                room.width / scaleFactor, room.height / scaleFactor);
+                room.width / scaleFactor, room.depth / scaleFactor);
         }
 
         context.stroke();
@@ -227,7 +229,7 @@ function handleCanvasClick(event) {
         if (x > room.x / scaleFactor &&
             x < room.x / scaleFactor + room.width / scaleFactor &&
             y > room.y / scaleFactor &&
-            y < room.y / scaleFactor + room.height / scaleFactor) 
+            y < room.y / scaleFactor + room.depth / scaleFactor) 
         {
             const popup = document.getElementById("popup");
             popup.classList.remove("hidden");

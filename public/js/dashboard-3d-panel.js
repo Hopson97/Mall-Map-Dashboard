@@ -4,7 +4,7 @@
 const scaleFactor = 15;
 
 //Gap between rooms
-const gapSize = 0.5;
+const gapSize = 0.7;
 const halfGap = gapSize / 2;
 
 /**
@@ -258,7 +258,7 @@ class Billboard {
  */
 class RenderableBillboard {
     /**
-     * Constructs the billboad rendering info
+     * Constructs the billboad rendering info, by transforming the room's 3D world coords to 2D screen coords
      * @param {Renderer} renderer The renderer to render the board to
      * @param {Camera} camera The camera that is used for looking at the billboard
      * @param {Room} room The room the billboard is displayed above
@@ -369,7 +369,7 @@ async function begin3DRenderer() {
         mapShader.loadUniformVector3(renderer.gl, "lightPosition", camera.position);
         mapShader.loadUniformMatrix4(renderer.gl, "projViewMatrix", camera.projectionViewMatrix);
 
-        render(renderer, camera);
+        renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
         window.requestAnimationFrame(loop);
@@ -377,13 +377,13 @@ async function begin3DRenderer() {
 };
 
 /**
- * Renders the map
+ * Renders the map objects
  * @param {WebGLRenderContext} gl The WebGL rendering context
  * @param {Context} ctx The context for rendering 2D
  * @param {Object} objects Object containing objects to draw    
  * @param {mat4} projectionViewMatrix Projection view matrix
  */
-function render(renderer, camera) {
+function renderObjects(renderer, camera) {
     //List to hold any billboards above rooms. This must be a defered render as they 
     //must be sorted by their z-distance to the camera
     const billboardRenderInfo = [];
@@ -393,6 +393,7 @@ function render(renderer, camera) {
         renderer.draw(room);
         if (room.billboard) {
             const renderableBillboard = new RenderableBillboard(renderer, camera, room);
+            //Do not draw billboards that are very far away
             if (renderableBillboard.z < 60) {
                 billboardRenderInfo.push(renderableBillboard);
             }
@@ -420,7 +421,7 @@ function render(renderer, camera) {
  * @param {WebGLRenderContext} gl The WebGL rendering conetext
  */
 async function createMapMesh(gl) {
-    const geometry = getMallLayout();
+    const geometry = await getMallLayout();
     return {
         rooms: await buildRoomsGeometry(gl, geometry.rooms),
         paths: buildPathGeometry(gl, geometry.paths),
@@ -540,7 +541,7 @@ function buildPathGeometry(gl, pathData) {
             pathLayout.x / scaleFactor + halfGap,
             pathLayout.y / scaleFactor + halfGap,
             pathLayout.width / scaleFactor,
-            pathLayout.height / scaleFactor
+            pathLayout.depth / scaleFactor
         );
 
         const geometry = createFloorQuadGeometry(path.x, 0, path.z, path.width, path.depth);
@@ -570,7 +571,7 @@ async function buildRoomsGeometry(gl, roomGeometry) {
         const x = room.x / scaleFactor + gapSize;
         const z = room.y / scaleFactor + gapSize;
         const roomWidth = room.width / scaleFactor - gapSize;
-        const roomDepth = room.height / scaleFactor - gapSize;
+        const roomDepth = room.depth / scaleFactor - gapSize;
 
         rooms.push(await createRoomGeometry(gl, room, roomsData, x, z, roomWidth, roomDepth, gapSize));
     }
@@ -626,8 +627,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
     createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
-
-    let colour;
+    
     //Do extra things if the room has an assosiated store
     if (roomsData[roomInfo.id]) {
         room.storeId = roomsData[roomInfo.id];
@@ -637,6 +637,15 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     return room;
 }
 
+/**
+ * Generates a grid of terrain tiles
+ * @param {WebGLRenderingContext} gl The WebGL context
+ * @param {Number} xBegin The X-Coordinate to start the terrain at
+ * @param {Number} zBegin The Z-Coordinate to start the terrsain at
+ * @param {Number} width The width of the terrain in terrain squares
+ * @param {Number} depth The height of the terrain in terrain squares
+ * @param {Number} quadSize The width/height of each quad
+ */
 function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
     const terrain = new Drawable3D();
     const y = -10;
@@ -644,10 +653,10 @@ function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
         for (let x = 0; x < width; x++) {
             terrain.mesh.positions.push(
                 x * quadSize - xBegin, 
-                y - Math.random() * 3 + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 20 : 1), 
+                y + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 20 : 1), 
                 z * quadSize - zBegin);
-            terrain.mesh.colours.push(128, 0, 128);
-            terrain.mesh.normals.push(0, 1, 0);
+            terrain.mesh.colours.push(0.2, 0, 0.4);
+            terrain.mesh.normals.push(Math.random(), Math.random(), Math.random());
         }
     }
 
