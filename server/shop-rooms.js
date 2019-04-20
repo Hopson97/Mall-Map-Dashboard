@@ -30,14 +30,20 @@ function addShopRoom(roomId, shopId) {
  * @param {Number} roomId The room ID to delete 
  */
 function tryDeleteShopRoomByRoomId(roomId) {
-    const index = shopRooms.findIndex(
-        shopRoom => shopRoom.roomId == roomId
-    );
-    if (index >= 0) {
-        shopRooms.splice(index, 1);
-        return true;
+    let found = false;
+    while (true) {
+        const index = shopRooms.findIndex(
+            shopRoom => shopRoom.roomId == roomId
+        );
+        if (index >= 0) {
+            shopRooms.splice(index, 1);
+            found = true;
+        }
+        else {
+            break;
+        }
     }
-    return false;
+    return found;
 }
 
 /**
@@ -45,14 +51,20 @@ function tryDeleteShopRoomByRoomId(roomId) {
  * @param {Number} roomId The room ID to delete 
  */
 function tryDeleteShopRoomByShopId(shopId) {
-    const index = shopRooms.findIndex(
-        shopRoom => shopRoom.shopId == shopId
-    );
-    if (index >= 0) {
-        shopRooms.splice(index, 1);
-        return true;
+    let found = false;
+    while (true) {
+        const index = shopRooms.findIndex(
+            shopRoom => shopRoom.shopId == shopId
+        );
+        if (index >= 0) {
+            shopRooms.splice(index, 1);
+            found = true;
+        }
+        else {
+            break;
+        }
     }
-    return false;
+    return found;
 }
 
 /**

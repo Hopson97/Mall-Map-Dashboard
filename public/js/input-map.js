@@ -134,6 +134,8 @@ async function initMapData() {
     const response = await fetch("api/map/section-data");
     const shopRoomsList = await response.json();
 
+    console.log(shopRoomsList);
+
     for (const room of mapData.rooms) {
         const index = shopRoomsList.findIndex(shopRoom => {
             return shopRoom.roomId == room.id;
