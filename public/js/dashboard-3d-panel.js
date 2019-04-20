@@ -204,8 +204,7 @@ class Room extends Drawable3D {
             const shopInformation = await response.json();
             this.billboard = new Billboard(this.roomId, shopInformation.name, shopInformation.type);
             colour = typeToColour(shopInformation.type).asNormalised().asArray();
-        }
-        else {
+        } else {
             colour = typeToColour("none").asNormalised().asArray();
             this.billboard = null;
         }
@@ -329,7 +328,6 @@ async function begin3DRenderer() {
     const renderer = new Renderer();
     const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
-    //TODO do I really need this?
     const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0));
 
     //Create shader for rendering the map
@@ -370,7 +368,7 @@ async function begin3DRenderer() {
         renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
-        window.requestAnimationFrame(loop);
+        //window.requestAnimationFrame(loop);
     }
 };
 
@@ -428,7 +426,9 @@ async function createMapMesh(gl) {
 
 /*
  * =======================================
+
  *      Geometry Generation Functions
+ * 
  * =======================================
  */
 /**
@@ -625,7 +625,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
     createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
-    
+
     //Do extra things if the room has an assosiated store
     if (roomsData[roomInfo.id]) {
         room.storeId = roomsData[roomInfo.id];
@@ -650,8 +650,8 @@ function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
     for (let z = 0; z < depth; z++) {
         for (let x = 0; x < width; x++) {
             terrain.mesh.positions.push(
-                x * quadSize - xBegin, 
-                y + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1), 
+                x * quadSize - xBegin,
+                y + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1),
                 z * quadSize - zBegin);
             terrain.mesh.colours.push(0.2, 0, 0.4);
             terrain.mesh.normals.push(0, 1, 0);
@@ -679,41 +679,41 @@ function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
 const shaders = {
     //Verex and fragment shader for the map
     mapVertex: `#version 300 es
-    in vec3 inVertexPosition;
-    in vec3 inColour;
-    in vec3 inNormal;
-    
-    out vec3 passColour;
-    out vec3 passNormal;
-    out vec3 passFragmentPosition;
-
-    uniform mat4 modelMatrix;
-    uniform mat4 projViewMatrix;
-
-    void main() {
-        gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
+        in vec3 inVertexPosition;
+        in vec3 inColour;
+        in vec3 inNormal;
         
-        passColour = inColour;
-        passNormal = inNormal;
-        passFragmentPosition = vec3(modelMatrix * vec4(inVertexPosition, 1.0));
-    }`,
+        out vec3 passColour;
+        out vec3 passNormal;
+        out vec3 passFragmentPosition;
+
+        uniform mat4 modelMatrix;
+        uniform mat4 projViewMatrix;
+
+        void main() {
+            gl_Position = projViewMatrix * modelMatrix * vec4(inVertexPosition.xyz, 1.0);
+            
+            passColour = inColour;
+            passNormal = inNormal;
+            passFragmentPosition = vec3(modelMatrix * vec4(inVertexPosition, 1.0));
+        }`,
     mapFragment: `#version 300 es
-    precision highp float;
+        precision highp float;
 
-    in vec3 passColour;
-    in vec3 passNormal;
-    in vec3 passFragmentPosition;
+        in vec3 passColour;
+        in vec3 passNormal;
+        in vec3 passFragmentPosition;
 
-    out vec4 colour;
+        out vec4 colour;
 
-    uniform vec3 lightPosition;
+        uniform vec3 lightPosition;
 
-    void main() {
-        vec3 lightDirection = normalize(lightPosition - passFragmentPosition);
-        float diff = max(dot(passNormal, lightDirection), 0.2);
-        vec3  finalColour = passColour * diff * 2.0;
-        colour = vec4(finalColour.xyz, 1.0);
-    }`,
+        void main() {
+            vec3 lightDirection = normalize(lightPosition - passFragmentPosition);
+            float diff = max(dot(passNormal, lightDirection), 0.2);
+            vec3  finalColour = passColour * diff * 2.0;
+            colour = vec4(finalColour.xyz, 1.0);
+        }`,
 }
 
 
