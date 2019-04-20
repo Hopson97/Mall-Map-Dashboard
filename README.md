@@ -111,6 +111,7 @@ Gets a list of all the shops added as JSON in the format
     },
     ...
 ]
+```
 
 #### GET information about one shop
 
