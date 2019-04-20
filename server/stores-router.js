@@ -44,15 +44,14 @@ router.post("/add-store", postStoreInformation);
 
 /**
  * 
- * @param {*} request Contain information about the store name and type
- * @param {*} response The HTTP response will return the newly added store
+ * @param {express.Request} request Contain information about the store name and type
+ * @param {express.response} response The HTTP response will return the newly added store
  */
 function postStoreInformation(request, response) {
     const storeName = request.body.storeName;
-    const storeType = request.body.stroeType;
+    const storeType = request.body.storeType;
 
     let storeId = 1;
-    //Cannot have duplicate store names
     if (stores.length > 0) {
         for (const store of stores) {
             //Set this store id number to be largest
@@ -60,7 +59,7 @@ function postStoreInformation(request, response) {
                 storeId = store.id + 1;
             }
 
-            //If the store name exists, then it is a failure
+            //If the store name exists, then do not allow it to be added
             if (store.name === storeName) {
                 response.json({
                     success: false,
@@ -71,6 +70,7 @@ function postStoreInformation(request, response) {
         }
     }
 
+    //Add the store and return it to client
     const store = {
         id: storeId,
         name: storeName,
@@ -107,7 +107,6 @@ function getStoreList(_, response) {
 function getStoreInformation(request, response) {
     const id = request.query.id;
     for (const store of stores) {
-        console.log(store);
         if (store.id == id) {
             response.json(store);
             return;
