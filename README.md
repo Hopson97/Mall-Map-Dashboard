@@ -145,10 +145,14 @@ Used to create the HTTP server.
 
 https://expressjs.com
 
+___
+
 ##### express-ws
 Used to add websocket functionality ontop of the express server application.
 
 https://www.npmjs.com/package/express-ws
+
+___
 
 #### Dev Dependancies
 
@@ -158,11 +162,15 @@ Used for unit testing the API
 
 https://qunitjs.com
 
+___
+
 ##### node-fetch
 
 Used for interacting with the server API from the unit test files
 
 https://www.npmjs.com/package/node-fetch
+
+___
 
 ##### cross-env
 
@@ -170,9 +178,13 @@ Used for cross-platform npm scripts
 
 https://www.npmjs.com/package/cross-env
 
+___
+
 
 ### Frontend
 
 gl-matrix: To assist with the matrix maths operations that are needed to effectively use WebGL
 
 http://glmatrix.net/
+
+___
