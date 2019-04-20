@@ -137,25 +137,36 @@ For example, if you were to `GET /api/stores/store-info?id=7`, you would get in 
 
 ### Backend
 
-Express: used to create the HTTP server.
+#### Normal Dependancies
+
+##### Express
+
+Used to create the HTTP server.
 
 https://expressjs.com
 
-ExpressWs: used to add websocket functionality ontop of the express server application.
+##### express-ws
+Used to add websocket functionality ontop of the express server application.
 
 https://www.npmjs.com/package/express-ws
 
 #### Dev Dependancies
 
-QUnit: Used for unit testing the API
+##### QUnit
+
+Used for unit testing the API
 
 https://qunitjs.com
 
-Node-Fetch: Used for interacting with the server API from the unit test files
+##### node-fetch
+
+Used for interacting with the server API from the unit test files
 
 https://www.npmjs.com/package/node-fetch
 
-Cross-Env: Used for cross-platform npm scripts
+##### cross-env
+
+Used for cross-platform npm scripts
 
 https://www.npmjs.com/package/cross-env
 
