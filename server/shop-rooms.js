@@ -22,7 +22,7 @@ const shopRooms = [];
  * @param {Number} shopId The shop ID
  */
 function addShopRoom(roomId, shopId) {
-    shopRooms.push({roomId, storeId: shopId});
+    shopRooms.push({roomId, shopId: shopId});
 }
 
 /**
@@ -46,7 +46,7 @@ function tryDeleteShopRoomByRoomId(roomId) {
  */
 function tryDeleteShopRoomByShopId(shopId) {
     const index = shopRooms.findIndex(
-        shopRoom => shopRoom.storeId == shopId
+        shopRoom => shopRoom.shopId == shopId
     );
     if (index >= 0) {
         shopRooms.splice(index, 1);

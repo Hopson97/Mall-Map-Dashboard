@@ -5,39 +5,39 @@ window.addEventListener("load", async e => {
 });
 
 async function populateTable() {
-    const storeTable = document.getElementById("store-table");
+    const shopTable = document.getElementById("shop-table");
 
-    //Get list of stores from server
-    const response = await fetch("/api/stores/list");
-    const storeList = await response.json();
+    //Get list of shops from server
+    const response = await fetch("/api/shops/list");
+    const shopList = await response.json();
     
-    //Create table from the store list
+    //Create table from the shop list
     const tableRowTemplate = document.getElementById("row");
-    for (const store of storeList) {
+    for (const shop of shopList) {
         const clone = document.importNode(tableRowTemplate.content, true);
         const cells = clone.querySelectorAll("td");
-        cells[0].textContent = store.name;
-        cells[1].textContent = store.type;
-        cells[2].textContent = store.dateAdded;
+        cells[0].textContent = shop.name;
+        cells[1].textContent = shop.type;
+        cells[2].textContent = shop.dateAdded;
 
         const editButton = clone.querySelector("a");
-        editButton.href = `edit-store?id=${store.id}`;
+        editButton.href = `edit-shop?id=${shop.id}`;
 
         //TODO make it so there is prompt first?
         const deleteButton = clone.querySelectorAll("img")[1];
         deleteButton.addEventListener("click", async() => {
-            await fetch("/api/stores/store", {
+            await fetch("/api/shops/shop", {
                 method: "delete",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({id: store.id})
+                body: JSON.stringify({id: shop.id})
             });
             location.reload(); //TODO is there a better way?
         });
 
 
         
-        storeTable.appendChild(clone);
+        shopTable.appendChild(clone);
     }
 }

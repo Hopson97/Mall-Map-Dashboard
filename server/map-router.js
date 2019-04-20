@@ -25,21 +25,21 @@ router.get("/layout", getLayout);
 //========================
 /**
  * Sets the information about a room in the mall. 
- * @param {express.request} request The HTTP request. Body should contain JSON with the room's ID, with the store name and type assosiated with it
+ * @param {express.request} request The HTTP request. Body should contain JSON with the room's ID, with the shop name and type assosiated with it
  * @param {express.Response} response The HTTP response. Response is true on success.
  */
 function postSectionData(request, response) {
     const roomId   = request.body.roomId;
-    const storeId  = request.body.storeId;
+    const shopId  = request.body.shopId;
 
-    shopRooms.addShopRoom(roomId, storeId);
+    shopRooms.addShopRoom(roomId, shopId);
 
     //Send info to all clients about the updated room
     for (const client of wss.clients) {
         client.send(JSON.stringify({
             type: "RoomUpdate",
             roomId,
-            storeId
+            shopId
         }));
     }
     
@@ -67,9 +67,9 @@ function deleteSectionData(request, response) {
 //
 //========================
 /**
- * Gets the data about the rooms, eg what their assosiated store is
+ * Gets the data about the rooms, eg what their assosiated shop is
  * @param {express.Request} request The HTTP request. 
- * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what store is assosiated with it)
+ * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what shop is assosiated with it)
  */
 function getSectionData(_, response) {
     response.json(shopRooms.getAllShopRooms());
@@ -78,7 +78,7 @@ function getSectionData(_, response) {
 /**
  * Gets the x, y, width, depth, height etc information about all the rooms, and the x, y, width and depth data about all paths
  * @param {express.Request} request The HTTP request. 
- * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what store is assosiated with it)
+ * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what shop is assosiated with it)
  */
 function getLayout(_, response) {
     fs.readFile('./server/data/map-layout.json', (err, json) => {

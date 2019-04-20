@@ -146,7 +146,7 @@ canvas {
 
 /*
 ------------------------------------
-    Store Editor Screen
+    shop Editor Screen
 ------------------------------------
 */
 
@@ -303,14 +303,14 @@ td {
     display: none;
 }
 
-.store-selection {
+.shop-selection {
     padding: 5px;
     border: 1px solid white;
     margin: 5px;
     transition: 1s;
 }
 
-.store-selection:hover {
+.shop-selection:hover {
     background-color: #5555;
 }
 

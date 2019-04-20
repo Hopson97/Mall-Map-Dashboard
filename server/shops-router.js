@@ -18,31 +18,31 @@ const adverts = [
 
 ]
 
-router.get("/list", getStoreList);
-router.get("/store-info", getStoreInformation);
+router.get("/list", getshopList);
+router.get("/shop-info", getshopInformation);
 router.get("/advert-list", getAdvertList);
 router.get("/get-advert", getAdvert);
 
 
-router.post("/add-store", postStoreInformation);
+router.post("/add-shop", postshopInformation);
 router.post("/add-advert", postAdvert);
 
-router.delete("/store", deleteStore);
+router.delete("/shop", deleteshop);
 
 //========================
 //   HTTP Post Requests
 //========================
 
 /**
- * Adds a store to the list of stores, given that a store with the name does not already exist
- * @param {express.Request} request Contain information about the store name and type
- * @param {express.response} response The HTTP response will return the newly added store on success
+ * Adds a shop to the list of shops, given that a shop with the name does not already exist
+ * @param {express.Request} request Contain information about the shop name and type
+ * @param {express.response} response The HTTP response will return the newly added shop on success
  */
-function postStoreInformation(request, response) {
-    const storeName = request.body.storeName;
-    const storeType = request.body.storeType;
+function postshopInformation(request, response) {
+    const shopName = request.body.shopName;
+    const shopType = request.body.shopType;
 
-    const shopId = shops.addShop(storeName, storeType);
+    const shopId = shops.addShop(shopName, shopType);
     if (shopId === -1) {
         response.sendStatus(409);
     } else {
@@ -53,17 +53,17 @@ function postStoreInformation(request, response) {
 
 /**
  * Adds an advert to the mall
- * @param {express.Request} request Must contain JSON with storeId, title, and body for the advert
+ * @param {express.Request} request Must contain JSON with shopId, title, and body for the advert
  * @param {express.response} response JSON with the newly added advert
  */
 function postAdvert(request, response) {
-    const storeId = request.body.storeId;
+    const shopId = request.body.shopId;
     const adTitle = request.body.title;
     const adBody = request.body.body;
 
     //TODO spelling
     let advetId = 1;
-    if (stores.length > 0) {
+    if (shops.length > 0) {
         for (const advert of adverts) {
             //Set this advert id number to be largest
             if (advert.id >= advetId) {
@@ -75,7 +75,7 @@ function postAdvert(request, response) {
     //Add the advert and return it to client
     const advert = {
         id: advetId,
-        storeId: storeId,
+        shopId: shopId,
         title: adTitle,
         body: adBody,
         added: util.getFormattedDate()
@@ -89,19 +89,19 @@ function postAdvert(request, response) {
 //   HTTP Get Requests
 //========================
 /**
- * Gets the list of all the added stores and their assosiated information eg type
- * @param {express.response} response The HTTP request. Contains json containing information about every store.
+ * Gets the list of all the added shops and their assosiated information eg type
+ * @param {express.response} response The HTTP request. Contains json containing information about every shop.
  */
-function getStoreList(_, response) {
+function getshopList(_, response) {
     response.json(shops.getAllShops());
 }
 
 /**
- * Gets the list of all the added stores and their assosiated information eg type
- * @param {express.Request} request The HTTP request. Should contain URL query with the store id to get information about (as ?id=<store id>)
- * @param {express.response} response The HTTP request. Contains json containing information about the chosen store
+ * Gets the list of all the added shops and their assosiated information eg type
+ * @param {express.Request} request The HTTP request. Should contain URL query with the shop id to get information about (as ?id=<shop id>)
+ * @param {express.response} response The HTTP request. Contains json containing information about the chosen shop
  */
-function getStoreInformation(request, response) {
+function getshopInformation(request, response) {
     const shop = shops.getShopInformation(request.query.id);
     if (shop) {
         response.json(shop);
@@ -143,7 +143,7 @@ function getAdvert(request, response) {
  * @param {express.Request} request Must contain JSON with {id: n} where n is the shop id to delete
  * @param {express.response} response 204 on success, 404 otherwise
  */
-function deleteStore(request, response) {
+function deleteshop(request, response) {
     const shopId = request.body.id;
     if (shops.tryDeleteShop(request.body.id)) {
         response.sendStatus(204);
