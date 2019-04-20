@@ -12,14 +12,20 @@ module.exports = {
     getFormattedDate: () => {
         const date = new Date();
 
-        const secs = date.getSeconds();
-        const mins = date.getMinutes();
-        const hours = date.getHours();
-
         const days = date.getDate();
         const month = date.getMonth();
         const year = date.getFullYear();
 
-        return `${hours}:${mins}:${secs} ${days}-${month}-${year}`;
+        return `${days}/${month}/${year}`;
+    },
+
+    getFormattedDateTime: () => {
+        const date = new Date();
+
+        const secs = date.getSeconds();
+        const mins = date.getMinutes();
+        const hours = date.getHours();
+        
+        return `${hours}:${mins}:${secs} ${getFormattedDate()}`;
     }
 }

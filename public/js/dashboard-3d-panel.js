@@ -202,8 +202,11 @@ class Room extends Drawable3D {
             //Get information about the store
             const response = await fetch("api/stores/store-info?id=" + this.storeId);
             const shopInformation = await response.json();
-            this.billboard = new Billboard(this.roomId, shopInformation.name, shopInformation.type);
-            colour = typeToColour(shopInformation.type).asNormalised().asArray();
+            this.billboard = new Billboard(
+                this.roomId,
+                shopInformation.store.name,
+                shopInformation.store.type);
+            colour = typeToColour(shopInformation.store.type).asNormalised().asArray();
         } else {
             colour = typeToColour("none").asNormalised().asArray();
             this.billboard = null;

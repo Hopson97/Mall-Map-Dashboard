@@ -121,6 +121,7 @@ main .page-title h2 {
 }
 
 main .main-content {
+    min-height: 85vh;
     width: 70%;
     margin: auto;
     color: black;
@@ -154,7 +155,29 @@ canvas {
 }
 
 .bin-icon:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
+}
+
+/*
+===================
+  General classes
+===================
+*/
+
+.center {
+    text-align: center;
+}
+
+.wide-button {
+    background-color: var(--header-colour);
+    color: white;
+    border: solid black;
+    padding: 10px;
+    transition: 1s;
+}
+
+.wide-button:hover {
+    background-color: var(--nav-hover-colour);
 }
 
 /*
@@ -228,8 +251,10 @@ canvas {
 ===================
 */
 table {
-    width: 90%;
+    width: 100%;
     margin: auto;
+    border-bottom: solid black;
+    margin-bottom: 20px;
 }
 
 th {
@@ -306,10 +331,6 @@ td {
 }
 
 @media screen and (max-width: 1140px) {
-    main .main-content {
-        width: 98%;
-        margin: auto;
-    }
     header nav {
         display: none;
     }
@@ -321,4 +342,24 @@ td {
         width: 95%;
         margin: auto;
     }
+
+
+    main .main-content {
+        width: 100%;
+        margin: auto;
+    }
+
+    main .content-container {
+        width: 100%;
+        margin: auto;
+    }
+
+
+
+    th,
+    td {
+        text-align: center;
+        padding: 2px;
+    }
 }
+

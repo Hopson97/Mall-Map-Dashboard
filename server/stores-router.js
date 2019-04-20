@@ -11,22 +11,25 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 
-//Temp, TODO
+//Temp, TODO//
 
 const stores = [{
         id: 1,
         name: "Game",
-        type: "Entertainment"
+        type: "Entertainment",
+        dateAdded: util.getFormattedDate()
     },
     {
         id: 2,
         name: "Greggs",
-        type: "Food/Drink"
+        type: "Food/Drink",
+        dateAdded: util.getFormattedDate()
     },
     {
         id: 3,
         name: "Next",
-        type: "Clothes"
+        type: "Clothes",
+        dateAdded: util.getFormattedDate()
     }
 ];
 
@@ -43,6 +46,8 @@ router.get("/get-advert", getAdvert);
 router.post("/add-store", postStoreInformation);
 router.post("/add-advert", postAdvert);
 
+router.delete("/store", deleteStore);
+
 //========================
 //
 //   HTTP Post Requests
@@ -50,9 +55,9 @@ router.post("/add-advert", postAdvert);
 //========================
 
 /**
- * 
+ * Adds a store to the list of stores, given that a store with the name does not already exist
  * @param {express.Request} request Contain information about the store name and type
- * @param {express.response} response The HTTP response will return the newly added store
+ * @param {express.response} response The HTTP response will return the newly added store on success
  */
 function postStoreInformation(request, response) {
     const storeName = request.body.storeName;
@@ -82,17 +87,20 @@ function postStoreInformation(request, response) {
         id: storeId,
         name: storeName,
         type: storeType,
-        added: util.getFormattedDate()
+        dateAdded: util.getFormattedDate()
     };
     stores.push(store);
-
     response.json({
         success: true,
         store
     });
 }
-
-
+//TODO COMMENTS/ DOCS OR WHATEVER THEY ARE CALLED!!!
+/**
+ * 
+ * @param {express.Request} request 
+ * @param {express.response} response 
+ */
 function postAdvert(request, response) {
     const storeId = request.body.storeId;
     const adTitle = request.body.title;
@@ -146,19 +154,33 @@ function getStoreInformation(request, response) {
     const id = request.query.id;
     for (const store of stores) {
         if (store.id == id) {
-            response.json(store);
+            response.json({
+                success: true,
+                store
+            });
             return;
         }
     }
 
     //Store not found
-    response.sendStatus(404);
+    response.json({
+        success: false,
+        reason: "404 store not found."
+    });
 }
-
+/**
+ * 
+ * @param {express.Request} request 
+ * @param {express.response} response
+ */
 function getAdvertList(request, response) {
     response.json(adverts);
 }
-
+/**
+ * 
+ * @param {express.Request} request 
+ * @param {express.response} response 
+ */
 function getAdvert(request, response) {
     const id = request.query.id;
     for (const ad of adverts) {
@@ -173,6 +195,27 @@ function getAdvert(request, response) {
     response.json({
         success: false,
         reason: `Unable to find advert with ID: ${id}`
+    });
+}
+
+//========================
+//
+//   HTTP Delete Requests
+//
+//========================
+function deleteStore(request, response) {
+    const deleteId = request.body.id;
+
+    const index = stores.findIndex((store) => {
+
+        return store.id == deleteId;
+    });
+
+    stores.splice(index, 1);
+
+
+    response.json({
+        success: true
     });
 }
 

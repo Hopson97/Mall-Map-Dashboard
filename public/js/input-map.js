@@ -139,8 +139,8 @@ async function initMapData() {
         if (json[room.id]) {
             const response = await fetch("api/stores/store-info?id=" + json[room.id]);
             const info = await response.json();
-            room.name = info.name;
-            room.type = info.type;
+            room.name = info.store.name;
+            room.type = info.store.type;
         }
     }
 }

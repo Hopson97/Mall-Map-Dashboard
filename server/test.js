@@ -10,8 +10,8 @@ QUnit.test("1 + 1", assert => {
 
 
 const URL = 'http://localhost:8080';
-const STORE_PATH = URL + "/api/stores/";
-const MAP_PATH = URL + "/api/map/"
+const STORE_PATH = URL + "/api/stores";
+const MAP_PATH = URL + "/api/map"
 
 async function postJson(url, json) {
     const response = await fetch(url, {
@@ -87,13 +87,49 @@ QUnit.test(
 
         const getReqResponse = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
         const getReqJson = await getReqResponse.json();
-        assert.deepEqual(getReqJson.id, storeId, "The ID should be the same");
+        assert.deepEqual(getReqJson.store.id, storeId, "The ID should be the same");
         assert.deepEqual({
-                storeName: getReqJson.name,
-                storeType: getReqJson.type
+                storeName: getReqJson.store.name,
+                storeType: getReqJson.store.type
             },
             store,
             "The respone should return the store that was just added");
+    });
+
+/**
+ * Testing DELETE /api/stores/store
+ */
+QUnit.test(
+    "Stores should be able to be deleted",
+    async assert => {
+        //Obfuscated store name as to not conflict with existing stores
+        const store = {
+            storeName: "afgdhtdfylkujyhtgrfsdf",
+            storeType: "Food/Drink"
+        };
+        //Get store ID after adding a new store
+        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        const json = await response.json();
+        const storeId = json.store.id;
+        //Test the delete request
+        const deleteResponse = await fetch(`${STORE_PATH}/store`, {
+            method: 'delete',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: storeId
+            })
+        });
+        const deleteJson = await deleteResponse.json();
+        assert.deepEqual(deleteJson.success, true, "The delete function should return true for a succesful delete");
+        
+        //Should no longer be able to find the store
+        {
+            const response = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
+            const json = await response.json();
+            assert.deepEqual(json.success, false, "The store should not be able to be found");
+        }
     });
 /**
  * Test posting and getting adverts
@@ -128,12 +164,12 @@ QUnit.test(
             const json = await response.json();
             assert.deepEqual(json.success, true, "Should be able to find the advert just posted");
             assert.deepEqual({
-                storeId: json.advert.storeId,
-                title: json.advert.title,
-                body: json.advert.body
-            },
-            advert,
-            "Should be able to find advert that contains the same info as the one posted");
+                    storeId: json.advert.storeId,
+                    title: json.advert.title,
+                    body: json.advert.body
+                },
+                advert,
+                "Should be able to find advert that contains the same info as the one posted");
         }
 
         //Testing for GET /api/stores/get-advert?id=advertId invalid case
@@ -143,6 +179,7 @@ QUnit.test(
             assert.deepEqual(json.success, false, "Should not be able to find advert with invalid id");
         }
     });
+
 
 //========================
 //
