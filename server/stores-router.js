@@ -13,8 +13,7 @@ router.use(bodyParser.json());
 
 //Temp, TODO
 
-const stores = [
-    {
+const stores = [{
         id: 1,
         name: "Game",
         type: "Entertainment"
@@ -31,8 +30,15 @@ const stores = [
     }
 ];
 
+const adverts = [
+
+]
+
 router.get("/list", getStoreList);
 router.get("/store-info", getStoreInformation);
+router.get("/advert-list", getAdvertList);
+router.get("/get-advert", getAdvert);
+
 
 router.post("/add-store", postStoreInformation);
 router.post("/add-advert", postAdvert);
@@ -76,7 +82,7 @@ function postStoreInformation(request, response) {
         id: storeId,
         name: storeName,
         type: storeType,
-        added: util.getFormattedDate() 
+        added: util.getFormattedDate()
     };
     stores.push(store);
 
@@ -88,7 +94,34 @@ function postStoreInformation(request, response) {
 
 
 function postAdvert(request, response) {
-    
+    const storeId = request.body.storeId;
+    const adTitle = request.body.title;
+    const adBody = request.body.body;
+
+    let advetId = 1;
+    if (stores.length > 0) {
+        for (const advert of adverts) {
+            //Set this advert id number to be largest
+            if (advert.id >= advetId) {
+                advetId = advert.id + 1;
+            }
+        }
+    }
+
+    //Add the advert and return it to client
+    const advert = {
+        id: advetId,
+        storeId: storeId,
+        title: adTitle,
+        body: adBody,
+        added: util.getFormattedDate()
+    };
+    adverts.push(advert);
+
+    response.json({
+        success: true,
+        advert
+    });
 }
 
 //========================
@@ -122,6 +155,26 @@ function getStoreInformation(request, response) {
     response.sendStatus(404);
 }
 
+function getAdvertList(request, response) {
+    response.json(adverts);
+}
+
+function getAdvert(request, response) {
+    const id = request.query.id;
+    for (const ad of adverts) {
+        if (ad.id == id) {
+            response.json({
+                success: true,
+                advert: ad
+            });
+            return;
+        }
+    }
+    response.json({
+        success: false,
+        reason: `Unable to find advert with ID: ${id}`
+    });
+}
 
 //Exports
 module.exports = {

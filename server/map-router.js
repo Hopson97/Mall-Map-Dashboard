@@ -66,7 +66,7 @@ function getSectionData(request, response) {
  * @param {express.Request} request The HTTP request. 
  * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what store is assosiated with it)
  */
-function getLayout(request, response) {
+function getLayout(_, response) {
     fs.readFile('./server/data/map-layout.json', (err, json) => {
         const layout = JSON.parse(json);
         response.json(layout);
