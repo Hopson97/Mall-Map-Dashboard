@@ -56,6 +56,10 @@ function addTableRow(shop) {
     shopTable.appendChild(clone);
 }
 
+/**
+ * Event handler for when the form is submitted
+ * @param {Event} event The submit event
+ */
 async function onSubmitShop(event) {
     event.preventDefault();
     const shopNameElement = document.getElementById("shop-name");
