@@ -6,7 +6,8 @@ require('./index'); //Start the server
 
 const URL = 'http://localhost:8080';
 const SHOP_PATH = URL + "/api/shops";
-const MAP_PATH = URL + "/api/map"
+const MAP_PATH = URL + "/api/map";
+const AD_PATH = URL + "/api/adverts";
 
 async function postJson(url, json) {
     const response = await fetch(url, {
@@ -122,9 +123,14 @@ QUnit.test(
             assert.deepEqual(response.status, 404, "The shop should not be able to be found");
         }
     });
+//========================
+//
+//   QUint Tests for the advert API
+//
+//========================
 /**
  * Test posting and getting adverts
- *
+ */
 QUnit.test(
     "API should allow for the posting and recieving of adverts for shops",
     async assert => {
@@ -137,7 +143,7 @@ QUnit.test(
         let advertId;
         //Testing for POST /api/shops/add-advert
         {
-            const response = await postJson(`${SHOP_PATH}/add-advert`, advert);
+            const response = await postJson(`${AD_PATH}/add-advert`, advert);
             const json = await response.json();
             advertId = json.id;
             assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
@@ -149,9 +155,10 @@ QUnit.test(
                 advert,
                 "The returned advert should contain same info as the one posted");
         }
+
         //Testing for GET /api/shops/get-advert?id=advertId
         {
-            const response = await fetch(`${SHOP_PATH}/get-advert?id=${advertId}`);
+            const response = await fetch(`${AD_PATH}/get-advert?id=${advertId}`);
             const json = await response.json();
             assert.deepEqual(response.status, 200, "Should be able to find the advert just posted");
             assert.deepEqual({
@@ -165,11 +172,11 @@ QUnit.test(
 
         //Testing for GET /api/shops/get-advert?id=advertId invalid case
         {
-            const response = await fetch(`${SHOP_PATH}/get-advert?id=${-50}`);
+            const response = await fetch(`${AD_PATH}/get-advert?id=${-50}`);
             assert.deepEqual(response.status, 404, "Should not be able to find advert with invalid id");
         }
     });
-*/
+
 
 //========================
 //

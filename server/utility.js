@@ -27,5 +27,12 @@ module.exports = {
         const hours = date.getHours();
         
         return `${hours}:${mins}:${secs} ${getFormattedDate()}`;
+    },
+
+    getMaxId(list) {
+        if (list.length == 0) {
+            return 0;
+        }
+        return Math.max(...list.map(obj => obj.id));
     }
 }
