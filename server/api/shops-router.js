@@ -3,8 +3,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const util = require('./utility');
-const shops = require("./shops");
+const util = require('../utility');
+const shops = require("../shops");
 
 let wss;
 

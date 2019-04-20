@@ -4,7 +4,7 @@ const express = require('express')
 const path = require('path');
 const bodyParser = require('body-parser');
 
-const api = require('./api');
+const api = require('./api/api');
 
 //Start the server using Express with websocket
 const expressWs = require('express-ws')(express());

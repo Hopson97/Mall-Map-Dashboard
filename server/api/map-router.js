@@ -4,7 +4,7 @@ const fs = require('fs')
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const shopRooms = require("./shop-rooms")
+const shopRooms = require("../shop-rooms")
 
 let wss;
 
