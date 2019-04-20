@@ -14,14 +14,24 @@ window.addEventListener("load", async e => {
  */
 async function handleMessage(event) {
     const data = JSON.parse(event.data);
-    console.log(data);
+    console.log(`Message received from web socket: ${data}`);
     switch (data.type) {
         case "RoomUpdate":
             for (const room of objects.rooms) {
                 if (room.roomId === data.roomId) {
-                    room.storeId = data.storeId;
+                    room.shopId = data.shopId;
                     await room.update();
                 }
             }
+            break;
+
+        case "ShopDelete":
+            for (const room of objects.rooms) {
+                if (room.shopId === data.shopId) {
+                    room.shopId = -1;
+                    await room.update();
+                }
+            }
+            break;
     }
 }

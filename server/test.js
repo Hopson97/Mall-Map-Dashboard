@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 require('./index'); //Start the server
 
 const URL = 'http://localhost:8080';
-const STORE_PATH = URL + "/api/stores";
+const SHOP_PATH = URL + "/api/shops";
 const MAP_PATH = URL + "/api/map"
 
 async function postJson(url, json) {
@@ -21,141 +21,141 @@ async function postJson(url, json) {
 
 //========================
 //
-//   QUint Tests for the store API for the shops
+//   QUint Tests for the shop API for the shops
 //
 //========================
 
 /**
- * Testing POST /api/stores/add-store
+ * Testing POST /api/shops/add-shop
  */
 QUnit.test(
-    "Stores should be able to be added via POST add-store",
+    "shops should be able to be added via POST add-shop",
     async assert => {
-        //Obfuscated store name as to not conflict with existing stores
-        const store = {
-            storeName: "xnjufchvrufchwaufhwauhwauhvwahcf",
-            storeType: "Food/Drink"
+        //Obfuscated shop name as to not conflict with existing shops
+        const shop = {
+            shopName: "xnjufchvrufchwaufhwauhwauhvwahcf",
+            shopType: "Food/Drink"
         };
 
-        //Test for posting a store
+        //Test for posting a shop
         {
-            const response = await postJson(`${STORE_PATH}/add-store`, store);
+            const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
             const json = await response.json();
 
             assert.deepEqual(response.status, 201, "The post should return successful");
 
             assert.deepEqual({
-                    storeName: json.name,
-                    storeType: json.type
+                    shopName: json.name,
+                    shopType: json.type
                 },
-                store,
-                "The respone should return the store that was just added");
+                shop,
+                "The respone should return the shop that was just added");
         }
 
-        //Test for posting the same store, should not work
+        //Test for posting the same shop, should not work
         {
-            const response = await postJson(`${STORE_PATH}/add-store`, store);
-            assert.deepEqual(response.status, 409, "The post should return not succesful with the same store name added again");
+            const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
+            assert.deepEqual(response.status, 409, "The post should return not succesful with the same shop name added again");
         }
     });
 
 
-let storeId;
+let shopId;
 /**
- * Testing GET /api/stores/store-info
+ * Testing GET /api/shops/shop-info
  */
 QUnit.test(
-    "After adding a store, the information about the store should be able to be recieved via GET store-info?id=<id>",
+    "After adding a shop, the information about the shop should be able to be recieved via GET shop-info?id=<id>",
     async assert => {
-        //Obfuscated store name as to not conflict with existing stores
-        const store = {
-            storeName: "kjdsfcjdwakjrcwarkuwar",
-            storeType: "Food/Drink"
+        //Obfuscated shop name as to not conflict with existing shops
+        const shop = {
+            shopName: "kjdsfcjdwakjrcwarkuwar",
+            shopType: "Food/Drink"
         };
-        //Get store ID after adding a new store
-        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        //Get shop ID after adding a new shop
+        const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
         const json = await response.json();
-        storeId = json.id;
+        shopId = json.id;
 
-        const getReqResponse = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
+        const getReqResponse = await fetch(`${SHOP_PATH}/shop-info?id=${shopId}`);
         const getReqJson = await getReqResponse.json();
-        assert.deepEqual(getReqJson.id, storeId, "The ID should be the same");
+        assert.deepEqual(getReqJson.id, shopId, "The ID should be the same");
         assert.deepEqual({
-                storeName: getReqJson.name,
-                storeType: getReqJson.type
+                shopName: getReqJson.name,
+                shopType: getReqJson.type
             },
-            store,
-            "The respone should return the store that was just added");
+            shop,
+            "The respone should return the shop that was just added");
     });
 
 /**
- * Testing DELETE /api/stores/store
+ * Testing DELETE /api/shops/shop
  */
 QUnit.test(
-    "Stores should be able to be deleted",
+    "shops should be able to be deleted",
     async assert => {
-        //Obfuscated store name as to not conflict with existing stores
-        const store = {
-            storeName: "afgdhtdfylkujyhtgrfsdf",
-            storeType: "Food/Drink"
+        //Obfuscated shop name as to not conflict with existing shops
+        const shop = {
+            shopName: "afgdhtdfylkujyhtgrfsdf",
+            shopType: "Food/Drink"
         };
-        //Get store ID after adding a new store
-        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        //Get shop ID after adding a new shop
+        const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
         const json = await response.json();
-        const storeId = json.id;
+        const shopId = json.id;
         //Test the delete request
-        const deleteResponse = await fetch(`${STORE_PATH}/store`, {
+        const deleteResponse = await fetch(`${SHOP_PATH}/shop`, {
             method: 'delete',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                id: storeId
+                id: shopId
             })
         });
 
         assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
 
-        //Should no longer be able to find the store
+        //Should no longer be able to find the shop
         {
-            const response = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
-            assert.deepEqual(response.status, 404, "The store should not be able to be found");
+            const response = await fetch(`${SHOP_PATH}/shop-info?id=${shopId}`);
+            assert.deepEqual(response.status, 404, "The shop should not be able to be found");
         }
     });
 /**
  * Test posting and getting adverts
- */
+ *
 QUnit.test(
     "API should allow for the posting and recieving of adverts for shops",
     async assert => {
         const advert = {
-            storeId: storeId,
+            shopId: shopId,
             title: "50% OFF!",
-            body: "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT store"
+            body: "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop"
         };
 
         let advertId;
-        //Testing for POST /api/stores/add-advert
+        //Testing for POST /api/shops/add-advert
         {
-            const response = await postJson(`${STORE_PATH}/add-advert`, advert);
+            const response = await postJson(`${SHOP_PATH}/add-advert`, advert);
             const json = await response.json();
             advertId = json.id;
             assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
             assert.deepEqual({
-                    storeId: json.storeId,
+                    shopId: json.shopId,
                     title: json.title,
                     body: json.body
                 },
                 advert,
                 "The returned advert should contain same info as the one posted");
         }
-        //Testing for GET /api/stores/get-advert?id=advertId
+        //Testing for GET /api/shops/get-advert?id=advertId
         {
-            const response = await fetch(`${STORE_PATH}/get-advert?id=${advertId}`);
+            const response = await fetch(`${SHOP_PATH}/get-advert?id=${advertId}`);
             const json = await response.json();
             assert.deepEqual(response.status, 200, "Should be able to find the advert just posted");
             assert.deepEqual({
-                    storeId: json.storeId,
+                    shopId: json.shopId,
                     title: json.title,
                     body: json.body
                 },
@@ -163,13 +163,13 @@ QUnit.test(
                 "Should be able to find advert that contains the same info as the one posted");
         }
 
-        //Testing for GET /api/stores/get-advert?id=advertId invalid case
+        //Testing for GET /api/shops/get-advert?id=advertId invalid case
         {
-            const response = await fetch(`${STORE_PATH}/get-advert?id=${-50}`);
+            const response = await fetch(`${SHOP_PATH}/get-advert?id=${-50}`);
             assert.deepEqual(response.status, 404, "Should not be able to find advert with invalid id");
         }
     });
-
+*/
 
 //========================
 //
@@ -181,7 +181,7 @@ QUnit.test(
     async assert => {
         const info = {
             roomId: 0,
-            storeId: 0
+            shopId: 0
         };
 
         const response = await postJson(`${MAP_PATH}/room-update`, info);

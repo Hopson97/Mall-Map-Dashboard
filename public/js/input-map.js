@@ -21,11 +21,11 @@ const buttonPressed = {
     'right': false
 }
 
-//Object to store map data
+//Object to shop map data
 const mapData = {}
 
 //The highlighted room currently being edited 
-let selectedStore = -1;
+let selectedshop = -1;
 
 /**
  * Class to abstract the rendering of the map
@@ -118,7 +118,7 @@ window.addEventListener("load", async () => {
         .addEventListener("click", handleZoomOutClick);
 
     //Build various DOM sections and initilize some data
-    buildStoreDOM();
+    buildshopDOM();
     await initMapData();
 
     //Begin the main loop
@@ -134,12 +134,14 @@ async function initMapData() {
     const response = await fetch("api/map/section-data");
     const shopRoomsList = await response.json();
 
+    console.log(shopRoomsList);
+
     for (const room of mapData.rooms) {
         const index = shopRoomsList.findIndex(shopRoom => {
             return shopRoom.roomId == room.id;
         })
         if (index > -1) {
-            const response = await fetch("api/stores/store-info?id=" + shopRoomsList[index].storeId);
+            const response = await fetch("api/shops/shop-info?id=" + shopRoomsList[index].shopId);
             if (response.status === 404) {
 
             } else {
@@ -181,7 +183,7 @@ function loop(canvas, context) {
         //Draw the rooms
         context.strokeStyle = "white";
         for (const room of mapData.rooms) {
-            if (selectedStore.id == room.id) {
+            if (selectedshop.id == room.id) {
                 context.fillStyle = "lime";
             } else {
                 context.fillStyle = typeToColour(room.type).asCSSString();
@@ -238,7 +240,7 @@ function handleCanvasClick(event) {
             y < room.y / scaleFactor + room.depth / scaleFactor) {
             const popup = document.getElementById("popup");
             popup.classList.remove("hidden");
-            selectedStore = room;
+            selectedshop = room;
         }
     }
 }
@@ -282,18 +284,18 @@ function handleZoomOutClick() {
 
 ///@TODO EWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
 /**
- * Builds DOM for the store selection popup
+ * Builds DOM for the shop selection popup
  */
-async function buildStoreDOM() {
-    const storeList = document.getElementById("store-list");
-    const storeListSect = document.getElementById("store-list-section");
-    const response = await fetch("/api/stores/list");
+async function buildshopDOM() {
+    const shopList = document.getElementById("shop-list");
+    const shopListSect = document.getElementById("shop-list-section");
+    const response = await fetch("/api/shops/list");
     const json = await response.json();
 
-    for (const store of json) {
-        const name = store.name;
-        const type = store.type;
-        const clone = document.importNode(storeListSect.content, true);
+    for (const shop of json) {
+        const name = shop.name;
+        const type = shop.type;
+        const clone = document.importNode(shopListSect.content, true);
         const container = clone.querySelector("div");
         const contentElements = clone.querySelectorAll('p');
         contentElements[0].textContent = name;
@@ -301,10 +303,10 @@ async function buildStoreDOM() {
 
         //Listens for the click event on the buttons
         container.addEventListener("click", async () => {
-            console.log(selectedStore.id);
+            console.log(selectedshop.id);
             const data = {
-                roomId: selectedStore.id,
-                storeId: store.id
+                roomId: selectedshop.id,
+                shopId: shop.id
             };
             const response = await fetch("api/map/room-update", {
                 method: "POST",
@@ -315,12 +317,12 @@ async function buildStoreDOM() {
             });
 
             if (response.status === 201) {
-                selectedStore.type = type;
-                selectedStore = -1;
+                selectedshop.type = type;
+                selectedshop = -1;
                 const popup = document.getElementById("popup");
                 popup.classList.add("hidden");
             }
         });
-        storeList.append(clone);
+        shopList.append(clone);
     }
 }

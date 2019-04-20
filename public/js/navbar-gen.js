@@ -22,7 +22,7 @@ window.addEventListener("load", e => {
     };
 
     addButton("Map Editor", 'input-map', false);
-    addButton("Store Editor", 'input-stores', false);
+    addButton("Shop Editor", 'input-shops', false);
     addButton("Advert Edtior", 'input-adverts', false);
     addButton("Announcement Editor", 'input-announcements', false);
     addButton("View Dashboard", 'dashboard', true);

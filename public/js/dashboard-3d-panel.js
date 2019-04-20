@@ -182,7 +182,7 @@ class Room extends Drawable3D {
         super();
         this.gl = gl;
         this.roomId = roomId;
-        this.storeId = -1;
+        this.shopId = -1;
         this.billboard = null;
         this.x = x;
         this.z = z;
@@ -198,9 +198,9 @@ class Room extends Drawable3D {
      */
     async update() {
         let colour;
-        if (this.storeId >= 0) {
-            //Get information about the store
-            const response = await fetch("api/stores/store-info?id=" + this.storeId);
+        if (this.shopId >= 0) {
+            //Get information about the shop
+            const response = await fetch("api/shops/shop-info?id=" + this.shopId);
             if (response.status === 404) {
                 //handle?
                 return;
@@ -217,7 +217,7 @@ class Room extends Drawable3D {
             this.billboard = null;
         }
         //Loop through the 60 colours (5 faces * 4 vertex per face * 3 colour per vertex) 
-        //to update it's colour to be that of the new store
+        //to update it's colour to be that of the new shop
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 3; j++) {
                 this.mesh.colours[i * 3 + j] = colour[j];
@@ -248,13 +248,13 @@ class Billboard {
     /**
      * Constructs the billboard with basic info
      * @param {Number} roomId The room ID this billboard assosiates with
-     * @param {String} storeName The name of the store to display
-     * @param {String} storeType The type of the store to display    
+     * @param {String} shopName The name of the shop to display
+     * @param {String} shopType The type of the shop to display    
      */
-    constructor(roomId, storeName, storeType) {
+    constructor(roomId, shopName, shopType) {
         this.roomId = roomId
-        this.storeName = storeName
-        this.storeType = storeType
+        this.shopName = shopName
+        this.shopType = shopType
     }
 }
 
@@ -294,7 +294,7 @@ class RenderableBillboard {
      * @param {Rederer} renderer The renderer to render the billboard to
      */
     draw(renderer) {
-        //TODO Use billboard store stats to fit the billboard size accordingly
+        //TODO Use billboard shop stats to fit the billboard size accordingly
         //Draw billboard thing
         const c = renderer.context;
         c.strokeStyle = "white";
@@ -312,8 +312,8 @@ class RenderableBillboard {
         c.fill();
         c.fillStyle = "white";
         c.fillText(`Room ${this.billboardData.roomId}`, this.x, this.y - 24);
-        c.fillText(`Store: ${this.billboardData.storeName}`, this.x, this.y - 12);
-        c.fillText(`${this.billboardData.storeType}`, this.x, this.y);
+        c.fillText(`shop: ${this.billboardData.shopName}`, this.x, this.y - 12);
+        c.fillText(`${this.billboardData.shopType}`, this.x, this.y);
     }
 }
 
@@ -566,7 +566,7 @@ function buildPathGeometry(gl, pathData) {
  * Creates WebGL geometric data (inc VAOs and VBOs) based on 2D layout of the map for the rooms/shops
  * @param {WebGLRenderContext} gl The WebGL Context
  * @param {Object} roomGeometry Object containing 2D data about each of the rooms
- * @param {Object} roomsData Object containing information about the room ID and their assosiated store IDs
+ * @param {Object} roomsData Object containing information about the room ID and their assosiated shop IDs
  */
 async function buildRoomsGeometry(gl, roomGeometry) {
     const rooms = [];
@@ -634,12 +634,12 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
 
     createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
 
-    //Do extra things if the room has an assosiated store
+    //Do extra things if the room has an assosiated shop
     const index = roomsData.findIndex(shopRoom => {
         return shopRoom.roomId == roomInfo.id;
     })
     if (index > -1) {
-        room.storeId = roomsData[index].storeId;
+        room.shopId = roomsData[index].shopId;
     }
     await room.update();
 

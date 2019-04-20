@@ -126,6 +126,7 @@ main .main-content {
     margin: auto;
     color: black;
     background-color: var(--background-colour-dark);
+    box-shadow: inset 0px 0px 5px 0px black;
 }
 
 main .content-container {
@@ -146,7 +147,7 @@ canvas {
 
 /*
 ------------------------------------
-    Store Editor Screen
+    shop Editor Screen
 ------------------------------------
 */
 
@@ -244,7 +245,32 @@ canvas {
 .arrows {
     color: white;
 }
+*/
+
 /*
+===================
+  Forms
+===================
+*/
+.edit-form {
+    padding: 10px;
+    border-bottom: solid black;
+}
+
+.edit-form > * {
+    padding: 10px;
+    width: 50%;
+    margin: auto;
+}
+
+.edit-form input[type=text], 
+.edit-form select {
+    width: 100%;
+    padding: 10px;
+    border: solid black 2px;
+    border-radius: 10px;
+    background: white;
+}
 /*
 ===================
   Table
@@ -303,14 +329,14 @@ td {
     display: none;
 }
 
-.store-selection {
+.shop-selection {
     padding: 5px;
     border: 1px solid white;
     margin: 5px;
     transition: 1s;
 }
 
-.store-selection:hover {
+.shop-selection:hover {
     background-color: #5555;
 }
 

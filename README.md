@@ -25,12 +25,12 @@ Gets information about the rooms in JSON format, with the format:
 
 ```
 {
-    <roomId>: <storeId>,
-    <roomId>: <storeId>,
-    <roomId>: <storeId>,
+    <roomId>: <shopId>,
+    <roomId>: <shopId>,
+    <roomId>: <shopId>,
 }
 ```
-For example, if store ID of 2 was assosiated with the store with an ID of 5:
+For example, if shop ID of 2 was assosiated with the shop with an ID of 5:
 ```
 {
     2: 5,
@@ -82,18 +82,18 @@ Updates a room with a new shop for the room to be assosiated with. The POST requ
 ```
 {
     roomId: <n>,
-    storeId: <n2>
+    shopId: <n2>
 }
 ```
 Where n is the room ID, and the n2 is the shop ID that the room, n, will now be assosiated with and will display information about on the dashboard.
 
 ___
 
-### Store API
+### shop API
 
 #### GET list of shops
 
-`GET /api/stores/list`
+`GET /api/shops/list`
 
 Gets a list of all the shops added as JSON in the format
 
@@ -115,11 +115,11 @@ Gets a list of all the shops added as JSON in the format
 
 #### GET information about one shop
 
-`GET /api/stores/store-info?id=<shop id>`
+`GET /api/shops/shop-info?id=<shop id>`
 
-Gets information about a single store in JSON format using the shop ID as a URL query.
+Gets information about a single shop in JSON format using the shop ID as a URL query.
 
-For example, if you were to `GET /api/stores/store-info?id=7`, you would get in response:
+For example, if you were to `GET /api/shops/shop-info?id=7`, you would get in response:
 
 ```
 {
@@ -131,7 +131,7 @@ For example, if you were to `GET /api/stores/store-info?id=7`, you would get in 
 
 #### POST Add a new shops
 
-`POST /api/stores/add-store`
+`POST /api/shops/add-shop`
 
 ## Libraries Used
 
