@@ -4,11 +4,6 @@ const fetch = require('node-fetch');
 
 require('./index'); //Start the server
 
-QUnit.test("1 + 1", assert => {
-    assert.deepEqual(1 + 1, 2, "1 + 1 = 2 ?");
-});
-
-
 const URL = 'http://localhost:8080';
 const STORE_PATH = URL + "/api/stores";
 const MAP_PATH = URL + "/api/map"
@@ -22,7 +17,6 @@ async function postJson(url, json) {
         body: JSON.stringify(json)
     })
     return response;
-    await response.json();
 }
 
 //========================
@@ -48,11 +42,11 @@ QUnit.test(
             const response = await postJson(`${STORE_PATH}/add-store`, store);
             const json = await response.json();
 
-            assert.deepEqual(json.success, true, "The post should return successful");
+            assert.deepEqual(response.status, 201, "The post should return successful");
 
             assert.deepEqual({
-                    storeName: json.store.name,
-                    storeType: json.store.type
+                    storeName: json.name,
+                    storeType: json.type
                 },
                 store,
                 "The respone should return the store that was just added");
@@ -61,9 +55,7 @@ QUnit.test(
         //Test for posting the same store, should not work
         {
             const response = await postJson(`${STORE_PATH}/add-store`, store);
-            const json = await response.json();
-
-            assert.deepEqual(json.success, false, "The post should return not succesful with the same store name added again");
+            assert.deepEqual(response.status, 409, "The post should return not succesful with the same store name added again");
         }
     });
 
@@ -83,14 +75,14 @@ QUnit.test(
         //Get store ID after adding a new store
         const response = await postJson(`${STORE_PATH}/add-store`, store);
         const json = await response.json();
-        storeId = json.store.id;
+        storeId = json.id;
 
         const getReqResponse = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
         const getReqJson = await getReqResponse.json();
-        assert.deepEqual(getReqJson.store.id, storeId, "The ID should be the same");
+        assert.deepEqual(getReqJson.id, storeId, "The ID should be the same");
         assert.deepEqual({
-                storeName: getReqJson.store.name,
-                storeType: getReqJson.store.type
+                storeName: getReqJson.name,
+                storeType: getReqJson.type
             },
             store,
             "The respone should return the store that was just added");
@@ -110,7 +102,7 @@ QUnit.test(
         //Get store ID after adding a new store
         const response = await postJson(`${STORE_PATH}/add-store`, store);
         const json = await response.json();
-        const storeId = json.store.id;
+        const storeId = json.id;
         //Test the delete request
         const deleteResponse = await fetch(`${STORE_PATH}/store`, {
             method: 'delete',
@@ -121,14 +113,13 @@ QUnit.test(
                 id: storeId
             })
         });
-        const deleteJson = await deleteResponse.json();
-        assert.deepEqual(deleteJson.success, true, "The delete function should return true for a succesful delete");
-        
+
+        assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
+
         //Should no longer be able to find the store
         {
             const response = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
-            const json = await response.json();
-            assert.deepEqual(json.success, false, "The store should not be able to be found");
+            assert.deepEqual(response.status, 404, "The store should not be able to be found");
         }
     });
 /**
@@ -148,12 +139,12 @@ QUnit.test(
         {
             const response = await postJson(`${STORE_PATH}/add-advert`, advert);
             const json = await response.json();
-            advertId = json.advert.id;
-            assert.deepEqual(json.success, true, "Should return true for a sucessful post");
+            advertId = json.id;
+            assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
             assert.deepEqual({
-                    storeId: json.advert.storeId,
-                    title: json.advert.title,
-                    body: json.advert.body
+                    storeId: json.storeId,
+                    title: json.title,
+                    body: json.body
                 },
                 advert,
                 "The returned advert should contain same info as the one posted");
@@ -162,11 +153,11 @@ QUnit.test(
         {
             const response = await fetch(`${STORE_PATH}/get-advert?id=${advertId}`);
             const json = await response.json();
-            assert.deepEqual(json.success, true, "Should be able to find the advert just posted");
+            assert.deepEqual(response.status, 200, "Should be able to find the advert just posted");
             assert.deepEqual({
-                    storeId: json.advert.storeId,
-                    title: json.advert.title,
-                    body: json.advert.body
+                    storeId: json.storeId,
+                    title: json.title,
+                    body: json.body
                 },
                 advert,
                 "Should be able to find advert that contains the same info as the one posted");
@@ -175,8 +166,7 @@ QUnit.test(
         //Testing for GET /api/stores/get-advert?id=advertId invalid case
         {
             const response = await fetch(`${STORE_PATH}/get-advert?id=${-50}`);
-            const json = await response.json();
-            assert.deepEqual(json.success, false, "Should not be able to find advert with invalid id");
+            assert.deepEqual(response.status, 404, "Should not be able to find advert with invalid id");
         }
     });
 
@@ -195,7 +185,20 @@ QUnit.test(
         };
 
         const response = await postJson(`${MAP_PATH}/room-update`, info);
-        const res = await response.text();
+        assert.deepEqual(response.status, 201, "Should be true for success");
+    });
 
-        assert.deepEqual(res, "true", "Should be true for success");
+QUnit.test(
+    "Should be able to delete room",
+    async assert => {
+        const deleteResponse = await fetch(`${MAP_PATH}/remove-room`, {
+            method: 'delete',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: 0
+            })
+        });
+        assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
     });

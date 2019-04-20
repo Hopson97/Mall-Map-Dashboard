@@ -77,8 +77,7 @@ window.addEventListener("load", async () => {
         //Give larger view on mobile
         scaleFactor = 5;
         canvas.height = canvas.clientWidth;
-    }
-    else {
+    } else {
         //Give canvas 16/9 aspect ratio on bigger displays
         canvas.height = canvas.clientWidth / (16 / 9);
     }
@@ -133,14 +132,21 @@ async function initMapData() {
     mapData.bounds = geometry.bounds;
 
     const response = await fetch("api/map/section-data");
-    const json = await response.json();
-    //TODO BEtter variable nbame other than json
+    const shopRoomsList = await response.json();
+
     for (const room of mapData.rooms) {
-        if (json[room.id]) {
-            const response = await fetch("api/stores/store-info?id=" + json[room.id]);
-            const info = await response.json();
-            room.name = info.store.name;
-            room.type = info.store.type;
+        const index = shopRoomsList.findIndex(shopRoom => {
+            return shopRoom.roomId == room.id;
+        })
+        if (index > -1) {
+            const response = await fetch("api/stores/store-info?id=" + shopRoomsList[index].storeId);
+            if (response.status === 404) {
+
+            } else {
+                const info = await response.json();
+                room.name = info.name;
+                room.type = info.type;
+            }
         }
     }
 }
@@ -229,8 +235,7 @@ function handleCanvasClick(event) {
         if (x > room.x / scaleFactor &&
             x < room.x / scaleFactor + room.width / scaleFactor &&
             y > room.y / scaleFactor &&
-            y < room.y / scaleFactor + room.depth / scaleFactor) 
-        {
+            y < room.y / scaleFactor + room.depth / scaleFactor) {
             const popup = document.getElementById("popup");
             popup.classList.remove("hidden");
             selectedStore = room;
@@ -308,8 +313,8 @@ async function buildStoreDOM() {
                 },
                 body: JSON.stringify(data)
             });
-            const success = await response.text();
-            if (success) {
+
+            if (response.status === 201) {
                 selectedStore.type = type;
                 selectedStore = -1;
                 const popup = document.getElementById("popup");

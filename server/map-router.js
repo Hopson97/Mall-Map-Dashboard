@@ -12,12 +12,16 @@ router.use(bodyParser.json());
 /**
  * Contains data about each room, eg roomId and the assosiated storeId
  */
-const rooms = {  
-};
+const rooms = [
+];
 
 router.post("/room-update", postSectionData);
+
+router.delete("/remove-room", deleteSectionData);
+
 router.get("/section-data", getSectionData);
 router.get("/layout", getLayout);
+
 
 //========================
 //
@@ -32,7 +36,7 @@ router.get("/layout", getLayout);
 function postSectionData(request, response) {
     const roomId   = request.body.roomId;
     const storeId  = request.body.storeId;
-    rooms[roomId] = storeId;
+    rooms.push({roomId, storeId});
 
     //Send info to all clients about the updated room
     for (const client of wss.clients) {
@@ -44,7 +48,30 @@ function postSectionData(request, response) {
         }));
     }
     
-    response.send(true);
+    response.sendStatus(201);
+}
+
+//========================
+//
+//   HTTP Delete Requests
+//
+//========================
+function deleteSectionData(request, response) {
+    const roomId = request.body.id;
+    console.log(rooms);
+    if (rooms[roomId]) {
+        rooms[roomId] 
+    }
+    const index = rooms.findIndex(room => {
+        return room.roomId === roomId
+    });
+    if (index > -1) {
+        rooms.splice(index, 1);
+        response.sendStatus(204);
+    }
+    else {
+        response.sendStatus(404);
+    }
 }
 
 //========================
@@ -57,7 +84,7 @@ function postSectionData(request, response) {
  * @param {express.Request} request The HTTP request. 
  * @param {express.Response} response The HTTP response. Contains the JSON with information about all the rooms (room ID, and what store is assosiated with it)
  */
-function getSectionData(request, response) {
+function getSectionData(_, response) {
     response.json(rooms);
 }
 

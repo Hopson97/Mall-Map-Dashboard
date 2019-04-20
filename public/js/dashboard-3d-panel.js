@@ -201,12 +201,17 @@ class Room extends Drawable3D {
         if (this.storeId >= 0) {
             //Get information about the store
             const response = await fetch("api/stores/store-info?id=" + this.storeId);
-            const shopInformation = await response.json();
-            this.billboard = new Billboard(
-                this.roomId,
-                shopInformation.store.name,
-                shopInformation.store.type);
-            colour = typeToColour(shopInformation.store.type).asNormalised().asArray();
+            if (response.status === 404) {
+                //handle?
+                return;
+            } else {
+                const shopInformation = await response.json();
+                this.billboard = new Billboard(
+                    this.roomId,
+                    shopInformation.name,
+                    shopInformation.type);
+                colour = typeToColour(shopInformation.type).asNormalised().asArray();
+            }
         } else {
             colour = typeToColour("none").asNormalised().asArray();
             this.billboard = null;
@@ -371,7 +376,7 @@ async function begin3DRenderer() {
         renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
-        //window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     }
 };
 
@@ -630,8 +635,11 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
 
     //Do extra things if the room has an assosiated store
-    if (roomsData[roomInfo.id]) {
-        room.storeId = roomsData[roomInfo.id];
+    const index = roomsData.findIndex(shopRoom => {
+        return shopRoom.roomId == roomInfo.id;
+    })
+    if (index > -1) {
+        room.storeId = roomsData[index].storeId;
     }
     await room.update();
 

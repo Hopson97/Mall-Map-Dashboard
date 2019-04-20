@@ -73,10 +73,7 @@ function postStoreInformation(request, response) {
 
             //If the store name exists, then do not allow it to be added
             if (store.name === storeName) {
-                response.json({
-                    success: false,
-                    reason: "store with name already exists"
-                });
+                response.sendStatus(409);
                 return;
             }
         }
@@ -90,10 +87,8 @@ function postStoreInformation(request, response) {
         dateAdded: util.getFormattedDate()
     };
     stores.push(store);
-    response.json({
-        success: true,
-        store
-    });
+
+    response.status(201).json(store);
 }
 //TODO COMMENTS/ DOCS OR WHATEVER THEY ARE CALLED!!!
 /**
@@ -126,10 +121,7 @@ function postAdvert(request, response) {
     };
     adverts.push(advert);
 
-    response.json({
-        success: true,
-        advert
-    });
+    response.status(201).json(advert);
 }
 
 //========================
@@ -154,19 +146,13 @@ function getStoreInformation(request, response) {
     const id = request.query.id;
     for (const store of stores) {
         if (store.id == id) {
-            response.json({
-                success: true,
-                store
-            });
+            response.json(store);
             return;
         }
     }
 
     //Store not found
-    response.json({
-        success: false,
-        reason: "404 store not found."
-    });
+    response.sendStatus(404);
 }
 /**
  * 
@@ -183,19 +169,13 @@ function getAdvertList(request, response) {
  */
 function getAdvert(request, response) {
     const id = request.query.id;
-    for (const ad of adverts) {
-        if (ad.id == id) {
-            response.json({
-                success: true,
-                advert: ad
-            });
+    for (const advert of adverts) {
+        if (advert.id == id) {
+            response.json(advert);
             return;
         }
     }
-    response.json({
-        success: false,
-        reason: `Unable to find advert with ID: ${id}`
-    });
+    response.sendStatus(404);
 }
 
 //========================
@@ -207,16 +187,15 @@ function deleteStore(request, response) {
     const deleteId = request.body.id;
 
     const index = stores.findIndex((store) => {
-
         return store.id == deleteId;
     });
-
-    stores.splice(index, 1);
-
-
-    response.json({
-        success: true
-    });
+    if (index > -1) {
+        stores.splice(index, 1);
+        response.sendStatus(204);
+    }
+    else {
+        response.sendStatus(404);
+    }
 }
 
 //Exports

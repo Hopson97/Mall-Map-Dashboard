@@ -25,9 +25,14 @@ async function populateTable() {
 
         //TODO make it so there is prompt first?
         const deleteButton = clone.querySelectorAll("img")[1];
-        deleteButton.addEventListener("click", e => {
-            
-            console.log("Deleting store with id of " + store.id);
+        deleteButton.addEventListener("click", async() => {
+            const response = await fetch("/api/stores/store", {
+                method: "delete",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({id: store.id})
+            })
         });
 
 
