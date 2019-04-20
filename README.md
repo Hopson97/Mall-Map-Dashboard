@@ -19,7 +19,7 @@ The input is spit across multiple pages....
 
 #### GET section data
 
-`GET api/map/section-data`
+`GET /api/map/section-data`
 
 Gets information about the rooms in JSON format, with the format:
 
@@ -39,7 +39,7 @@ For example, if store ID of 2 was assosiated with the store with an ID of 5:
 
 #### GET map layout
 
-`GET api/map/layout`
+`GET /api/map/layout`
 
 Gets the layout information of the mall as JSON with the format
 
@@ -75,7 +75,7 @@ This data is the x and y (or z in 3D space) coordinates of the rooms, as well as
 
 #### POST section data
 
-`POST api/map/section-data`
+`POST /api/map/section-data`
 
 Updates a room with a new shop for the room to be assosiated with. The POST request body must be JSON with the format:
 
@@ -88,6 +88,49 @@ Updates a room with a new shop for the room to be assosiated with. The POST requ
 Where n is the room ID, and the n2 is the shop ID that the room, n, will now be assosiated with and will display information about on the dashboard.
 
 ___
+
+### Store API
+
+#### GET list of shops
+
+`GET /api/stores/list`
+
+Gets a list of all the shops added as JSON in the format
+
+```
+[
+    {
+        id: 1,
+        name: <Shop Name>,
+        type: <Shop Type>
+    },
+    {
+        id: 2,
+        name: <Shop Name>,
+        type: <Shop Type>
+    },
+    ...
+]
+
+#### GET information about one shop
+
+`GET /api/stores/store-info?id=<shop id>`
+
+Gets information about a single store in JSON format using the shop ID as a URL query.
+
+For example, if you were to `GET /api/stores/store-info?id=7`, you would get in response:
+
+```
+{
+    id: 7,
+    name: <Shop Name>,
+    type: <Shop Type>
+}
+```
+
+#### POST Add a new shops
+
+`POST /api/stores/add-store`
 
 ## Libraries Used
 
