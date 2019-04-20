@@ -67,6 +67,7 @@ header nav {
 
 header nav a {
     text-decoration: none;
+    font-weight: bold;
     color: white;
     flex: 1;
     padding-bottom: 5px;
@@ -126,6 +127,11 @@ main .main-content {
     background-color: var(--background-colour-dark);
 }
 
+main .content-container {
+    width: 90%;
+    margin: auto;
+}
+
 
 /*
 ------------------------------------
@@ -137,6 +143,19 @@ canvas {
     margin: auto;
 }
 
+/*
+------------------------------------
+    Store Editor Screen
+------------------------------------
+*/
+
+.bin-icon {
+    transition: 1s;
+}
+
+.bin-icon:hover {
+    transform: scale(1.2);
+}
 
 /*
 canvas {
@@ -209,7 +228,7 @@ canvas {
 ===================
 */
 table {
-    width: 80%;
+    width: 90%;
     margin: auto;
 }
 
@@ -228,7 +247,7 @@ td {
 }
 
 .table-data:hover {
-    background-color: rgb(125, 125, 125);
+    background-color: rgb(200, 200, 200);
 }
 
 /*
@@ -270,7 +289,11 @@ td {
     background-color: #5555;
 }
 
-
+/*
+===================
+  Media Selection
+===================
+*/
 @media screen and (max-width: 1200px) {
     main .main-content {
         width: 90%;
