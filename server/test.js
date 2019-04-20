@@ -39,7 +39,7 @@ QUnit.test(
     async assert => {
         //Obfuscated store name as to not conflict with existing stores
         const store = {
-            storeName: "cw8jr3rhy3ry3r8y83yxj8yr",
+            storeName: "xnjufchvrufchwaufhwauhwauhvwahcf",
             storeType: "Food/Drink"
         };
 
@@ -77,7 +77,7 @@ QUnit.test(
     async assert => {
         //Obfuscated store name as to not conflict with existing stores
         const store = {
-            storeName: "uu8ruv32q8jr8328r2",
+            storeName: "kjdsfcjdwakjrcwarkuwar",
             storeType: "Food/Drink"
         };
         //Get store ID after adding a new store
@@ -149,11 +149,6 @@ QUnit.test(
 //   QUint Tests for the map API
 //
 //========================
-//------------
-//
-//  POST
-//
-//------------
 QUnit.test(
     "Updating room information should return true for success",
     async assert => {
