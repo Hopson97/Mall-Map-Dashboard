@@ -4,19 +4,22 @@
  * File to contain common utility functions
  */
 
- /**
-  * Gets a date with format SS:MM:HH DD-MM-YYYY
-  */
-function getFormattedDate() {
-    const date = new Date();
 
-    const secs = date.getSeconds();
-    const mins = date.getMinutes();
-    const hours = date.getHours();
+module.exports = {
+    /**
+     * Gets a date with format SS:MM:HH DD-MM-YYYY
+     */
+    getFormattedDate: () => {
+        const date = new Date();
 
-    const days = date.getDate();
-    const month = date.getMonth();
-    const year  = date.getFullYear();
+        const secs = date.getSeconds();
+        const mins = date.getMinutes();
+        const hours = date.getHours();
 
-    return `${secs}:${mins}:${hours} ${days}-${month}-${year}`;
+        const days = date.getDate();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+
+        return `${hours}:${mins}:${secs} ${days}-${month}-${year}`;
+    }
 }
