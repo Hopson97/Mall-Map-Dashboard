@@ -27,17 +27,39 @@
         </div>
         <div class="main-content">
             <div class="content-container">
+                <h3 class = "center">Current Shops</h3>
                 <table id="shop-table">
                     <tr>
-                        <th>shop Name</th>
-                        <th>shop Type</th>
+                        <th>Shop Name</th>
+                        <th>Shop Type</th>
                         <th>Date Added</th>
                         <th>Edit/Delete</th>
                     </tr>
                 </table>
-                <div class = "center">
-                    <a class = "wide-button">Add shop</a>
-                </div>
+                <h3 class = "center">Add A Shop</h3>
+                <form id = "add-store-form" class="center edit-form">
+                    <div>
+                        <label>
+                            Shop Name
+                            <input type="text" id="shop-name" required>
+
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Shop Type
+                            <select id="shop-type" required>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Food/Drink">Food/Drink</option>
+                                <option value="Clothes">Clothes</option>
+                                <option value="Restaurant">Restaurant</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="submit" value="Add Shop" class="wide-button">
+                    </div>
+                </form>
             </div>
         </div>
     </main>
