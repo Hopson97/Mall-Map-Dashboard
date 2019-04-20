@@ -26,13 +26,14 @@ async function populateTable() {
         //TODO make it so there is prompt first?
         const deleteButton = clone.querySelectorAll("img")[1];
         deleteButton.addEventListener("click", async() => {
-            const response = await fetch("/api/stores/store", {
+            await fetch("/api/stores/store", {
                 method: "delete",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({id: store.id})
-            })
+            });
+            location.reload(); //TODO is there a better way?
         });
 
 

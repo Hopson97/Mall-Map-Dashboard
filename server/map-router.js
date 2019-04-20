@@ -36,7 +36,6 @@ function postSectionData(request, response) {
 
     //Send info to all clients about the updated room
     for (const client of wss.clients) {
-        console.log("Sending data");
         client.send(JSON.stringify({
             type: "RoomUpdate",
             roomId,

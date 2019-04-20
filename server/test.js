@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 require('./index'); //Start the server
 
 const URL = 'http://localhost:8080';
-const STORE_PATH = URL + "/api/stores";
+const SHOP_PATH = URL + "/api/stores";
 const MAP_PATH = URL + "/api/map"
 
 async function postJson(url, json) {
@@ -39,7 +39,7 @@ QUnit.test(
 
         //Test for posting a store
         {
-            const response = await postJson(`${STORE_PATH}/add-store`, store);
+            const response = await postJson(`${SHOP_PATH}/add-store`, store);
             const json = await response.json();
 
             assert.deepEqual(response.status, 201, "The post should return successful");
@@ -54,7 +54,7 @@ QUnit.test(
 
         //Test for posting the same store, should not work
         {
-            const response = await postJson(`${STORE_PATH}/add-store`, store);
+            const response = await postJson(`${SHOP_PATH}/add-store`, store);
             assert.deepEqual(response.status, 409, "The post should return not succesful with the same store name added again");
         }
     });
@@ -73,11 +73,11 @@ QUnit.test(
             storeType: "Food/Drink"
         };
         //Get store ID after adding a new store
-        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        const response = await postJson(`${SHOP_PATH}/add-store`, store);
         const json = await response.json();
         storeId = json.id;
 
-        const getReqResponse = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
+        const getReqResponse = await fetch(`${SHOP_PATH}/store-info?id=${storeId}`);
         const getReqJson = await getReqResponse.json();
         assert.deepEqual(getReqJson.id, storeId, "The ID should be the same");
         assert.deepEqual({
@@ -100,11 +100,11 @@ QUnit.test(
             storeType: "Food/Drink"
         };
         //Get store ID after adding a new store
-        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        const response = await postJson(`${SHOP_PATH}/add-store`, store);
         const json = await response.json();
         const storeId = json.id;
         //Test the delete request
-        const deleteResponse = await fetch(`${STORE_PATH}/store`, {
+        const deleteResponse = await fetch(`${SHOP_PATH}/store`, {
             method: 'delete',
             headers: {
                 'Content-Type': 'application/json'
@@ -118,7 +118,7 @@ QUnit.test(
 
         //Should no longer be able to find the store
         {
-            const response = await fetch(`${STORE_PATH}/store-info?id=${storeId}`);
+            const response = await fetch(`${SHOP_PATH}/store-info?id=${storeId}`);
             assert.deepEqual(response.status, 404, "The store should not be able to be found");
         }
     });
@@ -137,7 +137,7 @@ QUnit.test(
         let advertId;
         //Testing for POST /api/stores/add-advert
         {
-            const response = await postJson(`${STORE_PATH}/add-advert`, advert);
+            const response = await postJson(`${SHOP_PATH}/add-advert`, advert);
             const json = await response.json();
             advertId = json.id;
             assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
@@ -151,7 +151,7 @@ QUnit.test(
         }
         //Testing for GET /api/stores/get-advert?id=advertId
         {
-            const response = await fetch(`${STORE_PATH}/get-advert?id=${advertId}`);
+            const response = await fetch(`${SHOP_PATH}/get-advert?id=${advertId}`);
             const json = await response.json();
             assert.deepEqual(response.status, 200, "Should be able to find the advert just posted");
             assert.deepEqual({
@@ -165,7 +165,7 @@ QUnit.test(
 
         //Testing for GET /api/stores/get-advert?id=advertId invalid case
         {
-            const response = await fetch(`${STORE_PATH}/get-advert?id=${-50}`);
+            const response = await fetch(`${SHOP_PATH}/get-advert?id=${-50}`);
             assert.deepEqual(response.status, 404, "Should not be able to find advert with invalid id");
         }
     });

@@ -50,11 +50,11 @@ function postStoreInformation(request, response) {
         response.status(201).json(shop);
     }
 }
-//TODO COMMENTS/ DOCS OR WHATEVER THEY ARE CALLED!!!
+
 /**
- * 
- * @param {express.Request} request 
- * @param {express.response} response 
+ * Adds an advert to the mall
+ * @param {express.Request} request Must contain JSON with storeId, title, and body for the advert
+ * @param {express.response} response JSON with the newly added advert
  */
 function postAdvert(request, response) {
     const storeId = request.body.storeId;
@@ -111,7 +111,7 @@ function getStoreInformation(request, response) {
 }
 
 /**
- * 
+ * Gets a list of adverts
  * @param {express.Request} request 
  * @param {express.response} response
  */
@@ -120,9 +120,9 @@ function getAdvertList(request, response) {
 }
 
 /**
- * 
- * @param {express.Request} request 
- * @param {express.response} response 
+ * Gets a single advert using query of `?id=n` where n is the advert Id
+ * @param {express.Request} request Must have query of `?id=n` where n is the advert Id
+ * @param {express.response} response Contains JSON with the advert information in it
  */
 function getAdvert(request, response) {
     const id = request.query.id;
@@ -139,13 +139,12 @@ function getAdvert(request, response) {
 //   HTTP Delete Requests
 //========================
 /**
- * 
- * @param {*} request 
- * @param {*} response 
+ * Deletes a shop from the server 
+ * @param {express.Request} request Must contain JSON with {id: n} where n is the shop id to delete
+ * @param {express.response} response 204 on success, 404 otherwise
  */
 function deleteStore(request, response) {
     const shopId = request.body.id;
-    console.log("Deleting shop with id " + shopId);
     if (shops.tryDeleteShop(request.body.id)) {
         response.sendStatus(204);
         for (const client of wss.clients) {

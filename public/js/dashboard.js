@@ -14,7 +14,7 @@ window.addEventListener("load", async e => {
  */
 async function handleMessage(event) {
     const data = JSON.parse(event.data);
-    console.log(data);
+    console.log(`Message received from web socket: ${data}`);
     switch (data.type) {
         case "RoomUpdate":
             for (const room of objects.rooms) {
