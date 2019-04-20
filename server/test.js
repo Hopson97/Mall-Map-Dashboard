@@ -21,14 +21,20 @@ async function postJson(url, json) {
         },
         body: JSON.stringify(json)
     })
-    return await response.json();
+    return response; await response.json();
 }
 
 //========================
 //
-//   QUint Tests for the store API
+//   QUint Tests for the store API for the shops
 //
 //========================
+
+//------------
+//
+//  POST
+//
+//------------
 /**
  * Testing POST /api/stores/add-store
  */
@@ -43,7 +49,8 @@ async assert => {
 
     //Test for posting a store
     {
-        const json = await postJson(`${STORE_PATH}/add-store`, store);
+        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        const json = await response.json();
 
         assert.deepEqual(json.success, true, "The post should return successful");
 
@@ -57,11 +64,20 @@ async assert => {
 
     //Test for posting the same store, should not work
     {
-        const json = await postJson(`${STORE_PATH}/add-store`, store);
+        const response = await postJson(`${STORE_PATH}/add-store`, store);
+        const json = await response.json();
+        
         assert.deepEqual(json.success, false, "The post should return not succesful with the same store name added again");
     }
 });
 
+
+
+//------------
+//
+//  GET
+//
+//------------
 /**
  * Testing GET /api/stores/store-info
  */
@@ -74,16 +90,16 @@ async assert => {
         storeType: "Food/Drink"
     };
     //Get store ID after adding a new store
-    const storeAddedJson = await postJson(`${STORE_PATH}/add-store`, store);
-    const id = storeAddedJson.store.id;
-
-    const response = await fetch(`${STORE_PATH}/store-info?id=${id}`);
+    const response = await postJson(`${STORE_PATH}/add-store`, store);
     const json = await response.json();
+    const id = json.store.id;
 
-    assert.deepEqual(json.id, id, "The ID should be the same");
+    const getReqResponse = await fetch(`${STORE_PATH}/store-info?id=${id}`);
+    const getReqJson = await getReqResponse.json();
+    assert.deepEqual(getReqJson.id, id, "The ID should be the same");
     assert.deepEqual({
-        storeName: json.name,
-        storeType: json.type
+        storeName: getReqJson.name,
+        storeType: getReqJson.type
     },
     store,
     "The respone should return the store that was just added");
@@ -94,3 +110,19 @@ async assert => {
 //   QUint Tests for the map API
 //
 //========================
+//------------
+//
+//  POST
+//
+//------------
+QUnit.test(
+"Updating room information should return that information",
+async assert => {
+    const info = {
+        roomId: 0,
+        storeId: 0
+    };
+
+    const response = await postJson(`${MAP_PATH}/room-update`, info);
+
+});

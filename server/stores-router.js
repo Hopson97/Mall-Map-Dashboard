@@ -35,6 +35,7 @@ router.get("/list", getStoreList);
 router.get("/store-info", getStoreInformation);
 
 router.post("/add-store", postStoreInformation);
+router.post("/add-advert", postAdvert);
 
 //========================
 //
@@ -85,6 +86,10 @@ function postStoreInformation(request, response) {
     });
 }
 
+
+function postAdvert(request, response) {
+    
+}
 
 //========================
 //

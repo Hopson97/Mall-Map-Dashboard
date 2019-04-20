@@ -301,7 +301,7 @@ async function buildStoreDOM() {
                 roomId: selectedStore.id,
                 storeId: store.id
             };
-            const response = await fetch("api/map/section-data", {
+            const response = await fetch("api/map/room-update", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

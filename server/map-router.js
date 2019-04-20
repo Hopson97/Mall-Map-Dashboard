@@ -15,7 +15,7 @@ router.use(bodyParser.json());
 const rooms = {  
 };
 
-router.post("/section-data", postSectionData);
+router.post("/room-update", postSectionData);
 router.get("/section-data", getSectionData);
 router.get("/layout", getLayout);
 
@@ -43,7 +43,7 @@ function postSectionData(request, response) {
             storeId
         }));
     }
-
+    
     response.send(true);
 }
 

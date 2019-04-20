@@ -75,7 +75,7 @@ This data is the x and y (or z in 3D space) coordinates of the rooms, as well as
 
 #### POST section data
 
-`POST /api/map/section-data`
+`POST /api/map/room-update`
 
 Updates a room with a new shop for the room to be assosiated with. The POST request body must be JSON with the format:
 
