@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const util = require('./utility');
+const shops = require("./shops");
 
 let wss;
 
@@ -12,26 +13,6 @@ router.use(bodyParser.json());
 
 
 //Temp, TODO//
-
-const stores = [{
-        id: 1,
-        name: "Game",
-        type: "Entertainment",
-        dateAdded: util.getFormattedDate()
-    },
-    {
-        id: 2,
-        name: "Greggs",
-        type: "Food/Drink",
-        dateAdded: util.getFormattedDate()
-    },
-    {
-        id: 3,
-        name: "Next",
-        type: "Clothes",
-        dateAdded: util.getFormattedDate()
-    }
-];
 
 const adverts = [
 
@@ -49,9 +30,7 @@ router.post("/add-advert", postAdvert);
 router.delete("/store", deleteStore);
 
 //========================
-//
 //   HTTP Post Requests
-//
 //========================
 
 /**
@@ -63,32 +42,13 @@ function postStoreInformation(request, response) {
     const storeName = request.body.storeName;
     const storeType = request.body.storeType;
 
-    let storeId = 1;
-    if (stores.length > 0) {
-        for (const store of stores) {
-            //Set this store id number to be largest
-            if (store.id >= storeId) {
-                storeId = store.id + 1;
-            }
-
-            //If the store name exists, then do not allow it to be added
-            if (store.name === storeName) {
-                response.sendStatus(409);
-                return;
-            }
-        }
+    const shopId = shops.addShop(storeName, storeType);
+    if (shopId === -1) {
+        response.sendStatus(409);
+    } else {
+        const shop = shops.getShopInformation(shopId);
+        response.status(201).json(shop);
     }
-
-    //Add the store and return it to client
-    const store = {
-        id: storeId,
-        name: storeName,
-        type: storeType,
-        dateAdded: util.getFormattedDate()
-    };
-    stores.push(store);
-
-    response.status(201).json(store);
 }
 //TODO COMMENTS/ DOCS OR WHATEVER THEY ARE CALLED!!!
 /**
@@ -101,6 +61,7 @@ function postAdvert(request, response) {
     const adTitle = request.body.title;
     const adBody = request.body.body;
 
+    //TODO spelling
     let advetId = 1;
     if (stores.length > 0) {
         for (const advert of adverts) {
@@ -125,16 +86,14 @@ function postAdvert(request, response) {
 }
 
 //========================
-//
 //   HTTP Get Requests
-//
 //========================
 /**
  * Gets the list of all the added stores and their assosiated information eg type
  * @param {express.response} response The HTTP request. Contains json containing information about every store.
  */
 function getStoreList(_, response) {
-    response.json(stores);
+    response.json(shops.getAllShops());
 }
 
 /**
@@ -143,17 +102,14 @@ function getStoreList(_, response) {
  * @param {express.response} response The HTTP request. Contains json containing information about the chosen store
  */
 function getStoreInformation(request, response) {
-    const id = request.query.id;
-    for (const store of stores) {
-        if (store.id == id) {
-            response.json(store);
-            return;
-        }
+    const shop = shops.getShopInformation(request.query.id);
+    if (shop) {
+        response.json(shop);
+    } else {
+        response.sendStatus(404);
     }
-
-    //Store not found
-    response.sendStatus(404);
 }
+
 /**
  * 
  * @param {express.Request} request 
@@ -162,6 +118,7 @@ function getStoreInformation(request, response) {
 function getAdvertList(request, response) {
     response.json(adverts);
 }
+
 /**
  * 
  * @param {express.Request} request 
@@ -179,21 +136,25 @@ function getAdvert(request, response) {
 }
 
 //========================
-//
 //   HTTP Delete Requests
-//
 //========================
+/**
+ * 
+ * @param {*} request 
+ * @param {*} response 
+ */
 function deleteStore(request, response) {
-    const deleteId = request.body.id;
-
-    const index = stores.findIndex((store) => {
-        return store.id == deleteId;
-    });
-    if (index > -1) {
-        stores.splice(index, 1);
+    const shopId = request.body.id;
+    console.log("Deleting shop with id " + shopId);
+    if (shops.tryDeleteShop(request.body.id)) {
         response.sendStatus(204);
-    }
-    else {
+        for (const client of wss.clients) {
+            client.send(JSON.stringify({
+                type: "ShopDelete",
+                shopId,
+            }));
+        }
+    } else {
         response.sendStatus(404);
     }
 }

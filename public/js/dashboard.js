@@ -23,5 +23,15 @@ async function handleMessage(event) {
                     await room.update();
                 }
             }
+            break;
+
+        case "ShopDelete":
+            for (const room of objects.rooms) {
+                if (room.storeId === data.shopId) {
+                    room.storeId = -1;
+                    await room.update();
+                }
+            }
+            break;
     }
 }

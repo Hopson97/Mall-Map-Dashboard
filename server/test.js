@@ -124,7 +124,7 @@ QUnit.test(
     });
 /**
  * Test posting and getting adverts
- */
+ *
 QUnit.test(
     "API should allow for the posting and recieving of adverts for shops",
     async assert => {
@@ -169,7 +169,7 @@ QUnit.test(
             assert.deepEqual(response.status, 404, "Should not be able to find advert with invalid id");
         }
     });
-
+*/
 
 //========================
 //
