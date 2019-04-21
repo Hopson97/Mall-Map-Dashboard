@@ -60,35 +60,34 @@ body {
 
 /*
 =====================================
-    Adverts. Has to be "ADVERTY" because of adblock
+    commercials. Has to be "commercial" because of adblock
 =====================================
 */
-.adverts-container {
+.commercials-container {
     flex: 1;
     
-    overflow: auto;
+    overflow: hidden;
     border-top: solid white;
     display: flex;
-}
-
-.adverts-container .adverty:nth-child(even) {
     background: #128191;
 }
 
-.adverts-container .adverty:nth-child(odd) {
-    background: #017080;
-}
 
-.adverts-container .adverty {
+.commercials-container .commercial {
+    /*hack to force css to use the GPU for animation*/
+    transform: translate3d(0, 0, 0);
+
     padding: 5px;
+    min-width: 25%;
+    border-right: solid white;
 }
 
 /*
-.adverts-container .adverty-title {
+.commercials-container .commercial-title {
 
 }
 
-.adverts-container .adverty-body {
+.commercials-container .commercial-body {
     
 }
 */

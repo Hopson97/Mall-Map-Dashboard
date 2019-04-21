@@ -7,7 +7,7 @@ require('./index'); //Start the server
 const URL = 'http://localhost:8080';
 const SHOP_PATH = URL + "/api/shops";
 const MAP_PATH = URL + "/api/map";
-const AD_PATH = URL + "/api/adverts";
+const AD_PATH = URL + "/api/commercials";
 
 async function postJson(url, json) {
     const response = await fetch(url, {
@@ -125,55 +125,55 @@ QUnit.test(
     });
 //========================
 //
-//   QUint Tests for the advert API
+//   QUint Tests for the commercial API
 //
 //========================
 /**
- * Test posting and getting adverts
+ * Test posting and getting commercials
  */
 QUnit.test(
-    "API should allow for the posting and recieving of adverts for shops",
+    "API should allow for the posting and recieving of commercials for shops",
     async assert => {
-        const advert = {
+        const commercial = {
             shopId: shopId,
             title: "50% OFF!",
             body: "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop"
         };
 
-        let advertId;
-        //Testing for POST /api/shops/add-advert
+        let commercialId;
+        //Testing for POST /api/shops/add-commercial
         {
-            const response = await postJson(`${AD_PATH}/add-advert`, advert);
+            const response = await postJson(`${AD_PATH}/add-commercial`, commercial);
             const json = await response.json();
-            advertId = json.id;
+            commercialId = json.id;
             assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
             assert.deepEqual({
                     shopId: json.shopId,
                     title: json.title,
                     body: json.body
                 },
-                advert,
-                "The returned advert should contain same info as the one posted");
+                commercial,
+                "The returned commercial should contain same info as the one posted");
         }
 
-        //Testing for GET /api/shops/get-advert?id=advertId
+        //Testing for GET /api/shops/get-commercial?id=commercialId
         {
-            const response = await fetch(`${AD_PATH}/get-advert?id=${advertId}`);
+            const response = await fetch(`${AD_PATH}/get-commercial?id=${commercialId}`);
             const json = await response.json();
-            assert.deepEqual(response.status, 200, "Should be able to find the advert just posted");
+            assert.deepEqual(response.status, 200, "Should be able to find the commercial just posted");
             assert.deepEqual({
                     shopId: json.shopId,
                     title: json.title,
                     body: json.body
                 },
-                advert,
-                "Should be able to find advert that contains the same info as the one posted");
+                commercial,
+                "Should be able to find commercial that contains the same info as the one posted");
         }
 
-        //Testing for GET /api/shops/get-advert?id=advertId invalid case
+        //Testing for GET /api/shops/get-commercial?id=commercialId invalid case
         {
-            const response = await fetch(`${AD_PATH}/get-advert?id=${-50}`);
-            assert.deepEqual(response.status, 404, "Should not be able to find advert with invalid id");
+            const response = await fetch(`${AD_PATH}/get-commercial?id=${-50}`);
+            assert.deepEqual(response.status, 404, "Should not be able to find commercial with invalid id");
         }
     });
 
