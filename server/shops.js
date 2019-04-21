@@ -45,7 +45,7 @@ function addShop(name, type) {
     }
 
     //Get the new ID by getting maximum ID value + 1
-    const shopId = Math.max(...shops.map(shop => shop.id)) + 1;
+    const shopId = util.getMaxId(shops) + 1
     //Add the shop
     shops.push({
         id: shopId,

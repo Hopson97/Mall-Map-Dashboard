@@ -7,7 +7,7 @@
 
 module.exports = {
     /**
-     * Gets a date with format SS:MM:HH DD-MM-YYYY
+     * Gets a date with format SS:MM:HH DD/MM/YYYY
      */
     getFormattedDate: () => {
         const date = new Date();
@@ -19,6 +19,9 @@ module.exports = {
         return `${days}/${month}/${year}`;
     },
 
+    /**
+     * Gets a date with format DD/MM/YYYY
+     */
     getFormattedDateTime: () => {
         const date = new Date();
 
@@ -29,6 +32,10 @@ module.exports = {
         return `${hours}:${mins}:${secs} ${getFormattedDate()}`;
     },
 
+    /**
+     * Finds the largest ID number in a list of objects
+     * @param {Object} list List of objects containing an ID element
+     */
     getMaxId(list) {
         if (list.length == 0) {
             return 0;
