@@ -5,54 +5,12 @@
  */
 
 const util = require('./utility');
+const fs   = require('fs');
 
-/**
- * Contains information about commercials, and their assosiated 
- */
-const commercials = [
-    {
-        id: 1,
-        shopId: 1,
-        title: "50% OFF ALL GOODS AND SERVICES! LIMITED TIME!",
-        body: "Come shop at game for a limited time only, get 50% off all games and consoles when you buy 5 Xboxes!",
-        dateAdded: util.getFormattedDate()
-    },
-    {
-        id: 2,
-        shopId: 1,
-        title: "commercial 2",
-        body: "Lorem ipsum....",
-        dateAdded: util.getFormattedDate()
-    },
-    {
-        id: 3,
-        shopId: 1,
-        title: "commercial 3",
-        body: "Lorem ipsum....",
-        dateAdded: util.getFormattedDate()
-    },
-    {//
-        id: 4,
-        shopId: 1,
-        title: "commercial 4",
-        body: "Lorem ipsum....",
-        dateAdded: util.getFormattedDate()
-    },
-    {
-        id: 5,
-        shopId: 1,
-        title: "commercial 5",
-        body: "Lorem ipsum....",
-        dateAdded: util.getFormattedDate()
-    },
-    {
-        id: 6,
-        shopId: 1,
-        title: "commercial 6",
-        body: "Lorem ipsum....",
-        dateAdded: util.getFormattedDate()
-    },
-]
+function getAllCommercials() {
+    const buffer = fs.readFileSync('./server/data/commercials.json');
+    return JSON.parse(buffer);
+} 
 
 /**
  * Adds an commercial to the system
@@ -61,14 +19,16 @@ const commercials = [
  * @param {String} body The information about the commercial 
  */
 function addCommercial(shopId, title, body) {
-    const commercialId = util.getMaxId(commercials) + 1;
+    const commercialId = util.getMaxId(getAllCommercials()) + 1;
 
-    commercials.push({
-        id: commercialId,
-        shopId,
-        title,
-        body,
-        dateAdded: util.getFormattedDate()
+    util.editJson(`commercials.json`, commercials => {
+        commercials.push({
+            id: commercialId,
+            shopId,
+            title,
+            body,
+            dateAdded: util.getFormattedDate()
+        });
     });
     return commercialId;
 }
@@ -78,28 +38,33 @@ function addCommercial(shopId, title, body) {
  * @param {Number} commercialId The ID of the commercial to get information about
  */
 function getCommercial(commercialId) {
+    const commercials = getAllCommercials();
     const index = commercials.findIndex(
         commercial => commercial.id == commercialId
     );
-
+    console.log(commercialId);
     if (index >= 0) {
         return commercials[index];
     } else {
+        console.log("\n\nFAILED TO FIND\n\n" + JSON.stringify(commercials) + "\n\n");
         return null;
     }
 }
 
 function tryDeleteCommercial(commercialId) {
-    const index = commercials.findIndex(
-        commercial => commercial.id == commercialId
-    );
-    if (index >= 0) {
-        commercials.splice(index, 1);
-        return true;
-    }
-    else {
-        return false;
-    }
+    let result = false;
+    util.editJson('commercials.json', (commercials) => {
+        const index = commercials.findIndex(
+            commercial => commercial.id == commercialId
+        );
+        if (index >= 0) {
+            commercials.splice(index, 1);
+            result = true;
+        } else {
+            result = false;
+        }
+    });
+    return result;
 }
 
 /**
@@ -108,27 +73,23 @@ function tryDeleteCommercial(commercialId) {
  */
 function tryDeleteCommercialByShopId(shopId) {
     let found = false;
-    while (true) {
-        const index = commercials.findIndex(
-            commercial => commercial.shopId == shopId
-        );
-        if (index >= 0) {
-            commercials.splice(index, 1);
-            found = true;
+
+    util.editJson('commercials.json', (commercials) => {
+        while (true) {
+            const index = commercials.findIndex(
+                commercial => commercial.shopId == shopId
+            );
+            if (index >= 0) {
+                commercials.splice(index, 1);
+                found = true;
+            } else {
+                break;
+            }
         }
-        else {
-            break;
-        }
-    }
+    });
     return found;
 }
 
-/**
- * Gets all the commercials
- */
-function getAllCommercials() {
-    return commercials;
-}
 
 module.exports = {
     addCommercial,
