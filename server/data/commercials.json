@@ -54,5 +54,26 @@
         "title": "50% OFF!",
         "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
         "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 10,
+        "shopId": 1,
+        "title": "Test title",
+        "body": "Test body",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 11,
+        "shopId": 1,
+        "title": "Test title",
+        "body": "Test body",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 12,
+        "shopId": 1,
+        "title": "Test title",
+        "body": "Test body",
+        "dateAdded": "21/3/2019"
     }
 ]
