@@ -16,14 +16,8 @@ function addRowCallback(shop, cells, row) {
 
     const deleteButton = row.querySelectorAll("img")[1];
     deleteButton.addEventListener("click", async () => {
-        await fetch("/api/shops/remove", {
-            method: "delete",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                id: shop.id
-            })
+        deleteRequestJson("/api/shops/remove", {
+            id: shop.id
         });
         location.reload(); //TODO is there a better way?
     });
@@ -43,21 +37,16 @@ async function onSubmitShop(event) {
     const shopType = typeElement.options[typeElement.selectedIndex].text;
 
     //Post it to the server
-    const response = await fetch("/api/shops/add", {
-        method: "post",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            shopName, shopType 
-        })
+    const response = await postRequestJson("/api/shops/add", {
+        shopName, 
+        shopType 
     });
 
     //If it was added succesfully then update the table
     if (response.status === 201) {
         const shop = await response.json();
         console.log(shop);
-        addTableRow(shop);
+        await addTableRow(shop, addRowCallback);
     }
 
 }

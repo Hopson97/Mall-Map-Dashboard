@@ -67,6 +67,12 @@ function getBrowserHeight() {
     );
 }
 
+
+/**
+ * Populates a table using a list of items from a URL
+ * @param {String} listUrl The URL where a list of item can be recieved via GET
+ * @param {Function} callback The function to call to update table (item, tableCells, rowTemplateClone)
+ */
 async function populateTable(listUrl, callback) {
     //Get list of something from server
     const response = await fetch(listUrl);
@@ -78,6 +84,11 @@ async function populateTable(listUrl, callback) {
     }
 }
 
+/**
+ * Adds a row to a table using the callback, inputting an item
+ * @param {The item to add to the table} item 
+ * @param {Function} callback The function to call to update table (item, tableCells, rowTemplateClone)
+ */
 async function addTableRow(item, callback) {
     const table = document.getElementById("table");
     const rowTemplate  = document.getElementById("row");
@@ -87,4 +98,27 @@ async function addTableRow(item, callback) {
     await callback(item, cells, rowClone);
 
     table.appendChild(rowClone);
+}
+
+
+async function postRequestJson(url, json) {
+    const response = await fetch(url, {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(json)
+    });
+    return response;
+}
+
+async function deleteRequestJson(url, json) {
+    const response = await fetch(url, {
+        method: "delete",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(json)
+    });
+    return response;
 }
