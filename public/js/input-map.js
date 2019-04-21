@@ -1,7 +1,7 @@
 "use strict"
 
-let offsetX = 0;
-let offsetY = 0;
+let offsetX = -100;
+let offsetY = -100;
 const PAN_SPEED = 4;
 let scaleFactor = 2;
 
@@ -307,7 +307,7 @@ async function buildshopDOM() {
                 shopId: shop.id
             });
             if (response.status === 201) {
-                selectedshop.type = type;
+                selectedshop.type = shop.type;
                 selectedshop = -1;
                 const popup = document.getElementById("popup");
                 popup.classList.add("hidden");

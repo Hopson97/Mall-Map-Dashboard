@@ -5,6 +5,7 @@
  */
 const util = require('./utility');
 const shopRooms = require('./shop-rooms');
+const commercials = require('./commercials')
 
 /**
  * Contains data about all shops that be added into mall rooms
@@ -74,6 +75,10 @@ function getShopInformation(shopId) {
     }
 }
 
+/**
+ * Deletes a shop, and any shoprooms, commericals assosiated with it
+ * @param {Number} shopId The shopId of the stop to delete
+ */
 function tryDeleteShop(shopId) {
     const index = shops.findIndex(
         shop => shop.id == shopId
@@ -81,6 +86,7 @@ function tryDeleteShop(shopId) {
     if (index >= 0) {
         shops.splice(index, 1);
         shopRooms.tryDeleteShopRoomByShopId(shopId);
+        commercials.tryDeleteCommercialByShopId(shopId);
         return true;
     }
     else {

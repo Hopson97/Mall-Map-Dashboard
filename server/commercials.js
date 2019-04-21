@@ -103,6 +103,27 @@ function tryDeleteCommercial(commercialId) {
 }
 
 /**
+ * Deletes a commercial. Returns false if the room was not found
+ * @param {Number} shopId The shop id to find the assosiated commericals with to delete
+ */
+function tryDeleteCommercialByShopId(shopId) {
+    let found = false;
+    while (true) {
+        const index = commercials.findIndex(
+            commercial => commercial.shopId == shopId
+        );
+        if (index >= 0) {
+            commercials.splice(index, 1);
+            found = true;
+        }
+        else {
+            break;
+        }
+    }
+    return found;
+}
+
+/**
  * Gets all the commercials
  */
 function getAllCommercials() {
@@ -113,5 +134,6 @@ module.exports = {
     addCommercial,
     getCommercial,
     getAllCommercials,
-    tryDeleteCommercial
+    tryDeleteCommercial,
+    tryDeleteCommercialByShopId
 };

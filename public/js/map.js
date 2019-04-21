@@ -16,6 +16,9 @@ function typeToColour(type) {
         case "clothes":
             return new Colour(250, 100, 75);
 
+        case "restaurant":
+            return new Colour(50, 50, 188);
+
         default:
             return new Colour(50, 50, 50);
     }
@@ -26,7 +29,10 @@ function typeToColour(type) {
  */
 async function getMallLayout() {
     const response = await fetch("/api/map/layout");
-    const {rooms, paths} = await response.json();
+    const {
+        rooms,
+        paths
+    } = await response.json();
 
     let maxY = 0xFFFFFFF;
     let maxX = -0xFFFFFFF;

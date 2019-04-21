@@ -10,9 +10,6 @@ function addRowCallback(shop, cells, row) {
     cells[0].textContent = shop.name;
     cells[1].textContent = shop.type;
     cells[2].textContent = shop.dateAdded;
-
-    //const editButton = row.querySelector("a");
-   // editButton.href = `edit-shop?id=${shop.id}`;
 }
 
 
