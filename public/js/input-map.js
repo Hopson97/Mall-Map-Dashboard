@@ -293,29 +293,19 @@ async function buildshopDOM() {
     const json = await response.json();
 
     for (const shop of json) {
-        const name = shop.name;
-        const type = shop.type;
         const clone = document.importNode(shopListSect.content, true);
         const container = clone.querySelector("div");
         const contentElements = clone.querySelectorAll('p');
-        contentElements[0].textContent = name;
-        contentElements[2].textContent = type;
+        
+        contentElements[0].textContent = shop.name;
+        contentElements[2].textContent = shop.type;
 
         //Listens for the click event on the buttons
         container.addEventListener("click", async () => {
-            console.log(selectedshop.id);
-            const data = {
+            const response = await postRequestJson("api/map/add", {
                 roomId: selectedshop.id,
                 shopId: shop.id
-            };
-            const response = await fetch("api/map/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
             });
-
             if (response.status === 201) {
                 selectedshop.type = type;
                 selectedshop = -1;

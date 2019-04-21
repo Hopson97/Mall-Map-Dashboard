@@ -9,21 +9,6 @@ const SHOP_PATH = URL + "/api/shops";
 const MAP_PATH = URL + "/api/map";
 const AD_PATH = URL + "/api/commercials";
 
-async function postJson(url, json) {
-    const response = await fetch(url, {
-        method: "post",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(json)
-    })
-    return response;
-}
-
-
-//   QUint Tests for the shop API for the shops
-
-
 /**
  * Testing POST /api/shops/add-shop
  */
@@ -38,7 +23,7 @@ QUnit.test(
 
         //Test for posting a shop
         {
-            const response = await postJson(`${SHOP_PATH}/add`, shop);
+            const response = await postRequestJson(`${SHOP_PATH}/add`, shop);
             const json = await response.json();
 
             assert.deepEqual(response.status, 201, "The post should return successful");
@@ -53,7 +38,7 @@ QUnit.test(
 
         //Test for posting the same shop, should not work
         {
-            const response = await postJson(`${SHOP_PATH}/add`, shop);
+            const response = await postRequestJson(`${SHOP_PATH}/add`, shop);
             assert.deepEqual(response.status, 409, "The post should return not succesful with the same shop name added again");
         }
     });
@@ -72,7 +57,7 @@ QUnit.test(
             shopType: "Food/Drink"
         };
         //Get shop ID after adding a new shop
-        const response = await postJson(`${SHOP_PATH}/add`, shop);
+        const response = await postRequestJson(`${SHOP_PATH}/add`, shop);
         const json = await response.json();
         shopId = json.id;
 
@@ -99,19 +84,11 @@ QUnit.test(
             shopType: "Food/Drink"
         };
         //Get shop ID after adding a new shop
-        const response = await postJson(`${SHOP_PATH}/add`, shop);
+        const response = await postRequestJson(`${SHOP_PATH}/add`, shop);
         const json = await response.json();
         const shopId = json.id;
         //Test the delete request
-        const deleteResponse = await fetch(`${SHOP_PATH}/remove`, {
-            method: 'delete',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: shopId
-            })
-        });
+        const deleteResponse = await deleteRequestJson(`${SHOP_PATH}/remove`, {id: shopId});
 
         assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
 
@@ -139,7 +116,7 @@ QUnit.test(
         let commercialId;
        
         {
-            const response = await postJson(`${AD_PATH}/add`, commercial);
+            const response = await postRequestJson(`${AD_PATH}/add`, commercial);
             const json = await response.json();
             commercialId = json.id;
             assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
@@ -185,21 +162,37 @@ QUnit.test(
             shopId: 0
         };
 
-        const response = await postJson(`${MAP_PATH}/add`, info);
+        const response = await postRequestJson(`${MAP_PATH}/add`, info);
         assert.deepEqual(response.status, 201, "Should be true for success");
     });
 
 QUnit.test(
     "Should be able to delete room",
     async assert => {
-        const deleteResponse = await fetch(`${MAP_PATH}/remove`, {
-            method: 'delete',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: 0
-            })
-        });
+        const deleteResponse = await deleteRequestJson(`${MAP_PATH}/remove`, {id: 0});
         assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
     });
+
+
+//Util
+async function postRequestJson(url, json) {
+    const response = await fetch(url, {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(json)
+    });
+    return response;
+}
+
+async function deleteRequestJson(url, json) {
+    const response = await fetch(url, {
+        method: "delete",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(json)
+    });
+    return response;
+}
