@@ -13,11 +13,11 @@ router.use(bodyParser.json());
 
 
 router.get("/list", getShopList);
-router.get("/shop-info", getShopInformation);
+router.get("/info", getShopInformation);
 
-router.post("/add-shop", postShopInformation);
+router.post("/add", postShopInformation);
 
-router.delete("/shop", deleteShop);
+router.delete("/remove", deleteShop);
 
 //========================
 //   HTTP Post Requests

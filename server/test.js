@@ -40,7 +40,7 @@ QUnit.test(
 
         //Test for posting a shop
         {
-            const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
+            const response = await postJson(`${SHOP_PATH}/add`, shop);
             const json = await response.json();
 
             assert.deepEqual(response.status, 201, "The post should return successful");
@@ -55,7 +55,7 @@ QUnit.test(
 
         //Test for posting the same shop, should not work
         {
-            const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
+            const response = await postJson(`${SHOP_PATH}/add`, shop);
             assert.deepEqual(response.status, 409, "The post should return not succesful with the same shop name added again");
         }
     });
@@ -74,11 +74,11 @@ QUnit.test(
             shopType: "Food/Drink"
         };
         //Get shop ID after adding a new shop
-        const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
+        const response = await postJson(`${SHOP_PATH}/add`, shop);
         const json = await response.json();
         shopId = json.id;
 
-        const getReqResponse = await fetch(`${SHOP_PATH}/shop-info?id=${shopId}`);
+        const getReqResponse = await fetch(`${SHOP_PATH}/info?id=${shopId}`);
         const getReqJson = await getReqResponse.json();
         assert.deepEqual(getReqJson.id, shopId, "The ID should be the same");
         assert.deepEqual({
@@ -101,11 +101,11 @@ QUnit.test(
             shopType: "Food/Drink"
         };
         //Get shop ID after adding a new shop
-        const response = await postJson(`${SHOP_PATH}/add-shop`, shop);
+        const response = await postJson(`${SHOP_PATH}/add`, shop);
         const json = await response.json();
         const shopId = json.id;
         //Test the delete request
-        const deleteResponse = await fetch(`${SHOP_PATH}/shop`, {
+        const deleteResponse = await fetch(`${SHOP_PATH}/remove`, {
             method: 'delete',
             headers: {
                 'Content-Type': 'application/json'
@@ -119,7 +119,7 @@ QUnit.test(
 
         //Should no longer be able to find the shop
         {
-            const response = await fetch(`${SHOP_PATH}/shop-info?id=${shopId}`);
+            const response = await fetch(`${SHOP_PATH}/info?id=${shopId}`);
             assert.deepEqual(response.status, 404, "The shop should not be able to be found");
         }
     });
@@ -141,7 +141,7 @@ QUnit.test(
         };
 
         let commercialId;
-        //Testing for POST /api/shops/add-commercial
+       
         {
             const response = await postJson(`${AD_PATH}/add-commercial`, commercial);
             const json = await response.json();
@@ -156,7 +156,7 @@ QUnit.test(
                 "The returned commercial should contain same info as the one posted");
         }
 
-        //Testing for GET /api/shops/get-commercial?id=commercialId
+        
         {
             const response = await fetch(`${AD_PATH}/get-commercial?id=${commercialId}`);
             const json = await response.json();
@@ -170,7 +170,7 @@ QUnit.test(
                 "Should be able to find commercial that contains the same info as the one posted");
         }
 
-        //Testing for GET /api/shops/get-commercial?id=commercialId invalid case
+        
         {
             const response = await fetch(`${AD_PATH}/get-commercial?id=${-50}`);
             assert.deepEqual(response.status, 404, "Should not be able to find commercial with invalid id");

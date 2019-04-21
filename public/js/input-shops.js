@@ -42,7 +42,7 @@ function addTableRow(shop) {
     //TODO make it so there is prompt first?
     const deleteButton = clone.querySelectorAll("img")[1];
     deleteButton.addEventListener("click", async () => {
-        await fetch("/api/shops/shop", {
+        await fetch("/api/shops/remove", {
             method: "delete",
             headers: {
                 "Content-Type": "application/json",
@@ -69,7 +69,7 @@ async function onSubmitShop(event) {
     const shopType = typeElement.options[typeElement.selectedIndex].text;
 
     //Post it to the server
-    const response = await fetch("/api/shops/add-shop", {
+    const response = await fetch("/api/shops/add", {
         method: "post",
         headers: {
             "Content-Type": "application/json",
