@@ -19,8 +19,7 @@ router.post("/add", postShopInformation);
 
 router.delete("/remove", deleteShop);
 
- Post Requests
-//========================
+// Post Requests
 
 /**
  * Adds a shop to the list of shops, given that a shop with the name does not already exist
@@ -40,8 +39,8 @@ function postShopInformation(request, response) {
     }
 }
 
- Get Requests
-//========================
+//Get Requests
+
 /**
  * Gets the list of all the added shops and their assosiated information eg type
  * @param {express.response} response The HTTP request. Contains json containing information about every shop.
@@ -64,8 +63,7 @@ function getShopInformation(request, response) {
     }
 }
 
- Delete Requests
-//========================
+//Delete Requests
 /**
  * Deletes a shop from the server 
  * @param {express.Request} request Must contain JSON with {id: n} where n is the shop id to delete
