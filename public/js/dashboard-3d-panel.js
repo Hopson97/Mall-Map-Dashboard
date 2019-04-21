@@ -34,8 +34,8 @@ class Renderer {
         this.context = canvas2D.getContext("2d");
 
         //Set canvas size
-        canvas3D.width = getBrowserWidth() * 0.8;
-        canvas3D.height = getBrowserHeight() * 0.7;
+        canvas3D.width = getBrowserWidth() * 0.85;
+        canvas3D.height = getBrowserHeight() * 0.75;
         canvas2D.width = canvas3D.clientWidth;
         canvas2D.height = canvas3D.clientHeight;
         this.width = canvas3D.width;
@@ -347,7 +347,7 @@ async function begin3DRenderer() {
     objects = await createMapMesh(renderer.gl);
 
     //Terrain
-    const terrain = makeTerrainMesh(renderer.gl, 50, 50, 20, 20, 12);
+    const terrain = makeTerrainMesh(renderer.gl, 50, 50, 20, 20, 12, 5);
 
     //Begin main rendering of stuff
     window.requestAnimationFrame(loop);
@@ -376,7 +376,7 @@ async function begin3DRenderer() {
         renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
-        //window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     }
 };
 
@@ -655,14 +655,14 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
  * @param {Number} depth The height of the terrain in terrain squares
  * @param {Number} quadSize The width/height of each quad
  */
-function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize) {
+function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize, heightOffset = 0) {
     const terrain = new Drawable3D();
     const y = -10;
     for (let z = 0; z < depth; z++) {
         for (let x = 0; x < width; x++) {
             terrain.mesh.positions.push(
                 x * quadSize - xBegin,
-                y + ((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1),
+                y + (((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1) + heightOffset),
                 z * quadSize - zBegin);
             terrain.mesh.colours.push(0.2, 0, 0.4);
             terrain.mesh.normals.push(0, 1, 0);

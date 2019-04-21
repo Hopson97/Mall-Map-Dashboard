@@ -9,9 +9,9 @@
 }
 
 body {
-    background-color: black;
     color: white;
     font-family: 'Open Sans', serif;
+    background: rgb(13, 0.0, 26);
 }
 
 /*
@@ -60,12 +60,45 @@ body {
 
 /*
 =====================================
-    Adverts
+    Adverts. Has to be "ADVERTY" because of adblock
 =====================================
 */
 .adverts-container {
     flex: 1;
-    background: #028090;
+    
     overflow: auto;
     border-top: solid white;
+    display: flex;
+}
+
+.adverts-container .adverty:nth-child(even) {
+    background: #128191;
+}
+
+.adverts-container .adverty:nth-child(odd) {
+    background: #017080;
+}
+
+.adverts-container .adverty {
+    padding: 5px;
+}
+
+/*
+.adverts-container .adverty-title {
+
+}
+
+.adverts-container .adverty-body {
+    
+}
+*/
+
+/*
+=====================================
+    General classes
+=====================================
+*/
+
+.center {
+    text-align: center;
 }
