@@ -131,7 +131,7 @@ async function initMapData() {
     mapData.paths = geometry.paths;
     mapData.bounds = geometry.bounds;
 
-    const response = await fetch("api/map/section-data");
+    const response = await fetch("api/map/shop-room-list");
     const shopRoomsList = await response.json();
 
     console.log(shopRoomsList);
@@ -308,7 +308,7 @@ async function buildshopDOM() {
                 roomId: selectedshop.id,
                 shopId: shop.id
             };
-            const response = await fetch("api/map/room-update", {
+            const response = await fetch("api/map/add", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

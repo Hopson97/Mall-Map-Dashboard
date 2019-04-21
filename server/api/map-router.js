@@ -12,9 +12,9 @@ const router = express.Router();
 router.use(bodyParser.json());
 
 //Requests
-router.post("/room-update", postSectionData);
-router.delete("/remove-room", deleteSectionData);
-router.get("/section-data", getSectionData);
+router.post("/add", postSectionData);
+router.delete("/remove", deleteSectionData);
+router.get("/shop-room-list", getSectionData);
 router.get("/layout", getLayout);
 
 

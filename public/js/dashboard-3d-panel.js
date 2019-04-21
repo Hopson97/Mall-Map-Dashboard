@@ -570,7 +570,7 @@ function buildPathGeometry(gl, pathData) {
  */
 async function buildRoomsGeometry(gl, roomGeometry) {
     const rooms = [];
-    const response = await fetch("/api/map/section-data");
+    const response = await fetch("/api/map/shop-room-list");
     const roomsData = await response.json();
     for (const room of roomGeometry) {
         //Scale the data down

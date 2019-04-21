@@ -191,14 +191,14 @@ QUnit.test(
             shopId: 0
         };
 
-        const response = await postJson(`${MAP_PATH}/room-update`, info);
+        const response = await postJson(`${MAP_PATH}/add`, info);
         assert.deepEqual(response.status, 201, "Should be true for success");
     });
 
 QUnit.test(
     "Should be able to delete room",
     async assert => {
-        const deleteResponse = await fetch(`${MAP_PATH}/remove-room`, {
+        const deleteResponse = await fetch(`${MAP_PATH}/remove`, {
             method: 'delete',
             headers: {
                 'Content-Type': 'application/json'
