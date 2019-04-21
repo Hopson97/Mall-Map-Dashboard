@@ -7,7 +7,7 @@
     <title>Mall Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="css/dashboard.css">
-    <link rel="shortcut icon" type="image/ico" href="img/favicon.ico"/>
+    <link rel="shortcut icon" type="image/ico" href="img/favicon.ico" />
     <!--Load in the scripts-->
     <script src="js/utilities.js"></script>
     <script src="js/map.js"></script>
@@ -18,11 +18,18 @@
 </head>
 
 <body>
-    <main>
-        <h1>Twin Pines Mall Map</h1>
+    <main class="dashboard-flex">
+        <div class="row">
             <div class="render-container">
                 <canvas id="map-canvas"></canvas>
                 <canvas id="text-canvas" class="canvas2d"></canvas>
+            </div>
+            <div class="announcement-container">
+                TEST
+            </div>
+        </div>
+        <div class="adverts-container">
+            TEST
         </div>
     </main>
 </body>

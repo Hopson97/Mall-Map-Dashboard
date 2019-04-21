@@ -14,13 +14,29 @@ body {
     font-family: 'Open Sans', serif;
 }
 
-canvas {
-    border: 3px solid white;
+/*
+=====================================
+    Flex Containers
+=====================================
+*/
+.dashboard-flex {
+    height: 100vh;
+    display: flex;
+    flex-flow: column;
 }
+
+.row {
+    display: flex;
+}
+
+/*
+=====================================
+    Canvas
+=====================================
+*/
 
 .render-container {
     position: relative;
-    height: 100%;
 }
 
 .canvas2d {
@@ -30,3 +46,26 @@ canvas {
     z-index: 1;
 }
 
+/*
+=====================================
+    Announcements
+=====================================
+*/
+.announcement-container {
+    flex: 1;
+    background: #05668D;
+    overflow: auto; 
+    border-left: solid white;
+}
+
+/*
+=====================================
+    Adverts
+=====================================
+*/
+.adverts-container {
+    flex: 1;
+    background: #028090;
+    overflow: auto;
+    border-top: solid white;
+}

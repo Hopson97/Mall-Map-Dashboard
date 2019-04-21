@@ -9,7 +9,15 @@ const util = require('./utility');
 /**
  * Contains information about adverts, and their assosiated 
  */
-const adverts = []
+const adverts = [
+    {
+        id: 1,
+        shopId: 1,
+        title: "50% OFF ALL GOODS AND SERVICES! LIMITED TIME!",
+        body: "Come shop at game for a limited time only, get 50% off all games and consoles when you buy 5 Xboxes!",
+        dateAdded: util.getFormattedDate()
+    }
+]
 
 /**
  * Adds an advert to the system
