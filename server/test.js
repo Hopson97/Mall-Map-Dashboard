@@ -20,11 +20,9 @@ async function postJson(url, json) {
     return response;
 }
 
-//========================
-//
+
 //   QUint Tests for the shop API for the shops
-//
-//========================
+
 
 /**
  * Testing POST /api/shops/add-shop
@@ -123,11 +121,9 @@ QUnit.test(
             assert.deepEqual(response.status, 404, "The shop should not be able to be found");
         }
     });
-//========================
-//
+
 //   QUint Tests for the commercial API
-//
-//========================
+
 /**
  * Test posting and getting commercials
  */
@@ -178,11 +174,9 @@ QUnit.test(
     });
 
 
-//========================
-//
+
 //   QUint Tests for the map API
-//
-//========================
+
 QUnit.test(
     "Updating room information should return true for success",
     async assert => {

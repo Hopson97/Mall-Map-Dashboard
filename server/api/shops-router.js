@@ -19,8 +19,7 @@ router.post("/add", postShopInformation);
 
 router.delete("/remove", deleteShop);
 
-//========================
-//   HTTP Post Requests
+ Post Requests
 //========================
 
 /**
@@ -41,8 +40,7 @@ function postShopInformation(request, response) {
     }
 }
 
-//========================
-//   HTTP Get Requests
+ Get Requests
 //========================
 /**
  * Gets the list of all the added shops and their assosiated information eg type
@@ -66,8 +64,7 @@ function getShopInformation(request, response) {
     }
 }
 
-//========================
-//   HTTP Delete Requests
+ Delete Requests
 //========================
 /**
  * Deletes a shop from the server 

@@ -18,11 +18,9 @@ router.get("/shop-room-list", getSectionData);
 router.get("/layout", getLayout);
 
 
-//========================
-//
-//   HTTP Post Requests
-//
-//========================
+
+// Post Requests
+
 /**
  * Sets the information about a room in the mall. 
  * @param {express.request} request The HTTP request. Body should contain JSON with the room's ID, with the shop name and type assosiated with it
@@ -46,11 +44,9 @@ function postSectionData(request, response) {
     response.sendStatus(201);
 }
 
-//========================
-//
-//   HTTP Delete Requests
-//
-//========================
+
+// Delete Requests
+
 function deleteSectionData(request, response) {
     const roomId = request.body.id;
     if (shopRooms.tryDeleteShopRoomByRoomId(roomId)) {
@@ -61,11 +57,9 @@ function deleteSectionData(request, response) {
     }
 }
 
-//========================
-//
-//   HTTP Get Requests
-//
-//========================
+
+// Get Requests
+
 /**
  * Gets the data about the rooms, eg what their assosiated shop is
  * @param {express.Request} request The HTTP request. 

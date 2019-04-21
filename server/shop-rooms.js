@@ -11,11 +11,9 @@
   */
 const shopRooms = [];
 
-//========================
-//
+
 //   Functions
-//
-//========================
+
 /**
  * Adds a shop room
  * @param {Number} roomId The room ID
