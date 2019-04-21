@@ -143,7 +143,7 @@ QUnit.test(
         let commercialId;
        
         {
-            const response = await postJson(`${AD_PATH}/add-commercial`, commercial);
+            const response = await postJson(`${AD_PATH}/add`, commercial);
             const json = await response.json();
             commercialId = json.id;
             assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
@@ -158,7 +158,7 @@ QUnit.test(
 
         
         {
-            const response = await fetch(`${AD_PATH}/get-commercial?id=${commercialId}`);
+            const response = await fetch(`${AD_PATH}/info?id=${commercialId}`);
             const json = await response.json();
             assert.deepEqual(response.status, 200, "Should be able to find the commercial just posted");
             assert.deepEqual({
@@ -172,7 +172,7 @@ QUnit.test(
 
         
         {
-            const response = await fetch(`${AD_PATH}/get-commercial?id=${-50}`);
+            const response = await fetch(`${AD_PATH}/info?id=${-50}`);
             assert.deepEqual(response.status, 404, "Should not be able to find commercial with invalid id");
         }
     });

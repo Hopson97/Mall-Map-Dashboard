@@ -14,8 +14,8 @@ router.use(bodyParser.json());
 //Requests
 //TODO Change the api names to make more sense? ie not commercial/commercial-list but reather commercial/list
 router.get("/list", getcommercialList);
-router.get("/get-commercial", getcommercial);
-router.post("/add-commercial", postcommercial);
+router.get("/info", getcommercial);
+router.post("/add", postcommercial);
 
 
 
