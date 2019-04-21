@@ -73,14 +73,14 @@ function getBrowserHeight() {
  * @param {String} listUrl The URL where a list of item can be recieved via GET
  * @param {Function} callback The function to call to update table (item, tableCells, rowTemplateClone)
  */
-async function populateTable(listUrl, callback) {
+async function populateTable(listUrl, deleteUrl, callback) {
     //Get list of something from server
     const response = await fetch(listUrl);
     const list = await response.json();
 
     //Add the shops
     for (const item of list) {
-        addTableRow(item, callback);
+        addTableRow(item, deleteUrl, callback);
     }
 }
 
@@ -89,7 +89,7 @@ async function populateTable(listUrl, callback) {
  * @param {The item to add to the table} item 
  * @param {Function} callback The function to call to update table (item, tableCells, rowTemplateClone)
  */
-async function addTableRow(item, callback) {
+async function addTableRow(item, deleteUrl, callback) {
     const table = document.getElementById("table");
     const rowTemplate  = document.getElementById("row");
     const rowClone = document.importNode(rowTemplate.content, true);
@@ -97,10 +97,22 @@ async function addTableRow(item, callback) {
 
     await callback(item, cells, rowClone);
 
+    const deleteButton = rowClone.querySelectorAll("img")[1];
+    deleteButton.addEventListener("click", async () => {
+        deleteRequestJson(deleteUrl, {
+            id: item.id
+        });
+        location.reload(); //TODO is there a better way?
+    });
+
     table.appendChild(rowClone);
 }
 
-
+/**
+ * Sends JSON to server using the URL as a post request
+ * @param {String} url The ulr of the post request
+ * @param {Object} json The object to send to the post reuquest location    
+ */
 async function postRequestJson(url, json) {
     const response = await fetch(url, {
         method: "post",
@@ -112,6 +124,11 @@ async function postRequestJson(url, json) {
     return response;
 }
 
+/**
+ * Sends JSON to server using the URL as a delete request
+ * @param {String} url The ulr of the delete request
+ * @param {Object} json The object to send to the post reuquest location    
+ */
 async function deleteRequestJson(url, json) {
     const response = await fetch(url, {
         method: "delete",

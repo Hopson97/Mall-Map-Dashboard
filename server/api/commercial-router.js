@@ -15,12 +15,9 @@ router.use(bodyParser.json());
 router.get("/list", getCommercialList);
 router.get("/info", getCommercial);
 router.post("/add", postCommercial);
-
-
-
+router.delete("/remove", deleteCommercial);
 
 // Post Requests
-
 /**
  * Adds an commercial to the mall
  * @param {express.Request} request Must contain JSON with shopId, title, and body for the commercial
@@ -32,8 +29,8 @@ function postCommercial(request, response) {
     const adBody = request.body.body;
 
     const commercialId = commercials.addCommercial(
-        shopId, 
-        adTitle, 
+        shopId,
+        adTitle,
         adBody
     );
 
@@ -43,8 +40,21 @@ function postCommercial(request, response) {
 
 
 // Delete Requests
-
-
+/**
+ * Deletes a commercial using commericial id as a param
+ * @param {express.Request} request 
+ * @param {express.response} response
+ */
+function deleteCommercial(request, response) {
+    console.log("Deleting: " + request.body.id);
+    if (commercials.tryDeleteCommercial(request.body.id)) {
+        response.sendStatus(204);
+    } 
+    else {
+        console.log(request.body.id);
+        response.sendStatus(404);
+    }
+}
 
 
 // Get Requests

@@ -89,6 +89,19 @@ function getCommercial(commercialId) {
     }
 }
 
+function tryDeleteCommercial(commercialId) {
+    const index = commercials.findIndex(
+        commercial => commercial.id == commercialId
+    );
+    if (index >= 0) {
+        commercials.splice(index, 1);
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 /**
  * Gets all the commercials
  */
@@ -99,5 +112,6 @@ function getAllCommercials() {
 module.exports = {
     addCommercial,
     getCommercial,
-    getAllCommercials
+    getAllCommercials,
+    tryDeleteCommercial
 };

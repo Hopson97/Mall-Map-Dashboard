@@ -88,7 +88,9 @@ QUnit.test(
         const json = await response.json();
         const shopId = json.id;
         //Test the delete request
-        const deleteResponse = await deleteRequestJson(`${SHOP_PATH}/remove`, {id: shopId});
+        const deleteResponse = await deleteRequestJson(`${SHOP_PATH}/remove`, {
+            id: shopId
+        });
 
         assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
 
@@ -114,7 +116,7 @@ QUnit.test(
         };
 
         let commercialId;
-       
+
         {
             const response = await postRequestJson(`${AD_PATH}/add`, commercial);
             const json = await response.json();
@@ -129,7 +131,7 @@ QUnit.test(
                 "The returned commercial should contain same info as the one posted");
         }
 
-        
+
         {
             const response = await fetch(`${AD_PATH}/info?id=${commercialId}`);
             const json = await response.json();
@@ -143,15 +145,45 @@ QUnit.test(
                 "Should be able to find commercial that contains the same info as the one posted");
         }
 
-        
+
         {
             const response = await fetch(`${AD_PATH}/info?id=${-50}`);
             assert.deepEqual(response.status, 404, "Should not be able to find commercial with invalid id");
         }
     });
 
+/**
+ * QUint Tests for deleting commercials
+ */
+QUnit.test(
+    "API should allow for the deleting of commercials",
+    async assert => {
+        const commercial = {
+            shopId: shopId,
+            title: "50% OFF!",
+            body: "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop"
+        };
 
+        let commercialId; {
+            const response = await postRequestJson(`${AD_PATH}/add`, commercial);
+            const json = await response.json();
+            commercialId = json.id;
+            assert.deepEqual(response.status, 201, "Should return HTTP 201 for a sucessful post");
+            assert.deepEqual({
+                    shopId: json.shopId,
+                    title: json.title,
+                    body: json.body
+                },
+                commercial,
+                "The returned commercial should contain same info as the one posted");
+        }
+        const response = await deleteRequestJson(`${AD_PATH}/remove`, {
+            id: commercialId
+        });
+        assert.deepEqual(response.status, 204, "The delete function should return HTTP for 204 saying it was a success");
 
+    }
+);
 //   QUint Tests for the map API
 
 QUnit.test(
@@ -169,7 +201,9 @@ QUnit.test(
 QUnit.test(
     "Should be able to delete room",
     async assert => {
-        const deleteResponse = await deleteRequestJson(`${MAP_PATH}/remove`, {id: 0});
+        const deleteResponse = await deleteRequestJson(`${MAP_PATH}/remove`, {
+            id: 0
+        });
         assert.deepEqual(deleteResponse.status, 204, "The delete function should return HTTP for 204 saying it was a success");
     });
 

@@ -1,7 +1,7 @@
 "use strict"
 
 window.addEventListener("load", async () => {
-    await populateTable("/api/shops/list", addRowCallback);
+    await populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
     document.getElementById("add-store-form")
         .addEventListener("submit", onSubmitShop);
 });
@@ -11,16 +11,8 @@ function addRowCallback(shop, cells, row) {
     cells[1].textContent = shop.type;
     cells[2].textContent = shop.dateAdded;
 
-    const editButton = row.querySelector("a");
-    editButton.href = `edit-shop?id=${shop.id}`;
-
-    const deleteButton = row.querySelectorAll("img")[1];
-    deleteButton.addEventListener("click", async () => {
-        deleteRequestJson("/api/shops/remove", {
-            id: shop.id
-        });
-        location.reload(); //TODO is there a better way?
-    });
+    //const editButton = row.querySelector("a");
+   // editButton.href = `edit-shop?id=${shop.id}`;
 }
 
 
@@ -46,7 +38,7 @@ async function onSubmitShop(event) {
     if (response.status === 201) {
         const shop = await response.json();
         console.log(shop);
-        await addTableRow(shop, addRowCallback);
+        await addTableRow(shop, "/api/shops/remove", addRowCallback);
     }
 
 }

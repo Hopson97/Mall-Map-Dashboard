@@ -1,7 +1,7 @@
 "use strict"
 
 window.addEventListener("load", async () => {
-    await populateTable("/api/commercials/list", addRowCallback);
+    await populateTable("/api/commercials/list", "/api/commercials/remove", addRowCallback);
 });
 
 async function addRowCallback(commercial, cells, row) {
