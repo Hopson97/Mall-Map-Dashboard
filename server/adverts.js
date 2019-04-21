@@ -6,8 +6,17 @@
 
 const util = require('./utility');
 
+/**
+ * Contains information about adverts, and their assosiated 
+ */
 const adverts = []
 
+/**
+ * Adds an advert to the system
+ * @param {Number} shopId The ID of the shop the advert is for
+ * @param {String} title The title of the advert
+ * @param {String} body The information about the advert 
+ */
 function addAdvert(shopId, title, body) {
     const advertId = util.getMaxId(adverts) + 1;
 
@@ -21,6 +30,10 @@ function addAdvert(shopId, title, body) {
     return advertId;
 }
 
+/**
+ * Gets a advert based on advert ID. Returns null if it cannot find it.
+ * @param {Number} advertId The ID of the advert to get information about
+ */
 function getAdvert(advertId) {
     const index = adverts.findIndex(
         advert => advert.id == advertId
@@ -33,6 +46,9 @@ function getAdvert(advertId) {
     }
 }
 
+/**
+ * Gets all the adverts
+ */
 function getAllAdverts() {
     return adverts;
 }
