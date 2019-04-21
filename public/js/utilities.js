@@ -97,7 +97,7 @@ async function addTableRow(item, deleteUrl, callback) {
 
     await callback(item, cells, rowClone);
 
-    const deleteButton = rowClone.querySelectorAll("img")[1];
+    const deleteButton = rowClone.querySelector("img");
     deleteButton.addEventListener("click", async () => {
         deleteRequestJson(deleteUrl, {
             id: item.id
