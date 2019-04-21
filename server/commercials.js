@@ -31,7 +31,7 @@ const commercials = [
         body: "Lorem ipsum....",
         dateAdded: util.getFormattedDate()
     },
-    {
+    {//
         id: 4,
         shopId: 1,
         title: "commercial 4",
