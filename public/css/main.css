@@ -151,11 +151,11 @@ canvas {
 ------------------------------------
 */
 
-.bin-icon {
+.grow-icon {
     transition: 1s;
 }
 
-.bin-icon:hover {
+.grow-icon:hover {
     transform: scale(1.1);
 }
 
@@ -264,7 +264,8 @@ canvas {
 }
 
 .edit-form input[type=text], 
-.edit-form select {
+.edit-form select,
+.edit-form textarea {
     width: 100%;
     padding: 10px;
     border: solid black 2px;

@@ -1,46 +1,20 @@
 "use strict"
 
-window.addEventListener("load", async e => {
-    await populateTable();
-
+window.addEventListener("load", async () => {
+    await populateTable("/api/shops/list", addRowCallback);
     document.getElementById("add-store-form")
         .addEventListener("submit", onSubmitShop);
 });
 
-/**
- * Populates the table with shops that have already been added
- */
-async function populateTable() {
-
-    //Get list of shops from server
-    const response = await fetch("/api/shops/list");
-    const shopList = await response.json();
-
-    //Add the shops
-    for (const shop of shopList) {
-        addTableRow(shop);
-    }
-}
-
-/**
- * Adds a row of shop data to the table
- * @param {Object} shop Object containing the shop name, type, and the date it was added
- */
-function addTableRow(shop) {
-    const shopTable = document.getElementById("shop-table");
-    const tableRowTemplate = document.getElementById("row");
-
-    const clone = document.importNode(tableRowTemplate.content, true);
-    const cells = clone.querySelectorAll("td");
+function addRowCallback(shop, cells, row) {
     cells[0].textContent = shop.name;
     cells[1].textContent = shop.type;
     cells[2].textContent = shop.dateAdded;
 
-    const editButton = clone.querySelector("a");
+    const editButton = row.querySelector("a");
     editButton.href = `edit-shop?id=${shop.id}`;
 
-    //TODO make it so there is prompt first?
-    const deleteButton = clone.querySelectorAll("img")[1];
+    const deleteButton = row.querySelectorAll("img")[1];
     deleteButton.addEventListener("click", async () => {
         await fetch("/api/shops/remove", {
             method: "delete",
@@ -53,8 +27,8 @@ function addTableRow(shop) {
         });
         location.reload(); //TODO is there a better way?
     });
-    shopTable.appendChild(clone);
 }
+
 
 /**
  * Event handler for when the form is submitted

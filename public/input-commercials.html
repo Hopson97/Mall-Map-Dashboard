@@ -7,7 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="css/main.css">
     <link rel="shortcut icon" type="image/ico" href="img/favicon.ico" />
+    <script src="js/utilities.js"></script>
     <script src="js/navbar-gen.js"></script>
+    <script src="js/input-commercials.js"></script>
 </head>
 
 <body>
@@ -24,7 +26,43 @@
         </div>
         <div class="main-content">
             <div class="content-container">
-                
+                <h3 class="center">Current Commercials</h3>
+                <table id="table">
+                    <tr>
+                        <th>Shop</th>
+                        <th>Title</th>
+                        <th>Body</th>
+                        <th>Date</th>
+                        <th>Edit/Delete</th>
+                    </tr>
+                </table>
+                <h3 class="center">Add A Commercial</h3>
+                <form id="add-commercial-form" class="center edit-form">
+                    <div>
+                        <label>
+                            Shop commercial is for
+                            <select id="shop-id" required>
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Commercial Title
+                            <input type="text" id="commercial-title" required>
+
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Commercial Text
+                            <textarea id = "commercial-body" rows="4" cols="50"></textarea>
+                            
+                        </label>
+                    </div>
+                    <div>
+                        <input type="submit" value="Add Shop" class="wide-button">
+                    </div>
+                </form>
             </div>
         </div>
     </main>
@@ -32,6 +70,18 @@
 
     </footer>
 </body>
+<template id="row">
+    <tr class="table-data">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+            <a><img class="bin-icon" src="img/edit.png"></a>
+            <img class="bin-icon" src="img/bin.png">
+        </td>
+    </tr>
+</template>
 <template id="nav-section">
     <a>
         <div class="nav-button-container">

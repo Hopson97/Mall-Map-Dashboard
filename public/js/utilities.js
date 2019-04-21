@@ -66,3 +66,25 @@ function getBrowserHeight() {
         document.documentElement.clientHeight
     );
 }
+
+async function populateTable(listUrl, callback) {
+    //Get list of something from server
+    const response = await fetch(listUrl);
+    const list = await response.json();
+
+    //Add the shops
+    for (const item of list) {
+        addTableRow(item, callback);
+    }
+}
+
+async function addTableRow(item, callback) {
+    const table = document.getElementById("table");
+    const rowTemplate  = document.getElementById("row");
+    const rowClone = document.importNode(rowTemplate.content, true);
+    const cells = rowClone.querySelectorAll("td");
+
+    await callback(item, cells, rowClone);
+
+    table.appendChild(rowClone);
+}
