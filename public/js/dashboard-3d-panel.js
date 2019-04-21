@@ -200,7 +200,7 @@ class Room extends Drawable3D {
         let colour;
         if (this.shopId >= 0) {
             //Get information about the shop
-            const response = await fetch("api/shops/info?id=" + this.shopId);
+            const response = await fetch("api/shops/get?id=" + this.shopId);
             if (response.status === 404) {
                 //handle?
                 return;

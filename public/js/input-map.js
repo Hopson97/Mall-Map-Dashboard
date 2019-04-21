@@ -141,7 +141,7 @@ async function initMapData() {
             return shopRoom.roomId == room.id;
         })
         if (index > -1) {
-            const response = await fetch("api/shops/info?id=" + shopRoomsList[index].shopId);
+            const response = await fetch("api/shops/get?id=" + shopRoomsList[index].shopId);
             if (response.status === 404) {
 
             } else {

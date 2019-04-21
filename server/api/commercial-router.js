@@ -13,7 +13,7 @@ router.use(bodyParser.json());
 
 //Requests
 router.get("/list", getCommercialList);
-router.get("/info", getCommercial);
+router.get("/get", getCommercial);
 router.post("/add", postCommercial);
 router.delete("/remove", deleteCommercial);
 

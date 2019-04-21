@@ -14,7 +14,7 @@ window.addEventListener("load", async () => {
  * @param {[HTMLDivElement]} row The row container to add data to
  */
 async function addRowCallback(commercial, cells, row) {
-    const response = await fetch(`/api/shops/info?id=${commercial.shopId}`);
+    const response = await fetch(`/api/shops/get?id=${commercial.shopId}`);
     const shopInfo = await response.json();
 
     cells[0].textContent = shopInfo.name;

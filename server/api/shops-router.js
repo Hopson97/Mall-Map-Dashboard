@@ -13,7 +13,7 @@ router.use(bodyParser.json());
 
 
 router.get("/list", getShopList);
-router.get("/info", getShopInformation);
+router.get("/get", getShopInformation);
 
 router.post("/add", postShopInformation);
 

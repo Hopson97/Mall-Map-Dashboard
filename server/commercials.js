@@ -42,11 +42,9 @@ function getCommercial(commercialId) {
     const index = commercials.findIndex(
         commercial => commercial.id == commercialId
     );
-    console.log(commercialId);
     if (index >= 0) {
         return commercials[index];
     } else {
-        console.log("\n\nFAILED TO FIND\n\n" + JSON.stringify(commercials) + "\n\n");
         return null;
     }
 }

@@ -5,5 +5,54 @@
         "title": "50% OFF ALL GOODS AND SERVICES! LIMITED TIME!",
         "body": "Come shop at game for a limited time only, get 50% off all games and consoles when you buy 5 Xboxes!",
         "dateAdded": "10/04/19"
+    },
+    {
+        "id": 3,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 4,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 5,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 6,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 7,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 8,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
+    },
+    {
+        "id": 9,
+        "shopId": 5,
+        "title": "50% OFF!",
+        "body": "ONLY FOR A LIMITED TIME GET 50% OFF ALL ITEMS AT shop",
+        "dateAdded": "21/3/2019"
     }
 ]
