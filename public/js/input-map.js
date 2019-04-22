@@ -308,9 +308,7 @@ function handleZoomOutClick() {
         scaleFactor = 6;
     }
 }
-
-
-///@TODO EWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+ 
 /**
  * Builds DOM for the shop selection popup
  */

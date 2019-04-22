@@ -41,7 +41,7 @@ async function handleMessage(event) {
             break;
 
         case "CommercialUpdate":
-            initCommercialPanel();
+            await initCommercialPanel();
             break;
     }
 }
@@ -63,9 +63,9 @@ async function addCommerical(commercial) {
     dashboardStats.commercialCount++;
 }
 
-function addCommericals(commercialList) {
+async function addCommericals(commercialList) {
     for (const commercial of commercialList) {
-        addCommerical(commercial);
+        await addCommerical(commercial);
     }
 }
 
@@ -75,12 +75,12 @@ async function initCommercialPanel() {
     const response = await fetch("/api/commercials/list");
     const commercialList = await response.json();
 
-    addCommericals(commercialList);
+    await addCommericals(commercialList);
     //If there are more than 4 commercials, then it means they go 
     //past screen width, hence needs to scroll animation to see all of them,
+    console.log(dashboardStats.commercialCount);
     if (dashboardStats.commercialCount > 4) {
         addCommericals(commercialList);
-
         //Set up the scrolling animation times and speed based on number of elements added
         document.getElementById("keyframe").textContent = 
         `
@@ -92,9 +92,8 @@ async function initCommercialPanel() {
                 transform: translateX(-${(dashboardStats.commercialCount / 2) * 100}%);
             }
         }
-        `
-        console.log(`transform: translateX(-${dashboardStats.commercialCount / 2 * 100}%);`)
-
+        `;
+        console.log("Animation set up");
     }
     else {
         //No animation needed for 4 or less adverts

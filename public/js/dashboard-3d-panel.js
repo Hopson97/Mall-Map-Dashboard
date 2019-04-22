@@ -354,10 +354,10 @@ async function begin3DRenderer() {
         const speed = 0.065;
         camera.update(
             new Vector3(
-                Math.cos(toRadians(camera.rotation.y)) * speed,
+                -Math.cos(toRadians(camera.rotation.y)) * speed,
                 0,
-                Math.sin(toRadians(camera.rotation.y)) * speed),
-            new Vector3(0, -0.05, 0)
+                -Math.sin(toRadians(camera.rotation.y)) * speed),
+            new Vector3(0, 0.05, 0)
         );
 
         //Load uniform variables to shader
