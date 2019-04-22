@@ -33,6 +33,11 @@ function postCommercial(request, response) {
         adTitle,
         adBody
     );
+    for (const client of wss.clients) {
+        client.send(JSON.stringify({
+            type: "CommercialUpdate"
+        }));
+    }
 
     const commercial = commercials.getCommercial(commercialId);
     response.status(201).json(commercial);
@@ -49,6 +54,11 @@ function deleteCommercial(request, response) {
     console.log("Deleting: " + request.body.id);
     if (commercials.tryDeleteCommercial(request.body.id)) {
         response.sendStatus(204);
+        for (const client of wss.clients) {
+            client.send(JSON.stringify({
+                type: "CommercialUpdate"
+            }));
+        }
     } 
     else {
         console.log(request.body.id);

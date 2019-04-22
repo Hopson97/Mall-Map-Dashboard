@@ -40,6 +40,10 @@ async function handleMessage(event) {
                 }
             }
             break;
+
+        case "CommercialUpdate":
+            await initCommercialPanel();
+            break;
     }
 }
 
