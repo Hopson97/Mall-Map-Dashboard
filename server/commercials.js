@@ -51,7 +51,7 @@ function getCommercial(commercialId) {
 
 function tryDeleteCommercial(commercialId) {
     let result = false;
-    util.editJson('commercials.json', (commercials) => {
+    util.editJson('commercials.json', commercials => {
         const index = commercials.findIndex(
             commercial => commercial.id == commercialId
         );
@@ -72,7 +72,7 @@ function tryDeleteCommercial(commercialId) {
 function tryDeleteCommercialByShopId(shopId) {
     let found = false;
 
-    util.editJson('commercials.json', (commercials) => {
+    util.editJson('commercials.json', commercials => {
         while (true) {
             const index = commercials.findIndex(
                 commercial => commercial.shopId == shopId
