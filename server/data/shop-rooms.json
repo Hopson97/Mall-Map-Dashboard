@@ -30,5 +30,69 @@
     {
         "roomId": 23,
         "shopId": 3
+    },
+    {
+        "roomId": 24,
+        "shopId": 2
+    },
+    {
+        "roomId": 25,
+        "shopId": 4
+    },
+    {
+        "roomId": 15,
+        "shopId": 4
+    },
+    {
+        "roomId": 15,
+        "shopId": 3
+    },
+    {
+        "roomId": 11,
+        "shopId": 2
+    },
+    {
+        "roomId": 11,
+        "shopId": 3
+    },
+    {
+        "roomId": 18,
+        "shopId": 2
+    },
+    {
+        "roomId": 20,
+        "shopId": 3
+    },
+    {
+        "roomId": 24,
+        "shopId": 2
+    },
+    {
+        "roomId": 18,
+        "shopId": 2
+    },
+    {
+        "roomId": 18,
+        "shopId": 1
+    },
+    {
+        "roomId": 18,
+        "shopId": 3
+    },
+    {
+        "roomId": 23,
+        "shopId": 3
+    },
+    {
+        "roomId": 7,
+        "shopId": 4
+    },
+    {
+        "roomId": 8,
+        "shopId": 3
+    },
+    {
+        "roomId": 26,
+        "shopId": 2
     }
 ]

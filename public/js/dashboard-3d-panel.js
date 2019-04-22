@@ -52,7 +52,7 @@ class Renderer {
         //Initilise the context
         this.context.fillStyle = "white";
         this.context.lineWidth = 3;
-        this.context.font = `bold 9.5 sans-serif`;
+        this.context.font = `bold 12px monospace`;
     }
 
     /**
@@ -297,6 +297,7 @@ class RenderableBillboard {
     draw(renderer) {
         //TODO Use billboard shop stats to fit the billboard size accordingly
         //Draw billboard thing
+        const length = Math.max(this.billboardData.shopName.length, this.billboardData.shopType.length);
         const c = renderer.context;
         c.strokeStyle = "white";
         c.fillStyle = "black";
@@ -305,16 +306,16 @@ class RenderableBillboard {
         c.lineTo(this.x + 10, this.y + 10);
         c.lineTo(this.x - 10, this.y + 5);
         c.lineTo(this.x - 10, this.y - 35);
-        c.lineTo(this.x + 70, this.y - 35);
-        c.lineTo(this.x + 70, this.y + 5);
+        c.lineTo(this.x + length * 10 + length, this.y - 35);
+        c.lineTo(this.x + length * 10 + length, this.y + 5);
         c.lineTo(this.x + 35, this.y + 10);
         c.lineTo(this.x + 25, this.y + 25);
         c.stroke();
         c.fill();
         c.fillStyle = "white";
-        c.fillText(`Room ${this.billboardData.roomId}`, this.x, this.y - 24);
-        c.fillText(`shop: ${this.billboardData.shopName}`, this.x, this.y - 12);
-        c.fillText(`${this.billboardData.shopType}`, this.x, this.y);
+        c.fillText(`Room ${this.billboardData.roomId}`, this.x - 8, this.y - 24);
+        c.fillText(`Shop: ${this.billboardData.shopName}`, this.x - 8, this.y - 12);
+        c.fillText(`${this.billboardData.shopType}`, this.x - 8, this.y);
     }
 }
 

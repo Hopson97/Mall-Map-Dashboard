@@ -55,16 +55,35 @@ class Renderer {
      * Draws a rectangle to the canvas
      * @param {Number} x The world-x coordinate to draw the rectangle to
      * @param {Number} y The world y-coordinate to draw the rectangle to
-     * @param {Number} w The width of the rectangle
-     * @param {Number} h The height of the rectangle
+     * @param {Number} width The width of the rectangle
+     * @param {Number} height The height of the rectangle
      */
-    renderRect(x, y, w, h) {
-        this.context.strokeRect(x + offsetX, y + offsetY, w, h);
-        this.context.fillRect(x + offsetX, y + offsetY, w, h);
+    renderRect(x, y, width, height) {
+        const xPos = (x  / scaleFactor) + offsetX;
+        const yPos = (y / scaleFactor) + offsetY;
+        const scaledWidth = width / scaleFactor;
+        const scaledHeight = height / scaleFactor;
+
+        this.context.strokeRect(xPos, yPos, scaledWidth, scaledHeight);
+        this.context.fillRect(xPos, yPos, scaledWidth, scaledHeight);
+    }
+
+    renderText(text, x, y) {
+        x-=10;
+        this.context.fillStyle = "black";
+        this.context.strokeStyle = "white";
+        this.renderRect(x - 12, y - 20, text.length * 18, 30);
+        this.context.font = "12px monospace";
+        this.context.fillStyle = "white";
+        this.context.fillText(text, x / scaleFactor + offsetX, y / scaleFactor + offsetY);
+        
     }
 } //Class renderer
 
 
+/**
+ * Entry point for map input class
+ */
 window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
     const ctx = canvas.getContext("2d");
@@ -172,8 +191,8 @@ function loop(canvas, context) {
         context.strokeStyle = '#CCCCCC';
         for (const path of mapData.paths) {
             renderer.renderRect(
-                path.x / scaleFactor, path.y / scaleFactor,
-                path.width / scaleFactor, path.depth / scaleFactor);
+                path.x, path.y ,
+                path.width, path.depth);
         }
 
         //Draw the rooms
@@ -183,10 +202,22 @@ function loop(canvas, context) {
                 context.fillStyle = "lime";
             } else {
                 context.fillStyle = typeToColour(room.type).asCSSString();
+
             }
             renderer.renderRect(
-                room.x / scaleFactor, room.y / scaleFactor,
-                room.width / scaleFactor, room.depth / scaleFactor);
+                room.x, 
+                room.y,
+                room.width, 
+                room.depth);
+            
+            context.fillStyle = "black";
+            if (room.type != "none") {
+                renderer.renderText(
+                    room.name, 
+                    room.x + room.width / 10, 
+                    room.y + room.depth / 2);
+
+            }
         }
 
         context.stroke();
@@ -292,7 +323,7 @@ async function buildshopDOM() {
         const clone = document.importNode(shopListSect.content, true);
         const container = clone.querySelector("div");
         const contentElements = clone.querySelectorAll('p');
-        
+
         contentElements[0].textContent = shop.name;
         contentElements[2].textContent = shop.type;
 
