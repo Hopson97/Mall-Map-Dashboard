@@ -34,7 +34,7 @@ class Renderer {
         this.context = canvas2D.getContext("2d");
 
         //Set canvas size
-        canvas3D.width = getBrowserWidth() * 0.85;
+        canvas3D.width = getBrowserWidth() * 0.80;
         canvas3D.height = getBrowserHeight() * 0.75;
         canvas2D.width = canvas3D.clientWidth;
         canvas2D.height = canvas3D.clientHeight;
@@ -367,7 +367,7 @@ async function begin3DRenderer() {
         renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
-        window.requestAnimationFrame(loop);
+        //window.requestAnimationFrame(loop);
     }
 };
 

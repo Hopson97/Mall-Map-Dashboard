@@ -19,7 +19,13 @@ function typeToColour(type) {
         case "restaurant":
             return new Colour(50, 50, 188);
 
-        default:
+        case "bar": 
+            return new Colour(210, 180, 140);
+
+        case "toy":
+            return new Colour(0, 166, 255);
+
+        default://none
             return new Colour(50, 50, 50);
     }
 }

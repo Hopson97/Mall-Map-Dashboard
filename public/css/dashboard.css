@@ -55,7 +55,24 @@ body {
     flex: 1;
     background: #05668D;
     overflow: auto; 
-    border-left: solid white;
+    border-right: solid white;
+}
+
+.time {
+    margin-top: 10px;
+    width: 75%;
+    margin: auto;
+    border-top: solid white;
+    border-bottom: solid white;
+    padding: 20px;
+}
+
+.time p:first-child {
+    font-size: 165%;
+}
+
+.time p:last-child {
+    font-size: 250%;
 }
 
 /*
@@ -98,6 +115,16 @@ body {
     
 }
 */
+
+/*
+=====================================
+    General classes
+=====================================
+*/
+.title {
+    font-size: 3em;
+    text-align: center;
+}
 
 /*
 =====================================
