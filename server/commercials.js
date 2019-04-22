@@ -1,7 +1,7 @@
 "use strict"
 
 /**
- * File to contain data about commercials
+ * File to handle interactions with commercial data
  */
 
 const util = require('./utility');

@@ -20,7 +20,6 @@ router.get("/layout", getLayout);
 
 
 // Post Requests
-
 /**
  * Sets the information about a room in the mall. 
  * @param {express.request} request The HTTP request. Body should contain JSON with the room's ID, with the shop name and type assosiated with it
@@ -46,7 +45,11 @@ function postSectionData(request, response) {
 
 
 // Delete Requests
-
+/**
+ * Deletes a shop room from
+ * @param {express.Request} request The HTTP request. Must contain the roomID to remove in JSON body
+ * @param {express.Response} response 204 for sucess, 404 for error aka can't find room you are trying to remove    
+ */
 function deleteSectionData(request, response) {
     const roomId = request.body.id;
     if (shopRooms.tryDeleteShopRoomByRoomId(roomId)) {
@@ -59,7 +62,6 @@ function deleteSectionData(request, response) {
 
 
 // Get Requests
-
 /**
  * Gets the data about the rooms, eg what their assosiated shop is
  * @param {express.Request} request The HTTP request. 

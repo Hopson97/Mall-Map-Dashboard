@@ -5,12 +5,12 @@
  * This is the rooms of the mall, and their assosiated shop ID
  */
 
- /**
-  * Contains data about each room of the map and the 
-  * shop that it is assosiated with
-  */
-const shopRooms = [];
-
+/**
+ * Contains data about each room of the map and the 
+ * shop that it is assosiated with
+ */
+const util = require('./utility');
+const fs = require('fs');
 
 //   Functions
 
@@ -20,7 +20,12 @@ const shopRooms = [];
  * @param {Number} shopId The shop ID
  */
 function addShopRoom(roomId, shopId) {
-    shopRooms.push({roomId, shopId: shopId});
+    util.editJson("shop-rooms.json", shopRooms =>
+        shopRooms.push({
+            roomId,
+            shopId: shopId
+        })
+    );
 }
 
 /**
@@ -29,18 +34,19 @@ function addShopRoom(roomId, shopId) {
  */
 function tryDeleteShopRoomByRoomId(roomId) {
     let found = false;
-    while (true) {
-        const index = shopRooms.findIndex(
-            shopRoom => shopRoom.roomId == roomId
-        );
-        if (index >= 0) {
-            shopRooms.splice(index, 1);
-            found = true;
+    util.editJson("shop-rooms.json", shopRooms =>{
+        while (true) {
+            const index = shopRooms.findIndex(
+                shopRoom => shopRoom.roomId == roomId
+            );
+            if (index >= 0) {
+                shopRooms.splice(index, 1);
+                found = true;
+            } else {
+                return;
+            }
         }
-        else {
-            break;
-        }
-    }
+    });
     return found;
 }
 
@@ -50,18 +56,19 @@ function tryDeleteShopRoomByRoomId(roomId) {
  */
 function tryDeleteShopRoomByShopId(shopId) {
     let found = false;
-    while (true) {
-        const index = shopRooms.findIndex(
-            shopRoom => shopRoom.shopId == shopId
-        );
-        if (index >= 0) {
-            shopRooms.splice(index, 1);
-            found = true;
+    util.editJson("shop-rooms.json", shopRooms =>{
+        while (true) {
+            const index = shopRooms.findIndex(
+                shopRoom => shopRoom.shopId == shopId
+            );
+            if (index >= 0) {
+                shopRooms.splice(index, 1);
+                found = true;
+            } else {
+                return;
+            }
         }
-        else {
-            break;
-        }
-    }
+    });
     return found;
 }
 
@@ -69,7 +76,8 @@ function tryDeleteShopRoomByShopId(shopId) {
  * Returns all of the shop rooms
  */
 function getAllShopRooms() {
-    return shopRooms;
+    const buffer = fs.readFileSync('./server/data/shop-rooms.json');
+    return JSON.parse(buffer);
 }
 
 module.exports = {
