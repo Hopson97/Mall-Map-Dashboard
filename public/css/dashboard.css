@@ -83,6 +83,11 @@ body {
     border-right: solid white;
 }
 
+.commercials-container .commercial .inner-commercial {
+    width: 75%;
+    margin: auto;
+}
+
 /*
 .commercials-container .commercial-title {
 

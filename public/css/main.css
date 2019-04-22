@@ -14,6 +14,7 @@
     border: 0;
     outline: 0;
     vertical-align: baseline;
+    overflow-x: hidden;
 }
 
 /*
@@ -132,6 +133,7 @@ main .main-content {
 main .content-container {
     width: 90%;
     margin: auto;
+    padding: 10px;
 }
 
 
@@ -140,15 +142,22 @@ main .content-container {
     Map Input Screen
 ------------------------------------
 */
-canvas {
-    width: 95%;
+.input-canvas {
+    width: 90%;
     margin: auto;
+    border: solid var(--header-colour)
 }
 
+.arrows img {
+    padding: 3px;
+    margin: 2px;
+    border: 2px solid var(--header-colour);
+    border-radius: 25px;
+}
 /*
-------------------------------------
-    shop Editor Screen
-------------------------------------
+===================
+  General classes
+===================
 */
 
 .grow-icon {
@@ -181,10 +190,7 @@ canvas {
     background-color: var(--nav-hover-colour);
 }
 
-/*
-canvas {
-    border: 2px solid white;
-}*/
+
 
 /*
 ===================

@@ -34,7 +34,6 @@ function addShop(name, type) {
             });
         }
     });
-    //Return ID
     return shopId;
 }
 

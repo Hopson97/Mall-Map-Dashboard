@@ -220,6 +220,7 @@ class Room extends Drawable3D {
         //to update it's colour to be that of the new shop
         for (let i = 0; i < 20; i++) {
             for (let j = 0; j < 3; j++) {
+                //012 == rgb
                 this.mesh.colours[i * 3 + j] = colour[j];
             }
         }

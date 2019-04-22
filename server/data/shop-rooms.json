@@ -2,5 +2,33 @@
     {
         "roomId": 18,
         "shopId": 1
+    },
+    {
+        "roomId": 19,
+        "shopId": 4
+    },
+    {
+        "roomId": 15,
+        "shopId": 3
+    },
+    {
+        "roomId": 9,
+        "shopId": 2
+    },
+    {
+        "roomId": 27,
+        "shopId": 2
+    },
+    {
+        "roomId": 2,
+        "shopId": 3
+    },
+    {
+        "roomId": 13,
+        "shopId": 4
+    },
+    {
+        "roomId": 23,
+        "shopId": 3
     }
 ]

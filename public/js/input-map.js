@@ -69,10 +69,6 @@ window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
     const ctx = canvas.getContext("2d");
 
-    //Give canvas 16/9 aspect ratio
-    canvas.height = canvas.clientWidth / (16 / 9);
-
-
     if (getBrowserWidth() < 800) {
         //Give larger view on mobile
         scaleFactor = 5;

@@ -16,5 +16,11 @@
         "name": "Next",
         "type": "Clothes",
         "dateAdded": "21/04/19"
+    },
+    {
+        "id": 4,
+        "name": "Pizza Hut",
+        "type": "Restaurant",
+        "dateAdded": "22/3/2019"
     }
 ]

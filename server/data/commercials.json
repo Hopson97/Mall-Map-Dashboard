@@ -1,9 +1,30 @@
 [
     {
         "id": 1,
-        "shopId": 1,
-        "title": "50% OFF ALL GOODS AND SERVICES! LIMITED TIME!",
-        "body": "Come shop at game for a limited time only, get 50% off all games and consoles when you buy 5 Xboxes!",
-        "dateAdded": "10/04/19"
+        "shopId": "2",
+        "title": "Vegan Sausage Rolls Now Available!",
+        "body": "We have partnered with Quorn to bring you meat-free vegan and veterinarian friendly sausage rolls for the low low cost of just £1!",
+        "dateAdded": "22/3/2019"
+    },
+    {
+        "id": 2,
+        "shopId": "1",
+        "title": "Special Offer on XBOX!",
+        "body": "Today only, buy 50 Xbox's and get your 51st one free!",
+        "dateAdded": "22/3/2019"
+    },
+    {
+        "id": 3,
+        "shopId": "4",
+        "title": "50% Off!*",
+        "body": "*when you spend £20 or more** \n\n**but less than £30 ",
+        "dateAdded": "22/3/2019"
+    },
+    {
+        "id": 4,
+        "shopId": "3",
+        "title": "Jumpers are now 20% off!",
+        "body": "It is cold cold cold in cold Britannia, thus we now offer 20% off all jumpers when you spend £50 or more!",
+        "dateAdded": "22/3/2019"
     }
 ]
