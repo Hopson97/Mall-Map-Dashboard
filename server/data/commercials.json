@@ -14,45 +14,10 @@
         "dateAdded": "22/3/2019"
     },
     {
-        "id": 3,
-        "shopId": "4",
-        "title": "50% Off!*",
-        "body": "*when you spend £20 or more** \n\n**but less than £30 ",
-        "dateAdded": "22/3/2019"
-    },
-    {
         "id": 4,
         "shopId": "3",
         "title": "Jumpers are now 20% off!",
         "body": "It is cold cold cold in cold Britannia, thus we now offer 20% off all jumpers when you spend £50 or more!",
-        "dateAdded": "22/3/2019"
-    },
-    {
-        "id": 5,
-        "shopId": "4",
-        "title": "WOW",
-        "body": "WOW PIZZA",
-        "dateAdded": "22/3/2019"
-    },
-    {
-        "id": 6,
-        "shopId": "4",
-        "title": "WOW",
-        "body": "WOW PIZZA",
-        "dateAdded": "22/3/2019"
-    },
-    {
-        "id": 7,
-        "shopId": "4",
-        "title": "WOW",
-        "body": "WOW PIZZA",
-        "dateAdded": "22/3/2019"
-    },
-    {
-        "id": 8,
-        "shopId": "4",
-        "title": "WOW",
-        "body": "WOW PIZZA",
         "dateAdded": "22/3/2019"
     }
 ]

@@ -74,8 +74,9 @@ body {
 
 
 .commercials-container .commercial {
-    /*hack to force css to use the GPU for animation*/
-    transform: translate3d(0, 0, 0);
+    /*A hack to force css to use the GPU for smoother animation*/
+    transform: translateZ(0);
+    will-change: transform;
 
     padding: 5px;
     min-width: 25%;

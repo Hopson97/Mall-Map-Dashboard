@@ -9,8 +9,7 @@ window.addEventListener("load", async e => {
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
     
-    initCommercialPanel();
-
+    await initCommercialPanel();
     await begin3DRenderer();
 });
 
@@ -42,16 +41,21 @@ async function handleMessage(event) {
             break;
 
         case "CommercialUpdate":
-            await initCommercialPanel();
+            initCommercialPanel();
             break;
     }
 }
 
-function addCommerical(commercial) {
+async function addCommerical(commercial) {
     const commercials = document.getElementById("commercial-panel");
     const temp = document.getElementById("commercial-template");
     const clone = document.importNode(temp.content, true);
+
+    const response = await fetch("/api/shops/get?id=" + commercial.shopId);
+    const shopInfo = await response.json();
     
+    clone.querySelector('h1').textContent = shopInfo.name;
+    clone.querySelector('h2').textContent = commercial.title;
     clone.querySelector('h2').textContent = commercial.title;
     clone.querySelector('p').textContent = commercial.body;
 
@@ -72,12 +76,16 @@ async function initCommercialPanel() {
     const commercialList = await response.json();
 
     addCommericals(commercialList);
-    if (dashboardStats.commercialCount >= 4) {
+    //If there are more than 4 commercials, then it means they go 
+    //past screen width, hence needs to scroll animation to see all of them,
+    if (dashboardStats.commercialCount > 4) {
         addCommericals(commercialList);
+
+        //Set up the scrolling animation times and speed based on number of elements added
         document.getElementById("keyframe").textContent = 
         `
         .commercials-container .commercial {
-            animation: commercials-slideshow ${10 + dashboardStats.commercialCount * 1.5}s linear infinite;
+            animation: commercials-slideshow ${10 + dashboardStats.commercialCount * 2.5}s linear infinite;
         }
         @keyframes commercials-slideshow {
             100% {

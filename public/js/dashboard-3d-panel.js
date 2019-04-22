@@ -295,8 +295,6 @@ class RenderableBillboard {
      * @param {Rederer} renderer The renderer to render the billboard to
      */
     draw(renderer) {
-        //TODO Use billboard shop stats to fit the billboard size accordingly
-        //Draw billboard thing
         const length = Math.max(this.billboardData.shopName.length, this.billboardData.shopType.length);
         const c = renderer.context;
         c.strokeStyle = "white";
@@ -330,11 +328,6 @@ class RenderableBillboard {
  */
 let objects;
 async function begin3DRenderer() {
-    //TEMP
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-    //TEMP
-
     const renderer = new Renderer();
     const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
@@ -355,10 +348,6 @@ async function begin3DRenderer() {
     window.requestAnimationFrame(loop);
 
     function loop() {
-        //TEMP
-        inputStuff(camera); //VERY VERY TEMP TODO
-        //TEMP
-
         renderer.clear();
 
         //Orbit the camera around the map of the mall
@@ -378,7 +367,7 @@ async function begin3DRenderer() {
         renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
-        //window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     }
 };
 
@@ -727,65 +716,4 @@ const shaders = {
             vec3  finalColour = passColour * diff * 2.0;
             colour = vec4(finalColour.xyz, 1.0);
         }`,
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//temp
-
-function inputStuff(camera) {
-    //TEMP
-    const speed = 0.1;
-    if (keydown["s"]) {
-        camera.position.x += Math.cos(toRadians(camera.rotation.y + 90)) * speed;
-        camera.position.z += Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-    } else if (keydown["w"]) {
-        camera.position.x += -Math.cos(toRadians(camera.rotation.y + 90)) * speed;
-        camera.position.z += -Math.sin(toRadians(camera.rotation.y + 90)) * speed;
-    }
-    if (keydown["a"]) {
-        camera.rotation.y -= 1;
-    } else if (keydown["d"]) {
-        camera.rotation.y += 1;
-    }
-    if (keydown["p"]) {
-        console.log(camera);
-    }
-    //TEMP
-}
-
-
-
-const keydown = {
-    "w": false,
-    "a": false,
-    "s": false,
-    "d": false
-};
-
-/**
- * Sets the key down event for the key pressed to true
- * @param {Event} event The key down event
- */
-function handleKeyDown(event) {
-    keydown[event.key] = true;
-}
-
-/**
- * Sets the key down event for the key pressed to false
- * @param {Event} event The key down event
- */
-function handleKeyUp(event) {
-    keydown[event.key] = false;
 }

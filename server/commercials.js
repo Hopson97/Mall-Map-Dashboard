@@ -49,6 +49,10 @@ function getCommercial(commercialId) {
     }
 }
 
+/**
+ * 
+ * @param {Number} commercialId Tries to delete a commericial using its id, given it exists
+ */
 function tryDeleteCommercial(commercialId) {
     let result = false;
     util.editJson('commercials.json', commercials => {
