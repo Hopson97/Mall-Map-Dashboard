@@ -41,6 +41,8 @@ class Renderer {
         this.width = canvas.width;
         this.height = canvas.height;
         this.context = context;
+        this.context.font = "bold 14px Sans-serif";
+        this.context.textAlign = "center"; 
     }
 
     /**
@@ -59,6 +61,7 @@ class Renderer {
      * @param {Number} height The height of the rectangle
      */
     renderRect(x, y, width, height) {
+        this.context.lineWidth = 2;
         const xPos = (x  / scaleFactor) + offsetX;
         const yPos = (y / scaleFactor) + offsetY;
         const scaledWidth = width / scaleFactor;
@@ -69,14 +72,12 @@ class Renderer {
     }
 
     renderText(text, x, y) {
-        x-=10;
-        this.context.fillStyle = "black";
-        this.context.strokeStyle = "white";
-        this.renderRect(x - 12, y - 20, text.length * 18, 30);
-        this.context.font = "12px monospace";
+        if (scaleFactor >= 4) return;
+        this.context.lineWidth = 8;
+        this.context.strokeStyle = "black";
         this.context.fillStyle = "white";
+        this.context.strokeText(text, x / scaleFactor + offsetX, y / scaleFactor + offsetY);
         this.context.fillText(text, x / scaleFactor + offsetX, y / scaleFactor + offsetY);
-        
     }
 } //Class renderer
 
@@ -175,7 +176,6 @@ async function initMapData() {
  */
 function loop(canvas, context) {
     const renderer = new Renderer(canvas, context);
-    context.lineWidth = 2;
 
     mapData.width = canvas.width;
     mapData.height = canvas.height;
@@ -196,8 +196,9 @@ function loop(canvas, context) {
         }
 
         //Draw the rooms
-        context.strokeStyle = "white";
+        
         for (const room of mapData.rooms) {
+            context.strokeStyle = "white";
             if (selectedshop.id == room.id) {
                 context.fillStyle = "lime";
             } else {
@@ -214,7 +215,7 @@ function loop(canvas, context) {
             if (room.type != "none") {
                 renderer.renderText(
                     room.name, 
-                    room.x + room.width / 10, 
+                    room.x + room.width / 2, 
                     room.y + room.depth / 2);
 
             }
@@ -241,7 +242,7 @@ function handleInput() {
     } else if (keydown["d"] || buttonPressed.right) {
         offsetX -= PAN_SPEED;
     }
-
+    console.log(scaleFactor);
     //Prevent out of bounds of world
     offsetX = Math.min(offsetX, mapData.width - 10);
     offsetX = Math.max(offsetX, -mapData.bounds.maxX + 10);

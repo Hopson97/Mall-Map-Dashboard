@@ -32,6 +32,7 @@ async function handleMessage(event) {
             break;
 
         case "ShopDelete":
+            await initCommercialPanel();
             for (const room of objects.rooms) {
                 if (room.shopId === data.shopId) {
                     room.shopId = -1;
@@ -61,6 +62,8 @@ function addCommericals(commercialList) {
 }
 
 async function initCommercialPanel() {
+    dashboardStats.commercialCount = 0;
+    removeAllChildren(document.getElementById("commercial-panel"));
     const response = await fetch("/api/commercials/list");
     const commercialList = await response.json();
 

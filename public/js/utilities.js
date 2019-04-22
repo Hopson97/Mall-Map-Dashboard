@@ -103,7 +103,10 @@ async function addTableRow(item, deleteUrl, callback) {
         deleteRequestJson(deleteUrl, {
             id: item.id
         });
-        location.reload(); //TODO is there a better way?
+        const row = deleteButton.parentNode.parentNode;
+        const table = row.parentNode;
+
+        table.removeChild(row);
     });
 
     table.appendChild(rowClone);
@@ -139,4 +142,14 @@ async function deleteRequestJson(url, json) {
         body: JSON.stringify(json)
     });
     return response;
+}
+
+/**
+ * Removes all child nodes from node
+ * @param {HTMLElement} node The node to delete children from
+ */
+function removeAllChildren(node) {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild);
+    }
 }
