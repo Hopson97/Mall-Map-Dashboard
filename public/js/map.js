@@ -3,7 +3,7 @@
 /**
  * Converts the room's type into a colour
  * @param {String} type The type that the room is
- */
+ *
 function typeToColour(type) {
     const typeLowerCase = type.toLowerCase();
     switch (typeLowerCase) {

@@ -12,7 +12,6 @@ class Colour {
         this.r = r;
         this.g = g;
         this.b = b;
-        console.log(r, g, b);
     }
     
     /**
