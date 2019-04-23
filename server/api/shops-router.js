@@ -28,9 +28,9 @@ router.delete("/remove", deleteShop);
  */
 function postShopInformation(request, response) {
     const shopName = request.body.shopName;
-    const shopType = request.body.shopType;
+    const categoryId = request.body.categoryId;
 
-    const shopId = shops.addShop(shopName, shopType);
+    const shopId = shops.addShop(shopName, categoryId);
     if (shopId === -1) {
         response.sendStatus(409);
     } else {

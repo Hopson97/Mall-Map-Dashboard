@@ -2,19 +2,19 @@
     {
         "id": 1,
         "name": "Game",
-        "type": "Entertainment",
+        "categoryId": 2,
         "dateAdded": "21/02/19"
     },
     {
         "id": 2,
         "name": "Greggs",
-        "type": "Food/Drink",
+        "categoryId": 3,
         "dateAdded": "21/03/19"
     },
     {
         "id": 3,
         "name": "Next",
-        "type": "Clothes",
+        "categoryId": 4,
         "dateAdded": "21/04/19"
     }
 ]
