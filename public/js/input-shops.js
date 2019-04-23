@@ -6,9 +6,12 @@ window.addEventListener("load", async () => {
         .addEventListener("submit", onSubmitShop);
 });
 
-function addRowCallback(shop, cells, row) {
+async function addRowCallback(shop, cells, row) {
+    const response = await fetch("/api/categories/get?id=" + shop.categoryId);
+    const categoryInfo = await response.json();
+
     cells[0].textContent = shop.name;
-    cells[1].textContent = shop.type;
+    cells[1].textContent = categoryInfo.name;
     cells[2].textContent = shop.dateAdded;
 }
 

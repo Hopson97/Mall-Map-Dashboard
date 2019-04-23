@@ -78,8 +78,6 @@ async function populateTable(listUrl, deleteUrl, callback) {
     const response = await fetch(listUrl);
     const list = await response.json();
 
-    //Add the shops
-    console.log(list);
     for (const item of list) {
         addTableRow(item, deleteUrl, callback);
     }
