@@ -62,5 +62,13 @@
     {
         "roomId": 26,
         "shopId": 2
+    },
+    {
+        "roomId": 2,
+        "shopId": 2
+    },
+    {
+        "roomId": 19,
+        "shopId": 2
     }
 ]

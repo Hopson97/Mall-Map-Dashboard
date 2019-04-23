@@ -422,7 +422,8 @@ function renderObjects(renderer, camera) {
  * @param {WebGLRenderContext} gl The WebGL rendering conetext
  */
 async function createMapMesh(gl) {
-    const geometry = await getMallLayout();
+    const response = await fetch("/api/map/layout");
+    const geometry = await response.json();
     return {
         rooms: await buildRoomsGeometry(gl, geometry.rooms),
         paths: buildPathGeometry(gl, geometry.paths),

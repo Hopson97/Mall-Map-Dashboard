@@ -26,8 +26,8 @@ router.get("/layout", getLayout);
  * @param {express.Response} response The HTTP response. Response is true on success.
  */
 function postSectionData(request, response) {
-    const roomId   = request.body.roomId;
-    const shopId  = request.body.shopId;
+    const roomId = request.body.roomId;
+    const shopId = request.body.shopId;
 
     shopRooms.addShopRoom(roomId, shopId);
 
@@ -39,7 +39,7 @@ function postSectionData(request, response) {
             shopId
         }));
     }
-    
+
     response.sendStatus(201);
 }
 
@@ -54,8 +54,7 @@ function deleteSectionData(request, response) {
     const roomId = request.body.id;
     if (shopRooms.tryDeleteShopRoomByRoomId(roomId)) {
         response.sendStatus(204);
-    }
-    else {
+    } else {
         response.sendStatus(404);
     }
 }
@@ -79,7 +78,22 @@ function getSectionData(_, response) {
 function getLayout(_, response) {
     fs.readFile('./server/data/map-layout.json', (err, json) => {
         const layout = JSON.parse(json);
-        response.json(layout);
+        const {rooms, paths} = layout;
+        let maxY = 0xFFFFFFF;
+        let maxX = -0xFFFFFFF;
+        for (const room of rooms) {
+            maxX = Math.max(room.x + room.width, maxX);
+            maxY = Math.max(room.y + room.depth, maxY);
+        }
+
+        response.json( {
+            rooms,
+            paths,
+            bounds: {
+                maxX,
+                maxY
+            }
+        });
     });
 }
 

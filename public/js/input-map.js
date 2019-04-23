@@ -142,13 +142,14 @@ window.addEventListener("load", async () => {
 });
 
 async function initMapData() {
-    const geometry = await getMallLayout();
+    const response = await fetch("/api/map/layout");
+    const geometry = await response.json();
     mapData.rooms = geometry.rooms;
     mapData.paths = geometry.paths;
     mapData.bounds = geometry.bounds;
 
-    const response = await fetch("api/map/shop-room-list");
-    const shopRoomsList = await response.json();
+    const shopsResponse = await fetch("api/map/shop-room-list");
+    const shopRoomsList = await shopsResponse.json();
 
     const catResponse = await fetch("/api/categories/get?id=1");
     const noCategory = await catResponse.json();
