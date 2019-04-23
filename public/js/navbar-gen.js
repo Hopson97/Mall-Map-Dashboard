@@ -3,27 +3,23 @@
 window.addEventListener("load", e => {
     const nav = document.getElementById("navbar");
 
-    let count = 0;
-    const addButton = (name, url, isLast, image) => {
+
+    const addButton = (name, url, image) => {
         const sect = document.getElementById("nav-section");
         const clone = document.importNode(sect.content, true);
         const anchor = clone.querySelector('a');
         const divs = clone.querySelectorAll('div');
+        const img  = clone.querySelector("img");
+        img.src = image;
         anchor.href = url;
         divs[1].textContent = name;
-        if (count == 0) {
-            anchor.classList.add("left-most");
-        }
-        else if (isLast) {
-            anchor.classList.add("right-most");
-        }
-        count++;
+
         nav.appendChild(clone);
     };
 
-    addButton("Map Editor", 'input-map', false);
-    addButton("Shop Editor", 'input-shops', false);
-    addButton("Commercial Edtior", 'input-commercials', false);
-    addButton("Announcement Editor", 'input-announcements', false);
-    addButton("View Dashboard", 'dashboard', true);
+    addButton("Map Editor", 'input-map', 'img/nav-map.png');
+    addButton("Shop Editor", 'input-shops', 'img/nav-shop.png');
+    addButton("Commercial Edtior", 'input-commercials', 'img/nav-commercial.png');
+    addButton("Announcement Editor", 'input-announcements', 'img/nav-map.png');
+    addButton("View Dashboard", 'dashboard', 'img/nav-dashboard.png');
 });
