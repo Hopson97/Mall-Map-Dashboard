@@ -16,7 +16,7 @@ router.get("/get", getCategoryInfo);
 function getCategoryList(request, response) {
     const buffer = fs.readFileSync("./server/data/categories.json");
     const categories = JSON.parse(buffer);
-    return categories;
+    response.json(categories);
 }
 
 /**

@@ -1,9 +1,26 @@
 "use strict"
 
+
 window.addEventListener("load", async () => {
     await populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
     document.getElementById("add-store-form")
         .addEventListener("submit", onSubmitShop);
+
+    //Populate the category selector
+    const select = document.getElementById("shop-type");
+    const response = await fetch("/api/categories/list");
+    const categories = await response.json();
+    console.log(categories);
+    for (const category of categories) {
+        if (category.name == "none") {
+            continue; 
+        }
+        const optionElement = document.createElement("option");
+        optionElement.textContent = category.name;
+        optionElement.value = category.id;
+        select.appendChild(optionElement);
+    }
+    document.getElementById("shop-type");
 });
 
 async function addRowCallback(shop, cells, row) {
@@ -23,15 +40,15 @@ async function addRowCallback(shop, cells, row) {
 async function onSubmitShop(event) {
     event.preventDefault();
     const shopNameElement = document.getElementById("shop-name");
-    const typeElement = document.getElementById("shop-type");
+    const categoryElement = document.getElementById("shop-type");
 
     const shopName = shopNameElement.value;
-    const shopType = typeElement.options[typeElement.selectedIndex].text;
+    const categoryId = categoryElement.options[categoryElement.selectedIndex].value;
 
     //Post it to the server
     const response = await postRequestJson("/api/shops/add", {
         shopName, 
-        shopType 
+        categoryId 
     });
 
     //If it was added succesfully then update the table
