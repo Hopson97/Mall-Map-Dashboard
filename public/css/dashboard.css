@@ -135,3 +135,31 @@ body {
 .center {
     text-align: center;
 }
+
+@media screen and (max-width: 1500px) {
+    .time p:first-child {
+        font-size: 145%;
+    }
+    
+    .time p:last-child {
+        font-size: 230%;
+    }
+
+    .title {
+        font-size: 2.5em;
+    }
+}
+
+@media screen and (max-width: 1370px) {
+    .time p:first-child {
+        font-size: 80%;
+    }
+    
+    .time p:last-child {
+        font-size: 200%;
+    }
+
+    .title {
+        font-size: 1.7em;
+    }
+}

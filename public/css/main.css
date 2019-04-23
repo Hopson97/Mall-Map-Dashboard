@@ -80,11 +80,11 @@ header nav a {
     border-left: solid white 1px;
 }
 
-header nav .left-most {
+header nav a:first-child {
     border-left: solid white 2px;
 }
 
-header nav .right-most {
+header nav a:last-child {
     border-right: solid white 2px;
 }
 

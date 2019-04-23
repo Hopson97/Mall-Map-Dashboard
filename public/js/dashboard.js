@@ -89,7 +89,7 @@ async function initCommercialPanel() {
         }
         @keyframes commercials-slideshow {
             100% {
-                transform: translateX(-${(dashboardStats.commercialCount / 2) * 100}%);
+                transform: translateX(-${(dashboardStats.commercialCount ) * 100}%);
             }
         }
         `;

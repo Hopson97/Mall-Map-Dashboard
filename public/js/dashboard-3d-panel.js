@@ -367,7 +367,7 @@ async function begin3DRenderer() {
         renderObjects(renderer, camera);
         renderer.draw(terrain, renderer.gl.LINES);
 
-        //window.requestAnimationFrame(loop);
+        window.requestAnimationFrame(loop);
     }
 };
 
