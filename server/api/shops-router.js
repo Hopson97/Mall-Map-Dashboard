@@ -3,14 +3,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const util = require('../utility');
 const shops = require("../shops");
 
 let wss;
 
 const router = express.Router();
 router.use(bodyParser.json());
-
 
 router.get("/list", getShopList);
 router.get("/get", getShopInformation);
@@ -20,7 +18,6 @@ router.post("/add", postShopInformation);
 router.delete("/remove", deleteShop);
 
 // Post Requests
-
 /**
  * Adds a shop to the list of shops, given that a shop with the name does not already exist
  * @param {express.Request} request Contain information about the shop name and type

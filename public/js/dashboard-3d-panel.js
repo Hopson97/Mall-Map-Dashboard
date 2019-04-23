@@ -206,14 +206,18 @@ class Room extends Drawable3D {
                 return;
             } else {
                 const shopInformation = await response.json();
+                const catResponse = await fetch("/api/categories/get?id=" + shopInformation.categoryId);
+                const category = await catResponse.json();
                 this.billboard = new Billboard(
                     this.roomId,
                     shopInformation.name,
-                    shopInformation.type);
-                colour = typeToColour(shopInformation.type).asNormalised().asArray();
+                    category);
+                colour = new Colour(...category.colour).asNormalised().asArray();
             }
         } else {
-            colour = typeToColour("none").asNormalised().asArray();
+            const response = await fetch("/api/categories/get?id=1");
+            const category = await response.json();
+            colour = new Colour(...category.colour).asNormalised().asArray();
             this.billboard = null;
         }
         //Loop through the 60 colours (5 faces * 4 vertex per face * 3 colour per vertex) 
@@ -250,12 +254,13 @@ class Billboard {
      * Constructs the billboard with basic info
      * @param {Number} roomId The room ID this billboard assosiates with
      * @param {String} shopName The name of the shop to display
-     * @param {String} shopType The type of the shop to display    
+     * @param {Object} category The category of the shop
+     * 
      */
-    constructor(roomId, shopName, shopType) {
+    constructor(roomId, shopName, category) {
         this.roomId = roomId
         this.shopName = shopName
-        this.shopType = shopType
+        this.category = category
     }
 }
 
@@ -295,7 +300,8 @@ class RenderableBillboard {
      * @param {Rederer} renderer The renderer to render the billboard to
      */
     draw(renderer) {
-        const length = Math.max(this.billboardData.shopName.length, this.billboardData.shopType.length);
+        const catName = this.billboardData.category.name;
+        const length = Math.max(this.billboardData.shopName.length, catName.length);
         const c = renderer.context;
         c.strokeStyle = "white";
         c.fillStyle = "black";
@@ -313,7 +319,7 @@ class RenderableBillboard {
         c.fillStyle = "white";
         c.fillText(`Room ${this.billboardData.roomId}`, this.x - 8, this.y - 24);
         c.fillText(`Shop: ${this.billboardData.shopName}`, this.x - 8, this.y - 12);
-        c.fillText(`${this.billboardData.shopType}`, this.x - 8, this.y);
+        c.fillText(`${catName}`, this.x - 8, this.y);
     }
 }
 

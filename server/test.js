@@ -9,7 +9,8 @@ const URL = 'http://localhost:8080';
 const paths = {
     shop: URL + "/api/shops",
     map: URL +"/api/map",
-    commercial: URL +"/api/commercials"
+    commercial: URL +"/api/commercials",
+    category: URL + "api/categories"
 }
 
 //Data that will be used for the testing
@@ -140,6 +141,12 @@ QUnit.test(
 
 testDeleteIsSuccess(...commercialArgs);
 testGetIsFailure(...commercialArgs);
+
+/**
+ *  ---------------------------------
+ *      Test for the category API
+ *  ---------------------------------
+ */
 
 
 /**

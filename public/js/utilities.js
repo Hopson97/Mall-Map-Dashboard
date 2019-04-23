@@ -12,8 +12,9 @@ class Colour {
         this.r = r;
         this.g = g;
         this.b = b;
+        console.log(r, g, b);
     }
-
+    
     /**
      * Converts the RGB into an array
      */
