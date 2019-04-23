@@ -12,9 +12,9 @@ const commercials = require('./commercials')
 /**
  * Tries to add a shop. Returns new shop ID, shop id of -1 on failure (eg shop with same name already exists)
  * @param {String} name The name of the shop to add
- * @param {String} type The type of shop. Must be one of "Entertainment", "Food/Drink", "Clothes"
+ * @param {Number} categoryId The id of the cateogry of shop.
  */
-function addShop(name, type) {
+function addShop(name, categoryId) {
     let shopId = -1;
     util.editJson("shops.json", shops => {
         //Check if shop with same name already exists
@@ -28,8 +28,8 @@ function addShop(name, type) {
             //Add the shop
             shops.push({
                 id: shopId,
+                categoryId,
                 name,
-                type,
                 dateAdded: util.getFormattedDate()
             });
         }

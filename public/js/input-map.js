@@ -150,21 +150,26 @@ async function initMapData() {
     const response = await fetch("api/map/shop-room-list");
     const shopRoomsList = await response.json();
 
-    console.log(shopRoomsList);
+    const catResponse = await fetch("/api/categories/get?id=1");
+    const noCategory = await catResponse.json();
 
     for (const room of mapData.rooms) {
         const index = shopRoomsList.findIndex(shopRoom => {
             return shopRoom.roomId == room.id;
-        })
+        });
+        //if the room has an assosiated store with it
         if (index > -1) {
             const response = await fetch("api/shops/get?id=" + shopRoomsList[index].shopId);
-            if (response.status === 404) {
-
-            } else {
+            if (response.status !== 404)  {
                 const info = await response.json();
+                const catResponse = await fetch("/api/categories/get?id=" + info.categoryId);
+                const category = await catResponse.json();
                 room.name = info.name;
-                room.type = info.type;
+                room.category = category;
             }
+        }
+        else {
+            room.category = noCategory;
         }
     }
 }
@@ -202,7 +207,7 @@ function loop(canvas, context) {
             if (selectedshop.id == room.id) {
                 context.fillStyle = "lime";
             } else {
-                context.fillStyle = typeToColour(room.type).asCSSString();
+                context.fillStyle = new Colour(...room.category.colour).asCSSString();
 
             }
             renderer.renderRect(
@@ -212,7 +217,7 @@ function loop(canvas, context) {
                 room.depth);
             
             context.fillStyle = "black";
-            if (room.type != "none") {
+            if (room.category.id != 1) {
                 renderer.renderText(
                     room.name, 
                     room.x + room.width / 2, 
@@ -242,7 +247,6 @@ function handleInput() {
     } else if (keydown["d"] || buttonPressed.right) {
         offsetX -= PAN_SPEED;
     }
-    console.log(scaleFactor);
     //Prevent out of bounds of world
     offsetX = Math.min(offsetX, mapData.width - 10);
     offsetX = Math.max(offsetX, -mapData.bounds.maxX + 10);
@@ -260,7 +264,6 @@ function handleCanvasClick(event) {
     //Convert the browser coordinates to canvas/world coordinates
     const x = (event.clientX - event.target.offsetLeft - offsetX);
     const y = (event.clientY - event.target.offsetTop - offsetY);
-    console.log(x + " " + y);
     for (const room of mapData.rooms) {
         if (x > room.x / scaleFactor &&
             x < room.x / scaleFactor + room.width / scaleFactor &&
@@ -317,14 +320,20 @@ async function buildshopDOM() {
     const shopListSect = document.getElementById("shop-list-section");
     const response = await fetch("/api/shops/list");
     const json = await response.json();
+    
+
 
     for (const shop of json) {
+
+        const response = await fetch("/api/categories/get?id=" + shop.categoryId);
+        const categoryInfo = await response.json();
+
         const clone = document.importNode(shopListSect.content, true);
         const container = clone.querySelector("div");
         const contentElements = clone.querySelectorAll('p');
 
         contentElements[0].textContent = shop.name;
-        contentElements[2].textContent = shop.type;
+        contentElements[2].textContent = categoryInfo.name;
 
         //Listens for the click event on the buttons
         container.addEventListener("click", async () => {
@@ -333,7 +342,8 @@ async function buildshopDOM() {
                 shopId: shop.id
             });
             if (response.status === 201) {
-                selectedshop.type = shop.type;
+                selectedshop.name = shop.name;
+                selectedshop.category = categoryInfo;
                 selectedshop = -1;
                 const popup = document.getElementById("popup");
                 popup.classList.add("hidden");

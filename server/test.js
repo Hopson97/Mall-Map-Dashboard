@@ -9,7 +9,8 @@ const URL = 'http://localhost:8080';
 const paths = {
     shop: URL + "/api/shops",
     map: URL +"/api/map",
-    commercial: URL +"/api/commercials"
+    commercial: URL +"/api/commercials",
+    category: URL + "api/categories"
 }
 
 //Data that will be used for the testing
@@ -20,7 +21,7 @@ const testData = {
         item: {
             //Obfuscated shop name as to not conflict with existing shops
             shopName: ",mnbhjxnjufchvruf-0987890p;.auhvwahcf",
-            shopType: "Food/Drink"
+            categoryId: 2
         }
     },
     commercial: {
@@ -97,7 +98,7 @@ QUnit.test(
         const json = await respone.json();
         assert.deepEqual({
             shopName: json.name,
-            shopType: json.type
+            categoryId: json.categoryId
         },
         testData.shop.item,
         "The response should return the shop that was just posted");
@@ -140,6 +141,12 @@ QUnit.test(
 
 testDeleteIsSuccess(...commercialArgs);
 testGetIsFailure(...commercialArgs);
+
+/**
+ *  ---------------------------------
+ *      Test for the category API
+ *  ---------------------------------
+ */
 
 
 /**

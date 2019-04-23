@@ -1,0 +1,21 @@
+[{
+        "id": 1,
+        "name": "none",
+        "colour": [50, 50, 50]
+    },
+    {
+        "id": 2,
+        "name": "Entertainment",
+        "colour": [128, 0, 128]
+    },
+    {
+        "id": 3,
+        "name": "Food/Drink",
+        "colour": [0, 128, 100]
+    },
+    {
+        "id": 4,
+        "name": "Clothes",
+        "colour": [250, 100, 75]
+    }
+]
