@@ -18,5 +18,49 @@
     {
         "roomId": 20,
         "shopId": 3
+    },
+    {
+        "roomId": 24,
+        "shopId": 2
+    },
+    {
+        "roomId": 11,
+        "shopId": 3
+    },
+    {
+        "roomId": 19,
+        "shopId": 4
+    },
+    {
+        "roomId": 8,
+        "shopId": 4
+    },
+    {
+        "roomId": 7,
+        "shopId": 3
+    },
+    {
+        "roomId": 5,
+        "shopId": 4
+    },
+    {
+        "roomId": 5,
+        "shopId": 4
+    },
+    {
+        "roomId": 5,
+        "shopId": 4
+    },
+    {
+        "roomId": 17,
+        "shopId": 2
+    },
+    {
+        "roomId": 25,
+        "shopId": 1
+    },
+    {
+        "roomId": 26,
+        "shopId": 2
     }
 ]

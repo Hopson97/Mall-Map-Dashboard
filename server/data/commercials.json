@@ -14,13 +14,6 @@
         "dateAdded": "22/3/2019"
     },
     {
-        "id": 4,
-        "shopId": "3",
-        "title": "Jumpers are now 20% off!",
-        "body": "It is cold cold cold in cold Britannia, thus we now offer 20% off all jumpers when you spend £50 or more!",
-        "dateAdded": "22/3/2019"
-    },
-    {
         "id": 5,
         "shopId": "2",
         "title": "4 for 3 ",
@@ -33,5 +26,12 @@
         "title": "Nintendo Switch",
         "body": "The Nintendo switch has been released, now available at GAME for the low low cost of £250!",
         "dateAdded": "22/3/2019"
+    },
+    {
+        "id": 7,
+        "shopId": "4",
+        "title": "Pizza hut now open!",
+        "body": "Head over to the north of the mall to feast your teeth on crunchy crusty chewy pizza pies!\n",
+        "dateAdded": "23/3/2019"
     }
 ]
