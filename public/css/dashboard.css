@@ -48,10 +48,10 @@ body {
 
 /*
 =====================================
-    Announcements
+    Legend
 =====================================
 */
-.announcement-container {
+.legend-container {
     flex: 1;
     background: #05668D;
     overflow: auto; 
@@ -77,7 +77,7 @@ body {
 
 /*
 =====================================
-    commercials. Has to be "commercial" because of adblock
+    commercials
 =====================================
 */
 .commercials-container {

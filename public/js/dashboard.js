@@ -8,10 +8,12 @@ window.addEventListener("load", async e => {
     //Setup the websocket
     const socket = new WebSocket("ws://localhost:8080");
     socket.addEventListener("message", handleMessage);
-    
+
     await initCommercialPanel();
+    await initLegendPanel();
     await begin3DRenderer();
 });
+
 
 /**
  * Handles incoming messages from web socket
@@ -46,6 +48,11 @@ async function handleMessage(event) {
     }
 }
 
+/*
+=====================================
+    Commercial Panel
+=====================================
+*/
 async function addCommerical(commercial) {
     const commercials = document.getElementById("commercial-panel");
     const temp = document.getElementById("commercial-template");
@@ -53,7 +60,7 @@ async function addCommerical(commercial) {
 
     const response = await fetch("/api/shops/get?id=" + commercial.shopId);
     const shopInfo = await response.json();
-    
+
     clone.querySelector('h1').textContent = shopInfo.name;
     clone.querySelector('h2').textContent = commercial.title;
     clone.querySelector('h2').textContent = commercial.title;
@@ -82,8 +89,8 @@ async function initCommercialPanel() {
     if (dashboardStats.commercialCount > 4) {
         addCommericals(commercialList);
         //Set up the scrolling animation times and speed based on number of elements added
-        document.getElementById("keyframe").textContent = 
-        `
+        document.getElementById("keyframe").textContent =
+            `
         .commercials-container .commercial {
             animation: commercials-slideshow ${10 + dashboardStats.commercialCount * 2.5}s linear infinite;
         }
@@ -94,10 +101,53 @@ async function initCommercialPanel() {
         }
         `;
         console.log("Animation set up");
-    }
-    else {
+    } else {
         //No animation needed for 4 or less adverts
-        document.getElementById("keyframe").textContent = 
-        `@keyframes commercials-slideshow {}`
+        document.getElementById("keyframe").textContent =
+            `@keyframes commercials-slideshow {}`
     }
+}
+
+/*
+=====================================
+    Legnd/Title panel
+=====================================
+*/
+
+async function initLegendPanel() {
+    updateTime();
+    setInterval(updateTime, 20000); //Thrice a minute
+
+    //Legend
+}
+
+
+/**
+ * Updates the time display 
+ */
+function updateTime() {
+    const days = [
+        "Monday", "Tuesday", "Wednessday", "Thursday", "Friday",
+        "Saturday", "Sunday"
+    ];
+    const months = [
+        "January", "February", "March", "April", 
+        "May", "June", "July", "August", "September", 
+        "October", "November",  "December"
+    ]
+
+    const dateElement = document.getElementById("date");
+    const timeElement = document.getElementById("time");
+
+    const date = new Date();
+    const day = date.getDay();
+    const dayN = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+
+    const hour = date.getHours();
+    const mins = date.getMinutes();
+
+    dateElement.textContent = `${days[day]} ${dayN} ${months[month]} ${year}`;
+    timeElement.textContent = `${hour}:${mins < 10 ? "0" + mins : mins}`;
 }
