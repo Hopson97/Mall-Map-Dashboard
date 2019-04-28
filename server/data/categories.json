@@ -1,21 +1,36 @@
 [{
         "id": 1,
-        "name": "none",
+        "name": "None",
         "colour": [50, 50, 50]
     },
     {
         "id": 2,
+        "name": "Toy",
+        "colour": [76, 167, 204]
+    },
+    {
+        "id": 3,
         "name": "Entertainment",
         "colour": [128, 0, 128]
     },
     {
-        "id": 3,
+        "id": 4,
         "name": "Food/Drink",
         "colour": [0, 128, 100]
     },
     {
-        "id": 4,
+        "id": 5,
+        "name": "Restaurant",
+        "colour": [250, 25, 75]
+    },
+    {
+        "id": 6,
         "name": "Clothes",
         "colour": [250, 100, 75]
+    },
+    {
+        "id": 7,
+        "name": "Miscellaneous",
+        "colour": [230, 230, 75]
     }
 ]

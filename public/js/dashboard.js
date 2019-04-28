@@ -114,11 +114,21 @@ async function initCommercialPanel() {
 =====================================
 */
 
+/**
+ * Inits the legend/title panel (left side)
+ */
 async function initLegendPanel() {
     updateTime();
-    setInterval(updateTime, 20000); //Thrice a minute
 
-    //Legend
+    //Updates the time every 15s (4 times minute)
+    setInterval(updateTime, 15000);
+
+    populateTable("/api/categories/list", null, (item, cells) => {
+        cells[0].style.background = new Colour(...item.colour).asCSSString();
+        cells[1].textContent = item.name;
+    });
+
+
 }
 
 

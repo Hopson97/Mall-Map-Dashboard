@@ -2,25 +2,31 @@
     {
         "id": 1,
         "name": "Game",
-        "categoryId": 2,
+        "categoryId": 3,
         "dateAdded": "21/02/19"
     },
     {
         "id": 2,
         "name": "Greggs",
-        "categoryId": 3,
+        "categoryId": 4,
         "dateAdded": "21/03/19"
     },
     {
         "id": 3,
         "name": "Next",
-        "categoryId": 4,
+        "categoryId": 6,
         "dateAdded": "21/04/19"
     },
     {
         "id": 4,
-        "categoryId": "3",
+        "categoryId": "5",
         "name": "Pizza Hut",
         "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 5,
+        "categoryId": "2",
+        "name": "Javid Co",
+        "dateAdded": "27/3/2019"
     }
 ]

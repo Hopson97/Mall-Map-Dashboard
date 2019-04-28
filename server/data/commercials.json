@@ -33,5 +33,12 @@
         "title": "Pizza hut now open!",
         "body": "Head over to the north of the mall to feast your teeth on crunchy crusty chewy pizza pies!\n",
         "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 8,
+        "shopId": "5",
+        "title": "Javid mech half price",
+        "body": "WOO",
+        "dateAdded": "27/3/2019"
     }
 ]

@@ -97,17 +97,18 @@ async function addTableRow(item, deleteUrl, callback) {
     await callback(item, cells, rowClone);
 
     //Handle the row being deleted
-    const deleteButton = rowClone.querySelector("img");
-    deleteButton.addEventListener("click", async () => {
-        deleteRequestJson(deleteUrl, {
-            id: item.id
+    if (deleteUrl) {
+        const deleteButton = rowClone.querySelector("img");
+        deleteButton.addEventListener("click", async () => {
+            deleteRequestJson(deleteUrl, {
+                id: item.id
+            });
+            //Remove row from table
+            const row = deleteButton.parentNode.parentNode;
+            const table = row.parentNode;
+            table.removeChild(row);
         });
-        //Remove row from table
-        const row = deleteButton.parentNode.parentNode;
-        const table = row.parentNode;
-        table.removeChild(row);
-    });
-
+    }
     table.appendChild(rowClone);
 }
 

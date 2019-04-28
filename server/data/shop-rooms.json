@@ -70,5 +70,21 @@
     {
         "roomId": 19,
         "shopId": 2
+    },
+    {
+        "roomId": 1,
+        "shopId": 5
+    },
+    {
+        "roomId": 4,
+        "shopId": 5
+    },
+    {
+        "roomId": 27,
+        "shopId": 5
+    },
+    {
+        "roomId": 13,
+        "shopId": 5
     }
 ]

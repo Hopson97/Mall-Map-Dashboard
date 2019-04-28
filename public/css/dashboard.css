@@ -75,6 +75,35 @@ body {
     font-size: 250%;
 }
 
+.legend {
+    width: 95%;
+    margin: auto;
+    margin-top: 1%;
+}
+
+table {
+    width: 65%;
+    margin: auto;
+    border-bottom: solid white;
+}
+
+th {
+    border-bottom: solid white;
+    text-align: center;
+}
+
+th,
+td {
+    padding: 5px;
+    margin: 15px;
+}
+
+table .colour {
+    background: red;
+    border: solid white;
+}
+
+
 /*
 =====================================
     commercials
@@ -125,15 +154,12 @@ body {
     font-size: 3em;
     text-align: center;
 }
-
-/*
-=====================================
-    General classes
-=====================================
-*/
-
 .center {
     text-align: center;
+}
+
+.left {
+    text-align: left;
 }
 
 @media screen and (max-width: 1500px) {
@@ -161,5 +187,11 @@ body {
 
     .title {
         font-size: 1.7em;
+    }
+
+    table {
+        width: 95%;
+        margin: auto;
+        margin-bottom: 20px;
     }
 }
