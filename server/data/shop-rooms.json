@@ -1,90 +1,14 @@
 [
     {
-        "roomId": 18,
-        "shopId": 1
-    },
-    {
-        "roomId": 15,
-        "shopId": 3
-    },
-    {
-        "roomId": 23,
-        "shopId": 3
-    },
-    {
-        "roomId": 18,
-        "shopId": 4
-    },
-    {
-        "roomId": 20,
-        "shopId": 3
-    },
-    {
-        "roomId": 24,
+        "roomId": 10,
         "shopId": 2
-    },
-    {
-        "roomId": 11,
-        "shopId": 3
-    },
-    {
-        "roomId": 19,
-        "shopId": 4
-    },
-    {
-        "roomId": 8,
-        "shopId": 4
-    },
-    {
-        "roomId": 7,
-        "shopId": 3
-    },
-    {
-        "roomId": 5,
-        "shopId": 4
-    },
-    {
-        "roomId": 5,
-        "shopId": 4
-    },
-    {
-        "roomId": 5,
-        "shopId": 4
     },
     {
         "roomId": 17,
-        "shopId": 2
+        "shopId": 3
     },
     {
-        "roomId": 25,
+        "roomId": 11,
         "shopId": 1
-    },
-    {
-        "roomId": 26,
-        "shopId": 2
-    },
-    {
-        "roomId": 2,
-        "shopId": 2
-    },
-    {
-        "roomId": 19,
-        "shopId": 2
-    },
-    {
-        "roomId": 1,
-        "shopId": 5
-    },
-    {
-        "roomId": 4,
-        "shopId": 5
-    },
-    {
-        "roomId": 27,
-        "shopId": 5
-    },
-    {
-        "roomId": 13,
-        "shopId": 5
     }
 ]

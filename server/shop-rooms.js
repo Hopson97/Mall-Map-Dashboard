@@ -20,12 +20,20 @@ const fs = require('fs');
  * @param {Number} shopId The shop ID
  */
 function addShopRoom(roomId, shopId) {
-    util.editJson("shop-rooms.json", shopRooms =>
+    util.editJson("shop-rooms.json", shopRooms => {
+        //If the room already has a shop, remove it
+        const index = shopRooms.findIndex(
+            shopRoom => shopRoom.roomId == roomId
+        );
+        if (index >= 0) {
+            shopRooms.splice(index, 1);
+        }
+
         shopRooms.push({
             roomId,
-            shopId: shopId
+            shopId
         })
-    );
+    });
 }
 
 /**
@@ -34,7 +42,7 @@ function addShopRoom(roomId, shopId) {
  */
 function tryDeleteShopRoomByRoomId(roomId) {
     let found = false;
-    util.editJson("shop-rooms.json", shopRooms =>{
+    util.editJson("shop-rooms.json", shopRooms => {
         while (true) {
             const index = shopRooms.findIndex(
                 shopRoom => shopRoom.roomId == roomId
@@ -56,7 +64,7 @@ function tryDeleteShopRoomByRoomId(roomId) {
  */
 function tryDeleteShopRoomByShopId(shopId) {
     let found = false;
-    util.editJson("shop-rooms.json", shopRooms =>{
+    util.editJson("shop-rooms.json", shopRooms => {
         while (true) {
             const index = shopRooms.findIndex(
                 shopRoom => shopRoom.shopId == shopId

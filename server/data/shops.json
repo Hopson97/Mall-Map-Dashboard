@@ -22,11 +22,5 @@
         "categoryId": "5",
         "name": "Pizza Hut",
         "dateAdded": "23/3/2019"
-    },
-    {
-        "id": 5,
-        "categoryId": "2",
-        "name": "Javid Co",
-        "dateAdded": "27/3/2019"
     }
 ]
