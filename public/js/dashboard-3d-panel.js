@@ -52,7 +52,7 @@ class Renderer {
         //Initilise the context
         this.context.fillStyle = "white";
         this.context.lineWidth = 3;
-        this.context.font = `bold 12px monospace`;
+        this.context.font = `bold 1rem monospace`;
     }
 
     /**
@@ -310,8 +310,8 @@ class RenderableBillboard {
         c.lineTo(this.x + 10, this.y + 10);
         c.lineTo(this.x - 10, this.y + 5);
         c.lineTo(this.x - 10, this.y - 35);
-        c.lineTo(this.x + length * 10, this.y - 35);
-        c.lineTo(this.x + length * 10, this.y + 5);
+        c.lineTo(this.x + length * 12, this.y - 35);
+        c.lineTo(this.x + length * 12, this.y + 5);
         c.lineTo(this.x + 35, this.y + 10);
         c.lineTo(this.x + 25, this.y + 25);
         c.stroke();

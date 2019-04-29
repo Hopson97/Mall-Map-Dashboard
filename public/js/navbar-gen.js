@@ -20,6 +20,5 @@ window.addEventListener("load", e => {
     addButton("Map Editor", 'input-map', 'img/nav-map.png');
     addButton("Shop Editor", 'input-shops', 'img/nav-shop.png');
     addButton("Commercial Edtior", 'input-commercials', 'img/nav-commercial.png');
-    addButton("Announcement Editor", 'input-announcements', 'img/nav-map.png');
     addButton("View Dashboard", 'dashboard', 'img/nav-dashboard.png');
 });

@@ -10,5 +10,41 @@
     {
         "roomId": 11,
         "shopId": 1
+    },
+    {
+        "roomId": 24,
+        "shopId": 4
+    },
+    {
+        "roomId": 18,
+        "shopId": 4
+    },
+    {
+        "roomId": 3,
+        "shopId": 3
+    },
+    {
+        "roomId": 2,
+        "shopId": 1
+    },
+    {
+        "roomId": 12,
+        "shopId": 2
+    },
+    {
+        "roomId": 19,
+        "shopId": 2
+    },
+    {
+        "roomId": 15,
+        "shopId": 4
+    },
+    {
+        "roomId": 21,
+        "shopId": 3
+    },
+    {
+        "roomId": 20,
+        "shopId": 1
     }
 ]

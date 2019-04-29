@@ -133,6 +133,11 @@ window.addEventListener("load", async () => {
     document.getElementById("btn-zoom-out")
         .addEventListener("click", handleZoomOutClick);
 
+    document.getElementById("click-off-popup")
+    .addEventListener("click", () => {
+        popup.classList.add("hidden");
+    });
+
     //Build various DOM sections and initilize some data
     buildshopDOM();
     await initMapData();
