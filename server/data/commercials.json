@@ -26,5 +26,19 @@
         "title": "Pizza hut now open!",
         "body": "Head over to the north of the mall to feast your teeth on crunchy crusty chewy pizza pies!\n",
         "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 8,
+        "shopId": "3",
+        "title": "50% off t shirts",
+        "body": "limited time only!!!!!!!!!!!!!!",
+        "dateAdded": "1/4/2019"
+    },
+    {
+        "id": 9,
+        "shopId": "5",
+        "title": "papa",
+        "body": "papapa pizza",
+        "dateAdded": "2/4/2019"
     }
 ]

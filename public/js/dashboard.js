@@ -90,7 +90,7 @@ async function initCommercialPanel() {
         addCommericals(commercialList);
         //Set up the scrolling animation times and speed based on number of elements added
         document.getElementById("keyframe").textContent =
-            `
+        `
         .commercials-container .commercial {
             animation: commercials-slideshow ${10 + dashboardStats.commercialCount * 2.5}s linear infinite;
         }
