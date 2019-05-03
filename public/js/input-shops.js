@@ -1,8 +1,9 @@
 "use strict"
 
+import * as lib from './lib.js';
 
 window.addEventListener("load", async () => {
-    await populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
+    await lib.populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
     document.getElementById("add-store-form")
         .addEventListener("submit", onSubmitShop);
 

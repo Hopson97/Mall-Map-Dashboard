@@ -7,7 +7,7 @@
 /**
  * Represents a RGB colour value
  */
-class Colour {
+export class Colour {
     constructor(r, g, b) {
         this.r = r;
         this.g = g;
@@ -44,7 +44,7 @@ class Colour {
 /**
  * Gets the width of the browser's inner window 
  */
-function getBrowserWidth() {
+export function getBrowserWidth() {
     return Math.max(
         document.body.scrollWidth,
         document.documentElement.scrollWidth,
@@ -57,7 +57,7 @@ function getBrowserWidth() {
 /**
  * Gets the height of the browser's inner window 
  */
-function getBrowserHeight() {
+export function getBrowserHeight() {
     return Math.max(
         document.body.scrollHeight,
         document.documentElement.scrollHeight,
@@ -73,7 +73,7 @@ function getBrowserHeight() {
  * @param {String} listUrl The URL where a list of item can be recieved via GET
  * @param {Function} callback The function to call to update table (item, tableCells, rowTemplateClone)
  */
-async function populateTable(listUrl, deleteUrl, callback) {
+export async function populateTable(listUrl, deleteUrl, callback) {
     //Get list of something from server
     const response = await fetch(listUrl);
     const list = await response.json();
@@ -117,7 +117,7 @@ async function addTableRow(item, deleteUrl, callback) {
  * @param {String} url The ulr of the post request
  * @param {Object} json The object to send to the post reuquest location    
  */
-async function postRequestJson(url, json) {
+export async function postRequestJson(url, json) {
     const response = await fetch(url, {
         method: "post",
         headers: {
@@ -133,7 +133,7 @@ async function postRequestJson(url, json) {
  * @param {String} url The ulr of the delete request
  * @param {Object} json The object to send to the post reuquest location    
  */
-async function deleteRequestJson(url, json) {
+export async function deleteRequestJson(url, json) {
     const response = await fetch(url, {
         method: "delete",
         headers: {
@@ -148,7 +148,7 @@ async function deleteRequestJson(url, json) {
  * Removes all child nodes from node
  * @param {HTMLElement} node The node to delete children from
  */
-function removeAllChildren(node) {
+export function removeAllChildren(node) {
     while (node.firstChild) {
         node.removeChild(node.firstChild);
     }
