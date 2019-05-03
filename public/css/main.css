@@ -301,10 +301,11 @@ td {
 }
 
 @media screen and (max-width: 1140px) {
-    header nav {
-        display: none;
-    }
-
+    /*
+    =====================================
+        Header selectors and classes
+    =====================================
+    */
     header .header-container {
         display: block;
         justify-content: space-evenly;
@@ -313,6 +314,63 @@ td {
         margin: auto;
     }
 
+
+    /*
+    ------------------------------------
+        Navbar selectors and classes
+    ------------------------------------
+    */
+    header nav {
+        display: none;
+    }
+    /*
+    header nav {
+        width: 80%;
+        display: flex;
+        justify-content: space-evenly;
+    }
+
+    header nav a {
+        text-decoration: none;
+        font-weight: bold;
+        color: white;
+        flex: 1;
+        padding-bottom: 5px;
+    }
+
+    header nav a {
+        transition: 1s;
+        border-right: solid white 1px;
+        border-left: solid white 1px;
+    }
+
+    header nav a:first-child {
+        border-left: solid white 2px;
+    }
+
+    header nav a:last-child {
+        border-right: solid white 2px;
+    }
+
+    header nav a:hover {
+        background-color: var(--nav-hover-colour);
+    }
+
+    .nav-button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .nav-button-container img {
+        padding: 5px;
+    }
+*/
+    /*
+    =====================================
+        Main Content
+    =====================================
+    */
 
     main .main-content {
         width: 100%;
@@ -324,12 +382,113 @@ td {
         margin: auto;
     }
 
+    main .page-title h2 {
+        text-align: left;
+    }
+    /*
+    main {
+        background-color: var(--background-colour-light);
+    }
 
+    main .page-title {
+        border-bottom: solid black;
+        padding: 2vh;
+        background-color: var(--title-bg-colour);
+    }
+
+    main .main-content {
+        min-height: 85vh;
+        width: 70%;
+        margin: auto;
+        color: black;
+        background-color: var(--background-colour-dark);
+        box-shadow: inset 0px 0px 5px 0px black;
+    }
+
+    main .content-container {
+        width: 90%;
+        margin: auto;
+        padding: 10px;
+    }
+*/
+
+    /*
+    ------------------------------------
+        Map Input Screen
+    ------------------------------------
+    */
+    .input-canvas {
+        width: 90%;
+        margin: auto;
+        border: solid var(--header-colour)
+    }
+
+    .arrows img {
+        padding: 3px;
+        margin: 2px;
+        border: 2px solid var(--header-colour);
+        border-radius: 25px;
+    }
+
+    /*
+    ===================
+    Forms
+    ===================
+    */
+    .edit-form {
+        padding: 10px;
+        border-bottom: solid black;
+    }
+
+    .edit-form > * {
+        padding: 10px;
+        width: 50%;
+        margin: auto;
+    }
+
+    .edit-form input[type=text], 
+    .edit-form select,
+    .edit-form textarea {
+        width: 100%;
+        padding: 10px;
+        border: solid black 2px;
+        border-radius: 10px;
+        background: white;
+    }
+    /*
+    ===================
+    Table
+    ===================
+    */
+    th,
+    td {
+        padding: 2px;
+    }
+/*
+    table {
+        width: 100%;
+        margin: auto;
+        border-bottom: solid black;
+        margin-bottom: 20px;
+    }
+
+    th {
+        border-bottom: solid black;
+    }
 
     th,
     td {
         text-align: center;
-        padding: 2px;
+        padding: 10px;
     }
+
+    .table-data {
+        transition: 1s;
+    }
+
+    .table-data:hover {
+        background-color: rgb(200, 200, 200);
+    }
+*/
 }
 
