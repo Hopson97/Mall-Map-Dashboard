@@ -1,7 +1,9 @@
 "use strict";
 
-import {begin3DRenderer} from './dashboard-3d-panel.js'
-import {removeAllChildren, populateTable, Colour} from './lib/lib.js'
+import {Colour}             from './lib/colour.js'
+import {removeAllChildren,  
+        populateTable}      from './lib/lib.js'
+import {begin3DRenderer}    from './dashboard-3d-panel.js'
 
 const dashboardStats = {
     commercialCount: 0

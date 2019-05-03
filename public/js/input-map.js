@@ -1,5 +1,6 @@
 "use strict"
 
+import {Colour} from './lib/colour.js'
 import * as lib from './lib/lib.js'
 
 let offsetX = -100;
@@ -215,7 +216,7 @@ function loop(canvas, context) {
             if (selectedshop.id == room.id) {
                 context.fillStyle = "lime";
             } else {
-                context.fillStyle = new lib.Colour(...room.category.colour).asCSSString();
+                context.fillStyle = new Colour(...room.category.colour).asCSSString();
 
             }
             renderer.renderRect(

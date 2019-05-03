@@ -4,6 +4,7 @@ import * as lib     from './lib/lib.js';
 import * as glMaths from './lib/webgl/webgl-maths.js';
 import * as libgl   from './lib/webgl/webgl-utilities.js';
 
+import {Colour}     from './lib/colour.js';
 import {Mesh}       from './lib/webgl/mesh.js'
 import {Shader}     from './lib/webgl/shader.js'
 import {Vector3}    from './lib/webgl/vector3.js'
@@ -220,12 +221,12 @@ class Room extends Drawable3D {
                     this.roomId,
                     shopInformation.name,
                     category);
-                colour = new lib.Colour(...category.colour).asNormalised().asArray();
+                colour = new Colour(...category.colour).asNormalised().asArray();
             }
         } else {
             const response = await fetch("/api/categories/get?id=1");
             const category = await response.json();
-            colour = new lib.Colour(...category.colour).asNormalised().asArray();
+            colour = new Colour(...category.colour).asNormalised().asArray();
             this.billboard = null;
         }
         //Loop through the 60 colours (5 faces * 4 vertex per face * 3 colour per vertex) 
@@ -560,7 +561,7 @@ function buildPathGeometry(gl, pathData) {
         path.mesh.positions.push(...geometry.positions);
         path.mesh.normals.push(...geometry.normals);
 
-        createColourIndicesData(path.mesh, new lib.Colour(1, 1, 1));
+        createColourIndicesData(path.mesh, new Colour(1, 1, 1));
 
         path.buffer(gl);
         paths.push(path);
@@ -638,7 +639,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, depth + gapSize));
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
-    createColourIndicesData(room.mesh, new lib.Colour(0.8, 0.8, 0.8));
+    createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
 
     //Do extra things if the room has an assosiated shop
     const index = roomsData.findIndex(shopRoom => {
