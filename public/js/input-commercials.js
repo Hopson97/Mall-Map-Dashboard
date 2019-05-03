@@ -1,7 +1,9 @@
 "use strict"
 
+import * as lib from './lib.js'
+
 window.addEventListener("load", async () => {
-    await populateTable("/api/commercials/list", "/api/commercials/remove", addRowCallback);
+    await lib.populateTable("/api/commercials/list", "/api/commercials/remove", addRowCallback);
     await createFormData();
     document.getElementById("add-commercial-form")
         .addEventListener("submit", onSubmitCommercial);
@@ -53,14 +55,14 @@ async function onSubmitCommercial(event) {
     const body  = bodyElement.value;
 
     //Post it to the server
-    const response = await postRequestJson("/api/commercials/add", {
+    const response = await lib.postRequestJson("/api/commercials/add", {
         shopId, title, body
     });
 
     //If it was added succesfully then update the table
     if (response.status === 201) {
         const commercial = await response.json();
-        await addTableRow(commercial, "/api/commercials/remove", addRowCallback);
+        await lib.addTableRow(commercial, "/api/commercials/remove", addRowCallback);
     }
 
 }

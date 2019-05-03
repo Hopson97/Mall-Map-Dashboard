@@ -88,7 +88,7 @@ export async function populateTable(listUrl, deleteUrl, callback) {
  * @param {The item to add to the table} item 
  * @param {Function} callback The function to call to update table (item, tableCells, rowTemplateClone)
  */
-async function addTableRow(item, deleteUrl, callback) {
+export async function addTableRow(item, deleteUrl, callback) {
     const table = document.getElementById("table");
     const rowTemplate  = document.getElementById("row");
     const rowClone = document.importNode(rowTemplate.content, true);

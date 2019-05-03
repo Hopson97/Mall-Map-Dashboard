@@ -47,7 +47,7 @@ async function onSubmitShop(event) {
     const categoryId = categoryElement.options[categoryElement.selectedIndex].value;
 
     //Post it to the server
-    const response = await postRequestJson("/api/shops/add", {
+    const response = await lib.postRequestJson("/api/shops/add", {
         shopName, 
         categoryId 
     });
@@ -56,7 +56,7 @@ async function onSubmitShop(event) {
     if (response.status === 201) {
         const shop = await response.json();
         console.log(shop);
-        await addTableRow(shop, "/api/shops/remove", addRowCallback);
+        await lib.addTableRow(shop, "/api/shops/remove", addRowCallback);
     }
 
 }

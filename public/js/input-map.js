@@ -1,5 +1,7 @@
 "use strict"
 
+import * as lib from './lib.js'
+
 let offsetX = -100;
 let offsetY = -100;
 const PAN_SPEED = 4;
@@ -89,7 +91,7 @@ window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
     const ctx = canvas.getContext("2d");
 
-    if (getBrowserWidth() < 800) {
+    if (lib.getBrowserWidth() < 800) {
         //Give larger view on mobile
         scaleFactor = 5;
         canvas.height = canvas.clientWidth;
@@ -213,7 +215,7 @@ function loop(canvas, context) {
             if (selectedshop.id == room.id) {
                 context.fillStyle = "lime";
             } else {
-                context.fillStyle = new Colour(...room.category.colour).asCSSString();
+                context.fillStyle = new lib.Colour(...room.category.colour).asCSSString();
 
             }
             renderer.renderRect(
@@ -343,7 +345,7 @@ async function buildshopDOM() {
 
         //Listens for the click event on the buttons
         container.addEventListener("click", async () => {
-            const response = await postRequestJson("api/map/add", {
+            const response = await lib.postRequestJson("api/map/add", {
                 roomId: selectedshop.id,
                 shopId: shop.id
             });
