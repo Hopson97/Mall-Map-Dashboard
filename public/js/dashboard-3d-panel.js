@@ -1,8 +1,12 @@
 "use strict";
 
-import * as lib from './lib.js';
-import * as libgl from './webgl-utilities.js';
-import * as glMaths from './webgl-maths.js'
+import * as lib     from './lib/lib.js';
+import * as glMaths from './lib/webgl/webgl-maths.js';
+import * as libgl   from './lib/webgl/webgl-utilities.js';
+
+import {Mesh}       from './lib/webgl/mesh.js'
+import {Shader}     from './lib/webgl/shader.js'
+import {Vector3}    from './lib/webgl/vector3.js'
 
 //Scale down for the geometry
 const scaleFactor = 15;
@@ -90,8 +94,8 @@ class Renderer {
 class Entity {
     /**
      * Construct the entity
-     * @param {libgl.Vector3} position The position of the entity
-     * @param {libgl.Vector3} rotation The roation of the entity
+     * @param {Vector3} position The position of the entity
+     * @param {Vector3} rotation The roation of the entity
      */
     constructor(position, rotation) {
         this.position = position;
@@ -100,7 +104,7 @@ class Entity {
 
     /**
      * Moves the entity's position by an offset
-     * @param {libgl.Vector3} offset The amount to move the entity
+     * @param {Vector3} offset The amount to move the entity
      */
     move(offset) {
         this.position.add(offset);
@@ -108,7 +112,7 @@ class Entity {
 
     /**
      * Rotates the entity by an offset
-     * @param {libgl.Vector3} rotation The amount to rotate the entity
+     * @param {Vector3} rotation The amount to rotate the entity
      */
     rotate(rotation) {
         this.rotation.add(rotation);
@@ -121,21 +125,21 @@ class Entity {
 class Camera extends Entity {
     /**
      * Construct the camera and the matrices
-     * @param {libgl.Vector3} position The position of the entity
-     * @param {libgl.Vector3} rotation The roation of the entity
+     * @param {Vector3} position The position of the entity
+     * @param {Vector3} rotation The roation of the entity
      */
     constructor(gl, position, rotation) {
         super(position, rotation);
         this.projectionMatrix = glMaths.createProjectionMatrix(90, gl);
         this.viewMatrix = mat4.create();
         this.projectionViewMatrix = mat4.create();
-        this.update(new libgl.Vector3(), new libgl.Vector3());
+        this.update(new Vector3(), new Vector3());
     }
 
     /**
      * Moves the entity's position by an offset
-     * @param {libgl.Vector3} offset The amount to move the entity
-     * @param {libgl.Vector3} rotation The amount to rotate the entity
+     * @param {Vector3} offset The amount to move the entity
+     * @param {Vector3} rotation The amount to rotate the entity
      */
     update(offset, rotation) {
         //Move and rotate camera
@@ -159,7 +163,7 @@ class Drawable3D {
         this.vao = 0;
         this.indicesCount = 0
         this.bufferList = []
-        this.mesh = new libgl.Mesh();
+        this.mesh = new Mesh();
     }
 
     buffer(gl) {
@@ -280,8 +284,8 @@ class RenderableBillboard {
      */
     constructor(renderer, camera, room) {
         const modelMatrix = glMaths.createModelMatrix(
-            new libgl.Vector3(0, 0, 0),
-            new libgl.Vector3(room.centerX, 3, room.centerZ)
+            new Vector3(0, 0, 0),
+            new Vector3(room.centerX, 3, room.centerZ)
         );
         const transform = mat4.create();
         mat4.mul(transform, camera.projectionViewMatrix, modelMatrix);
@@ -339,12 +343,12 @@ class RenderableBillboard {
 let objects;
 export async function begin3DRenderer() {
     const renderer = new Renderer();
-    const camera = new Camera(renderer.gl, new libgl.Vector3(65, 25, 140), new libgl.Vector3(50, 0, 0))
+    const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
 
-    const modelMatrix = glMaths.createModelMatrix(new libgl.Vector3(0, 0, 0), new libgl.Vector3(0, -1, 0));
+    const modelMatrix = glMaths.createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0));
 
     //Create shader for rendering the map
-    const mapShader = new libgl.Shader(renderer.gl, shaders.mapVertex, shaders.mapFragment);
+    const mapShader = new Shader(renderer.gl, shaders.mapVertex, shaders.mapFragment);
     mapShader.use(renderer.gl);
     mapShader.loadUniformMatrix4(renderer.gl, "modelMatrix", modelMatrix);
 
@@ -363,11 +367,11 @@ export async function begin3DRenderer() {
         //Orbit the camera around the map of the mall
         const speed = 0.065;
         camera.update(
-            new libgl.Vector3(
+            new Vector3(
                 -Math.cos(glMaths.toRadians(camera.rotation.y)) * speed,
                 0,
                 -Math.sin(glMaths.toRadians(camera.rotation.y)) * speed),
-            new libgl.Vector3(0, 0.05, 0)
+            new Vector3(0, 0.05, 0)
         );
 
         //Load uniform variables to shader

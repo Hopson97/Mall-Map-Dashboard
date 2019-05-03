@@ -1,6 +1,6 @@
 "use strict"
 
-import * as lib from './lib.js';
+import * as lib from './lib/lib.js';
 
 window.addEventListener("load", async () => {
     await lib.populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
