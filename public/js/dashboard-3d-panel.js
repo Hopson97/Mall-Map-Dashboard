@@ -1,5 +1,9 @@
 "use strict";
 
+import * as lib from './lib.js';
+import * as libgl from './webgl-utilities.js';
+import * as glMaths from './webgl-maths.js'
+
 //Scale down for the geometry
 const scaleFactor = 15;
 
@@ -34,8 +38,8 @@ class Renderer {
         this.context = canvas2D.getContext("2d");
 
         //Set canvas size
-        canvas3D.width = getBrowserWidth() * 0.80;
-        canvas3D.height = getBrowserHeight() * 0.75;
+        canvas3D.width = lib.getBrowserWidth() * 0.80;
+        canvas3D.height = lib.getBrowserHeight() * 0.75;
         canvas2D.width = canvas3D.clientWidth;
         canvas2D.height = canvas3D.clientHeight;
         this.width = canvas3D.width;
@@ -86,8 +90,8 @@ class Renderer {
 class Entity {
     /**
      * Construct the entity
-     * @param {Vector3} position The position of the entity
-     * @param {Vector3} rotation The roation of the entity
+     * @param {libgl.Vector3} position The position of the entity
+     * @param {libgl.Vector3} rotation The roation of the entity
      */
     constructor(position, rotation) {
         this.position = position;
@@ -96,7 +100,7 @@ class Entity {
 
     /**
      * Moves the entity's position by an offset
-     * @param {Vector3} offset The amount to move the entity
+     * @param {libgl.Vector3} offset The amount to move the entity
      */
     move(offset) {
         this.position.add(offset);
@@ -104,7 +108,7 @@ class Entity {
 
     /**
      * Rotates the entity by an offset
-     * @param {Vector3} rotation The amount to rotate the entity
+     * @param {libgl.Vector3} rotation The amount to rotate the entity
      */
     rotate(rotation) {
         this.rotation.add(rotation);
@@ -117,21 +121,21 @@ class Entity {
 class Camera extends Entity {
     /**
      * Construct the camera and the matrices
-     * @param {Vector3} position The position of the entity
-     * @param {Vector3} rotation The roation of the entity
+     * @param {libgl.Vector3} position The position of the entity
+     * @param {libgl.Vector3} rotation The roation of the entity
      */
     constructor(gl, position, rotation) {
         super(position, rotation);
-        this.projectionMatrix = createProjectionMatrix(90, gl);
+        this.projectionMatrix = glMaths.createProjectionMatrix(90, gl);
         this.viewMatrix = mat4.create();
         this.projectionViewMatrix = mat4.create();
-        this.update(new Vector3(), new Vector3());
+        this.update(new libgl.Vector3(), new libgl.Vector3());
     }
 
     /**
      * Moves the entity's position by an offset
-     * @param {Vector3} offset The amount to move the entity
-     * @param {Vector3} rotation The amount to rotate the entity
+     * @param {libgl.Vector3} offset The amount to move the entity
+     * @param {libgl.Vector3} rotation The amount to rotate the entity
      */
     update(offset, rotation) {
         //Move and rotate camera
@@ -139,7 +143,7 @@ class Camera extends Entity {
         super.rotate(rotation);
 
         //Reset matrices
-        this.viewMatrix = createViewMatrix(this.rotation, this.position);
+        this.viewMatrix = glMaths.createViewMatrix(this.rotation, this.position);
         mat4.multiply(
             this.projectionViewMatrix,
             this.projectionMatrix,
@@ -155,7 +159,7 @@ class Drawable3D {
         this.vao = 0;
         this.indicesCount = 0
         this.bufferList = []
-        this.mesh = new Mesh();
+        this.mesh = new libgl.Mesh();
     }
 
     buffer(gl) {
@@ -212,12 +216,12 @@ class Room extends Drawable3D {
                     this.roomId,
                     shopInformation.name,
                     category);
-                colour = new Colour(...category.colour).asNormalised().asArray();
+                colour = new lib.Colour(...category.colour).asNormalised().asArray();
             }
         } else {
             const response = await fetch("/api/categories/get?id=1");
             const category = await response.json();
-            colour = new Colour(...category.colour).asNormalised().asArray();
+            colour = new lib.Colour(...category.colour).asNormalised().asArray();
             this.billboard = null;
         }
         //Loop through the 60 colours (5 faces * 4 vertex per face * 3 colour per vertex) 
@@ -275,9 +279,9 @@ class RenderableBillboard {
      * @param {Room} room The room the billboard is displayed above
      */
     constructor(renderer, camera, room) {
-        const modelMatrix = createModelMatrix(
-            new Vector3(0, 0, 0),
-            new Vector3(room.centerX, 3, room.centerZ)
+        const modelMatrix = glMaths.createModelMatrix(
+            new libgl.Vector3(0, 0, 0),
+            new libgl.Vector3(room.centerX, 3, room.centerZ)
         );
         const transform = mat4.create();
         mat4.mul(transform, camera.projectionViewMatrix, modelMatrix);
@@ -333,14 +337,14 @@ class RenderableBillboard {
  * 
  */
 let objects;
-async function begin3DRenderer() {
+export async function begin3DRenderer() {
     const renderer = new Renderer();
-    const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
+    const camera = new Camera(renderer.gl, new libgl.Vector3(65, 25, 140), new libgl.Vector3(50, 0, 0))
 
-    const modelMatrix = createModelMatrix(new Vector3(0, 0, 0), new Vector3(0, -1, 0));
+    const modelMatrix = glMaths.createModelMatrix(new libgl.Vector3(0, 0, 0), new libgl.Vector3(0, -1, 0));
 
     //Create shader for rendering the map
-    const mapShader = new Shader(renderer.gl, shaders.mapVertex, shaders.mapFragment);
+    const mapShader = new libgl.Shader(renderer.gl, shaders.mapVertex, shaders.mapFragment);
     mapShader.use(renderer.gl);
     mapShader.loadUniformMatrix4(renderer.gl, "modelMatrix", modelMatrix);
 
@@ -359,11 +363,11 @@ async function begin3DRenderer() {
         //Orbit the camera around the map of the mall
         const speed = 0.065;
         camera.update(
-            new Vector3(
-                -Math.cos(toRadians(camera.rotation.y)) * speed,
+            new libgl.Vector3(
+                -Math.cos(glMaths.toRadians(camera.rotation.y)) * speed,
                 0,
-                -Math.sin(toRadians(camera.rotation.y)) * speed),
-            new Vector3(0, 0.05, 0)
+                -Math.sin(glMaths.toRadians(camera.rotation.y)) * speed),
+            new libgl.Vector3(0, 0.05, 0)
         );
 
         //Load uniform variables to shader
@@ -552,7 +556,7 @@ function buildPathGeometry(gl, pathData) {
         path.mesh.positions.push(...geometry.positions);
         path.mesh.normals.push(...geometry.normals);
 
-        createColourIndicesData(path.mesh, new Colour(1, 1, 1));
+        createColourIndicesData(path.mesh, new lib.Colour(1, 1, 1));
 
         path.buffer(gl);
         paths.push(path);
@@ -630,7 +634,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, depth + gapSize));
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
-    createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
+    createColourIndicesData(room.mesh, new lib.Colour(0.8, 0.8, 0.8));
 
     //Do extra things if the room has an assosiated shop
     const index = roomsData.findIndex(shopRoom => {
