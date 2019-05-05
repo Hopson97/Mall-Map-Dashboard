@@ -1,11 +1,5 @@
 [
     {
-        "id": 1,
-        "name": "Game",
-        "categoryId": 3,
-        "dateAdded": "21/02/19"
-    },
-    {
         "id": 2,
         "name": "Greggs",
         "categoryId": 4,
@@ -22,5 +16,17 @@
         "categoryId": "5",
         "name": "Pizza Hut",
         "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 5,
+        "categoryId": "3",
+        "name": "Game",
+        "dateAdded": "5/4/2019"
+    },
+    {
+        "id": 6,
+        "categoryId": "7",
+        "name": "Tesco",
+        "dateAdded": "5/4/2019"
     }
 ]

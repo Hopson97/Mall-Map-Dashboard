@@ -308,7 +308,7 @@ td {
     }
 }
 
-@media screen and (max-width: 1140px) {
+@media screen and (max-width: 900px) {
     /*
     =====================================
         Header selectors and classes

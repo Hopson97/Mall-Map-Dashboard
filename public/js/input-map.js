@@ -92,7 +92,7 @@ window.addEventListener("load", async () => {
     const canvas = document.getElementById("map-canvas");
     const ctx = canvas.getContext("2d");
 
-    if (lib.getBrowserWidth() < 800) {
+    if (lib.getBrowserWidth() < 900) {
         //Give larger view on mobile
         scaleFactor = 5;
         canvas.height = canvas.clientWidth;

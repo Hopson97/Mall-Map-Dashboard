@@ -7,20 +7,6 @@
         "dateAdded": "22/3/2019"
     },
     {
-        "id": 2,
-        "shopId": "1",
-        "title": "Special Offer on XBOX!",
-        "body": "Today only, buy 50 Xbox's and get your 51st one free!",
-        "dateAdded": "22/3/2019"
-    },
-    {
-        "id": 6,
-        "shopId": "1",
-        "title": "Nintendo Switch",
-        "body": "The Nintendo switch has been released, now available at GAME for the low low cost of £250!",
-        "dateAdded": "22/3/2019"
-    },
-    {
         "id": 7,
         "shopId": "4",
         "title": "Pizza hut now open!",
