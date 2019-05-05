@@ -14,5 +14,17 @@
     {
         "roomId": 18,
         "shopId": 6
+    },
+    {
+        "roomId": 25,
+        "shopId": 3
+    },
+    {
+        "roomId": 5,
+        "shopId": 5
+    },
+    {
+        "roomId": 20,
+        "shopId": 4
     }
 ]

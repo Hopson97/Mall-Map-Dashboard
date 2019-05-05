@@ -288,6 +288,7 @@ class RenderableBillboard {
             new Vector3(0, 0, 0),
             new Vector3(room.centerX, 3, room.centerZ)
         );
+        
         const transform = mat4.create();
         mat4.mul(transform, camera.projectionViewMatrix, modelMatrix);
 

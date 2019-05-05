@@ -45,6 +45,7 @@ header {
 header .header-container {
     display: flex;
     justify-content: space-around;
+    align-items: center;
     
     width: 95%;
     margin: auto;
@@ -100,6 +101,10 @@ header nav a:hover {
 
 .nav-button-container img {
     padding: 5px;
+}
+
+.nav-ham {
+    display: none;
 }
 
 /*
@@ -314,23 +319,25 @@ td {
         Header selectors and classes
     =====================================
     */
+    header nav {
+        width: 100%;
+        text-align: center;
+    }
+    
     header .header-container {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-content: flex-start;
         justify-content: space-evenly;
         
-        width: 95%;
+        width: 99%;
         margin: auto;
     }
 
-
-    /*
-    ------------------------------------
-        Navbar selectors and classes
-    ------------------------------------
-    */
-    header nav {
+    header nav .dash-button {
         display: none;
     }
+
 
     /*
     =====================================
@@ -347,11 +354,6 @@ td {
         width: 100%;
         margin: auto;
     }
-
-    main .page-title h2 {
-        text-align: left;
-    }
-
     /*
     ------------------------------------
         Map Input Screen
@@ -412,6 +414,10 @@ td {
         margin: auto;
         border-bottom: solid white;
         padding: 5px;
+    }
+
+    .mtr-container h3 {
+        font-size: 90%;
     }
 
     .mtr-inner-container {

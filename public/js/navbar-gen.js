@@ -15,10 +15,12 @@ window.addEventListener("load", e => {
         divs[1].textContent = name;
 
         nav.appendChild(clone);
+        return anchor;
     };
 
     addButton("Map Editor", 'index', 'img/nav-map.png');
     addButton("Shop Editor", 'input-shops', 'img/nav-shop.png');
     addButton("Commercial Edtior", 'input-commercials', 'img/nav-commercial.png');
-    addButton("View Dashboard", 'dashboard', 'img/nav-dashboard.png');
+    const db = addButton("View Dashboard", 'dashboard', 'img/nav-dashboard.png');
+    db.classList.add("dash-button");
 });
