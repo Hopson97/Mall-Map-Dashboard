@@ -2,11 +2,19 @@
 
 import * as lib from './lib/lib.js';
 import * as tables from './lib/tables.js';
+import {makeTextBox} from './lib/text-box.js';
 
 window.addEventListener("load", async () => {
     await tables.populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
     document.getElementById("add-store-form")
         .addEventListener("submit", onSubmitShop);
+
+    //Set up the shop name to be a limited character text box
+    makeTextBox(
+        document.getElementById("shop-name"),
+        document.getElementById("shop-name-count"),
+        16
+    );
 
     //Populate the category selector
     const select = document.getElementById("shop-type");

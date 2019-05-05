@@ -2,10 +2,25 @@
 
 import * as lib from './lib/lib.js'
 import * as tables from './lib/tables.js';
+import {makeTextBox} from './lib/text-box.js';
 
 window.addEventListener("load", async () => {
     await tables.populateTable("/api/commercials/list", "/api/commercials/remove", addRowCallback);
     await createFormData();
+
+    //Set up text box character counters
+    makeTextBox(
+        document.getElementById("commercial-title"), 
+        document.getElementById("com-title-counter"), 
+        20
+    );
+
+    makeTextBox(
+        document.getElementById("commercial-body"), 
+        document.getElementById("com-body-counter"), 
+        120
+    );
+
     document.getElementById("add-commercial-form")
         .addEventListener("submit", onSubmitCommercial);
 });
