@@ -1,9 +1,10 @@
 "use strict"
 
 import * as lib from './lib/lib.js'
+import * as tables from './lib/tables.js';
 
 window.addEventListener("load", async () => {
-    await lib.populateTable("/api/commercials/list", "/api/commercials/remove", addRowCallback);
+    await tables.populateTable("/api/commercials/list", "/api/commercials/remove", addRowCallback);
     await createFormData();
     document.getElementById("add-commercial-form")
         .addEventListener("submit", onSubmitCommercial);
@@ -62,7 +63,7 @@ async function onSubmitCommercial(event) {
     //If it was added succesfully then update the table
     if (response.status === 201) {
         const commercial = await response.json();
-        await lib.addTableRow(commercial, "/api/commercials/remove", addRowCallback);
+        await tables.addTableRow(commercial, "/api/commercials/remove", addRowCallback);
     }
 
 }

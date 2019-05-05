@@ -1,9 +1,10 @@
 "use strict"
 
 import * as lib from './lib/lib.js';
+import * as tables from './lib/tables.js';
 
 window.addEventListener("load", async () => {
-    await lib.populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
+    await tables.populateTable("/api/shops/list", "/api/shops/remove", addRowCallback);
     document.getElementById("add-store-form")
         .addEventListener("submit", onSubmitShop);
 
@@ -56,7 +57,7 @@ async function onSubmitShop(event) {
     if (response.status === 201) {
         const shop = await response.json();
         console.log(shop);
-        await lib.addTableRow(shop, "/api/shops/remove", addRowCallback);
+        await tables.addTableRow(shop, "/api/shops/remove", addRowCallback);
     }
 
 }
