@@ -25,16 +25,19 @@
         </div>
         <div class="main-content">
             <div class="content-container">
-                <h3 class="center">Current Commercials</h3>
-                <table id="table">
-                    <tr>
-                        <th>Shop</th>
-                        <th>Title</th>
-                        <th>Body</th>
-                        <th>Date</th>
+                <h3 class = "center">Current Commercials</h3>
+                <table class = "table" id="table">
+                    <tr id="table-rows">
+                        <th>Advert</th>
+                        <th>Advert Title</th>
+                        <th>Advert Body</th>
+                        <th>Added</th>
                         <th>Delete</th>
                     </tr>
                 </table>
+                <div class = "mobile-table" id = "mobile-table">
+
+                </div>
                 <h3 class="center">Add A Commercial</h3>
                 <form id="add-commercial-form" class="center edit-form">
                     <div>
@@ -55,7 +58,6 @@
                         <label>
                             Commercial Text
                             <textarea id = "commercial-body" rows="4" cols="50"></textarea>
-                            
                         </label>
                     </div>
                     <div>

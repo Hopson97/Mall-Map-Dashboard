@@ -186,6 +186,7 @@ main .content-container {
 
 .hidden {
     display: none;
+    visibility: hidden;
 }
 
 
@@ -243,6 +244,11 @@ td {
 .table-data:hover {
     background-color: rgb(200, 200, 200);
 }
+
+.mobile-table {
+    display: none;
+}
+
 
 /*
 ===================
@@ -320,49 +326,7 @@ td {
     header nav {
         display: none;
     }
-    /*
-    header nav {
-        width: 80%;
-        display: flex;
-        justify-content: space-evenly;
-    }
 
-    header nav a {
-        text-decoration: none;
-        font-weight: bold;
-        color: white;
-        flex: 1;
-        padding-bottom: 5px;
-    }
-
-    header nav a {
-        transition: 1s;
-        border-right: solid white 1px;
-        border-left: solid white 1px;
-    }
-
-    header nav a:first-child {
-        border-left: solid white 2px;
-    }
-
-    header nav a:last-child {
-        border-right: solid white 2px;
-    }
-
-    header nav a:hover {
-        background-color: var(--nav-hover-colour);
-    }
-
-    .nav-button-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .nav-button-container img {
-        padding: 5px;
-    }
-*/
     /*
     =====================================
         Main Content
@@ -382,32 +346,6 @@ td {
     main .page-title h2 {
         text-align: left;
     }
-    /*
-    main {
-        background-color: var(--background-colour-light);
-    }
-
-    main .page-title {
-        border-bottom: solid black;
-        padding: 2vh;
-        background-color: var(--title-bg-colour);
-    }
-
-    main .main-content {
-        min-height: 85vh;
-        width: 70%;
-        margin: auto;
-        color: black;
-        background-color: var(--background-colour-dark);
-        box-shadow: inset 0px 0px 5px 0px black;
-    }
-
-    main .content-container {
-        width: 90%;
-        margin: auto;
-        padding: 10px;
-    }
-*/
 
     /*
     ------------------------------------
@@ -452,40 +390,41 @@ td {
         border-radius: 10px;
         background: white;
     }
+}
+
+@media screen and (max-width: 650px) {
     /*
     ===================
     Table
     ===================
     */
-    th,
-    td {
-        padding: 2px;
+    .mobile-table {
+        display: block;
     }
-/*
-    table {
-        width: 100%;
+
+    .mtr-container {
+        width: 80%;
         margin: auto;
-        border-bottom: solid black;
-        margin-bottom: 20px;
+        border-bottom: solid white;
+        padding: 5px;
     }
 
-    th {
-        border-bottom: solid black;
+    .mtr-inner-container {
+        width: 90%;
+        margin: auto;
     }
 
-    th,
-    td {
-        text-align: center;
-        padding: 10px;
+    .mtr-header {
+        display: flex;
+        justify-content: space-between;
     }
 
-    .table-data {
-        transition: 1s;
+    .mtr-row-title {
+        padding: 2px;
+        border-bottom: solid white 1px;
     }
 
-    .table-data:hover {
-        background-color: rgb(200, 200, 200);
+    .table {
+        display: none;
     }
-*/
 }
-

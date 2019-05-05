@@ -131,7 +131,7 @@ async function initLegendPanel() {
     populateTable("/api/categories/list", null, (item, cells) => {
         cells[0].style.background = new Colour(...item.colour).asCSSString();
         cells[1].textContent = item.name;
-    });
+    }, false);
 
 
 }
