@@ -26,10 +26,15 @@
     {
         "id": 6,
         "name": "Clothes",
-        "colour": [250, 100, 75]
+        "colour": [250, 150, 125]
     },
     {
         "id": 7,
+        "name": "Supermarket",
+        "colour": [100, 250, 200]
+    },
+    {
+        "id": 8,
         "name": "Miscellaneous",
         "colour": [230, 230, 75]
     }
