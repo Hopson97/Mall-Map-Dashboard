@@ -159,6 +159,13 @@ main .content-container {
   General classes
 ===================
 */
+.quick-transition {
+    transition: 0.2s;
+}
+
+.flip {
+    transform: rotate(180deg);
+}
 
 .grow-icon {
     transition: 1s;
@@ -186,9 +193,7 @@ main .content-container {
 
 .hidden {
     display: none;
-    visibility: hidden;
 }
-
 
 /*
 ===================

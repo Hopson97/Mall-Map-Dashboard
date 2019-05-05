@@ -72,7 +72,7 @@ export function createDeleteButton() {
  * Creates a mobile friendly version of the table row
  * @param {HTMLTdElement[]} cells List of cells of the table row
  */
-function createMobileRow(cells) {
+function createMobileRow(item, cells, deleteUrl, deleteButtonFromTable) {
 
     const mobileTable = document.getElementById("mobile-table");
     const rowNames = getTableTitles();
@@ -82,15 +82,16 @@ function createMobileRow(cells) {
 
     // Create the header
     const header    = document.createElement("div");
-    const ham       = document.createElement("img");
+    const dropdown  = document.createElement("img");
     const conTitle = document.createElement("h3");
     const delButton = createDeleteButton();
                 
     header.classList.add("mtr-header");
-    ham.src = "img/hamburger-icon.png"
+    dropdown.src = "img/dropdown.png"
+    dropdown.classList.add("quick-transition");
     conTitle.textContent = `${rowNames[0]}: ${cells[0].textContent}`;
              
-    header.appendChild(ham);
+    header.appendChild(dropdown);
     header.appendChild(conTitle);
     header.appendChild(delButton);
     
@@ -121,9 +122,22 @@ function createMobileRow(cells) {
     innerContainer.classList.add("mtr-inner-container");
 
     //Setup event listeners
-    ham.addEventListener("click", e => {
+    dropdown.addEventListener("click", e => {
         innerContainer.classList.toggle("hidden");
+        dropdown.classList.toggle("flip");
     });
+
+    delButton.addEventListener("click", () => {
+        container.parentNode.removeChild(container);
+        deleteRequestJson(deleteUrl, {
+            id: item.id
+        });
+        const row = deleteButtonFromTable.parentNode.parentNode;
+        const table = row.parentNode;
+        table.removeChild(row);
+    });
+
+    return container;
 }
 
 /**
@@ -138,12 +152,16 @@ export async function addTableRow(item, deleteUrl, callback, supportMobile = tru
     const cells = rowClone.querySelectorAll("td");
 
     await callback(item, cells, rowClone);
+    let mobileContainer;
+    let deleteButton;
+    if (deleteUrl) { 
+        deleteButton = rowClone.querySelector("img");
+    }
     if (supportMobile) {
-        createMobileRow(cells);
+        mobileContainer = createMobileRow(item, cells, deleteUrl, deleteButton);
     }
     //Handle the row being deleted
     if (deleteUrl) {
-        const deleteButton = rowClone.querySelector("img");
         deleteButton.addEventListener("click", async () => {
             deleteRequestJson(deleteUrl, {
                 id: item.id
@@ -152,6 +170,10 @@ export async function addTableRow(item, deleteUrl, callback, supportMobile = tru
             const row = deleteButton.parentNode.parentNode;
             const table = row.parentNode;
             table.removeChild(row);
+
+            if(mobileContainer) {
+                mobileContainer.parentNode.removeChild(mobileContainer);
+            }
         });
     }
     table.appendChild(rowClone);
