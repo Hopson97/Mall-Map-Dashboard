@@ -311,7 +311,7 @@ class RenderableBillboard {
      */
     draw(renderer) {
         const catName = this.billboardData.category.name;
-        const length = Math.max(this.billboardData.shopName.length + 2, catName.length - 4);
+        const length = Math.max(this.billboardData.shopName.length + 6, catName.length) * 7.5;
         const c = renderer.context;
         c.strokeStyle = "white";
         c.fillStyle = "black";
@@ -320,8 +320,8 @@ class RenderableBillboard {
         c.lineTo(this.x + 10, this.y + 10);
         c.lineTo(this.x - 10, this.y + 5);
         c.lineTo(this.x - 10, this.y - 35);
-        c.lineTo(this.x + length * 12, this.y - 35);
-        c.lineTo(this.x + length * 12, this.y + 5);
+        c.lineTo(this.x + length, this.y - 35);
+        c.lineTo(this.x + length, this.y + 5);
         c.lineTo(this.x + 35, this.y + 10);
         c.lineTo(this.x + 25, this.y + 25);
         c.stroke();
@@ -343,6 +343,10 @@ class RenderableBillboard {
  * 
  */
 let objects;
+export function getObjects() {
+    return objects;
+}
+
 export async function begin3DRenderer() {
     const renderer = new Renderer();
     const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))

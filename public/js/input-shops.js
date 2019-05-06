@@ -13,7 +13,7 @@ window.addEventListener("load", async () => {
     makeTextBox(
         document.getElementById("shop-name"),
         document.getElementById("shop-name-count"),
-        16
+        12
     );
 
     //Populate the category selector
@@ -22,7 +22,7 @@ window.addEventListener("load", async () => {
     const categories = await response.json();
     console.log(categories);
     for (const category of categories) {
-        if (category.name == "none") {
+        if (category.name == "None") {
             continue; 
         }
         const optionElement = document.createElement("option");

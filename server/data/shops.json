@@ -28,5 +28,17 @@
         "categoryId": "7",
         "name": "Tesco",
         "dateAdded": "5/4/2019"
+    },
+    {
+        "id": 8,
+        "categoryId": "3",
+        "name": "Vue Cinema",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 9,
+        "categoryId": "3",
+        "name": "Odeon Cinema",
+        "dateAdded": "6/4/2019"
     }
 ]

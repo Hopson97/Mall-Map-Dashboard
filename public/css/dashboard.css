@@ -131,19 +131,9 @@ table .colour {
 }
 
 .commercials-container .commercial .inner-commercial {
-    width: 75%;
+    width: 95%;
     margin: auto;
 }
-
-/*
-.commercials-container .commercial-title {
-
-}
-
-.commercials-container .commercial-body {
-    
-}
-*/
 
 /*
 =====================================
@@ -193,5 +183,21 @@ table .colour {
         width: 95%;
         margin: auto;
         margin-bottom: 20px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .commercials-container .commercial .inner-commercial {
+        width: 98%;
+    }
+    .inner-commercial h1 {
+        font-size: 140%;
+    }
+    .inner-commercial h2 {
+        font-size: 130%;
+    }
+
+    .inner-commercial p {
+        font-size: 85%;
     }
 }

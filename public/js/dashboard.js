@@ -1,9 +1,10 @@
 "use strict";
 
-import {Colour}             from './lib/colour.js';
 import {removeAllChildren}  from './lib/lib.js';
-import {begin3DRenderer}    from './dashboard-3d-panel.js';
+import {Colour}             from './lib/colour.js';
 import {populateTable}      from './lib/tables.js';
+import {begin3DRenderer, 
+        getObjects}         from './dashboard-3d-panel.js';
 
 const dashboardStats = {
     commercialCount: 0
@@ -26,7 +27,7 @@ window.addEventListener("load", async e => {
  */
 async function handleMessage(event) {
     const data = JSON.parse(event.data);
-    console.log(`Message received from web socket: ${data}`);
+    const objects = getObjects();
     switch (data.type) {
         case "RoomUpdate":
             for (const room of objects.rooms) {

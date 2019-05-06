@@ -12,5 +12,26 @@
         "title": "Pizza hut now open!",
         "body": "Head over to the north of the mall to feast your teeth on crunchy crusty chewy pizza pies!\n",
         "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 8,
+        "shopId": "8",
+        "title": "Better than Odeon",
+        "body": "For real, we are definitely better than Odeon. ",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 9,
+        "shopId": "9",
+        "title": "CALLING A STUDENTS",
+        "body": "1/2 price tickets for students at Odeon Cinema!",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 10,
+        "shopId": "5",
+        "title": "Xbox Deal",
+        "body": "If you buy 10 Xbox's, you will get a free Nintendo Wii.",
+        "dateAdded": "6/4/2019"
     }
 ]
