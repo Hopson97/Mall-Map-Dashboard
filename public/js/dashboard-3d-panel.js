@@ -2,7 +2,6 @@
 
 import * as lib     from './lib/lib.js';
 import * as glMaths from './lib/webgl/webgl-maths.js';
-import * as libgl   from './lib/webgl/webgl-utilities.js';
 
 import {Colour}     from './lib/colour.js';
 import {Mesh}       from './lib/webgl/mesh.js'
@@ -186,8 +185,9 @@ class Room extends Drawable3D {
      * @param {Number} z The Z-Coordinate of this room
      * @param {Number} width The width of this room
      * @param {Number} depth The depth of this room
+     * @param {Number} height The height of this room
      */
-    constructor(gl, roomId, x, z, width, depth) {
+    constructor(gl, roomId, x, z, width, depth, height) {
         super();
         this.gl = gl;
         this.roomId = roomId;
@@ -197,6 +197,7 @@ class Room extends Drawable3D {
         this.z = z;
         this.width = width;
         this.depth = depth;
+        this.height = height;
         this.centerX = x + width / 2;
         this.centerZ = z + depth / 2;
         this.billboard = null;
@@ -298,7 +299,7 @@ class RenderableBillboard {
 
         //Convert clip space to screen space
         this.x = (clipX * 0.5 + 0.5) * renderer.width - 25;
-        this.y = (clipY * -0.5 + 0.5) * renderer.height - 15;
+        this.y = (clipY * -0.5 + 0.5) * renderer.height - 15 - room.height * 2;
         this.z = transform[14];
 
         //get data
@@ -347,6 +348,9 @@ export function getObjects() {
     return objects;
 }
 
+/**
+ * Starts the 3D rendering of the scene
+ */
 export async function begin3DRenderer() {
     const renderer = new Renderer();
     const camera = new Camera(renderer.gl, new Vector3(65, 25, 140), new Vector3(50, 0, 0))
@@ -362,7 +366,7 @@ export async function begin3DRenderer() {
     objects = await createMapMesh(renderer.gl);
 
     //Terrain
-    const terrain = makeTerrainMesh(renderer.gl, 50, 50, 20, 20, 12, 5);
+    const terrain = makeTerrainMesh(renderer.gl, 50, 50, 20, 20, 12, -10);
 
     //Begin main rendering of stuff
     window.requestAnimationFrame(loop);
@@ -611,7 +615,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
 
 
     //Contains information about this room, also is return of this function
-    const room = new Room(gl, roomInfo.id, x, z, width, depth);
+    const room = new Room(gl, roomInfo.id, x, z, width, depth, roomHeight);
 
     //Adds normal and vertex data to the mesh
     function addMeshData(geometry) {
@@ -619,6 +623,9 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
         room.mesh.normals.push(...geometry.normals);
     }
 
+    //All these calls to 'addMeshData' look really bad but it is just geometry calculations, typically
+    //this geometry data would be stored in a file and parsed, but client side js does not have access
+    //to a file system (except the server?), hence just calculate the geometry on the fly
     //Create ceiling geometry
     addMeshData(createFloorQuadGeometry(x, roomHeight, z, width, depth));
 
@@ -644,6 +651,7 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
     addMeshData(createFloorQuadGeometry(x - halfGap, roomHeight, z - halfGap, halfGap, depth + gapSize));
     addMeshData(createFloorQuadGeometry(x + width, roomHeight, z - halfGap, halfGap, depth + gapSize));
 
+    //Fill the rest of the data
     createColourIndicesData(room.mesh, new Colour(0.8, 0.8, 0.8));
 
     //Do extra things if the room has an assosiated shop
@@ -669,18 +677,20 @@ async function createRoomGeometry(gl, roomInfo, roomsData, x, z, width, depth) {
  */
 function makeTerrainMesh(gl, xBegin, zBegin, width, depth, quadSize, heightOffset = 0) {
     const terrain = new Drawable3D();
-    const y = -10;
+
+    //Calcuate the positions, colours, and normals
     for (let z = 0; z < depth; z++) {
         for (let x = 0; x < width; x++) {
             terrain.mesh.positions.push(
                 x * quadSize - xBegin,
-                y + (((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1) + heightOffset),
+                (((z <= 1 || x <= 1 || z >= depth - 2 || x >= width - 2) ? 30 : 1) + heightOffset),
                 z * quadSize - zBegin);
             terrain.mesh.colours.push(0.2, 0, 0.4);
             terrain.mesh.normals.push(0, 1, 0);
         }
     }
 
+    //Calculate the indices
     for (let z = 0; z < depth - 1; z++) {
         for (let x = 0; x < width - 1; x++) {
             const i = x + z * width;

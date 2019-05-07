@@ -43,6 +43,10 @@ class Renderer {
     constructor(canvas, context) {
         this.width = canvas.width;
         this.height = canvas.height;
+        window.addEventListener('resize', () => {
+            this.width = canvas.width;
+            this.height = canvas.height;
+        })
         this.context = context;
         this.context.font = "bold 14px Sans-serif";
         this.context.textAlign = "center"; 

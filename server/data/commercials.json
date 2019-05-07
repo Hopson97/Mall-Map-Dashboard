@@ -23,15 +23,15 @@
     {
         "id": 9,
         "shopId": "9",
-        "title": "CALLING A STUDENTS",
-        "body": "1/2 price tickets for students at Odeon Cinema!",
+        "title": "STUDENTS",
+        "body": "50% OFF ALL TICKETS FOR STUDENTS! LIMITED TIME!",
         "dateAdded": "6/4/2019"
     },
     {
         "id": 10,
-        "shopId": "5",
-        "title": "Xbox Deal",
-        "body": "If you buy 10 Xbox's, you will get a free Nintendo Wii.",
+        "shopId": "10",
+        "title": "Toys! Lego! ",
+        "body": "Lego is now up to 20% off at Toymaster, while stocks last!",
         "dateAdded": "6/4/2019"
     }
 ]

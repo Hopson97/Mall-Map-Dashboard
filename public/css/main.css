@@ -219,7 +219,7 @@ main .content-container {
 .edit-form input[type=text], 
 .edit-form select,
 .edit-form textarea {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     border: solid black 2px;
     border-radius: 10px;
