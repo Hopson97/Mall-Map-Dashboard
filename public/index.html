@@ -19,7 +19,7 @@
             <img class = "nav-ham" id = "nav-drop-down" width = 32 height = 32 src="img/hamburger-icon.png" />
             -->
             <nav id="navbar"></nav>
-            
+
         </div>
     </header>
     <main>
@@ -48,9 +48,11 @@
             <div class="popup" id="shop-select-popup">
                 <img class="popup-head" id="click-off-popup" src="img/cross.png">
                 <h2 class="popup-head">Select shop to set:</h2>
-                <div id="shop-list">
+                <div class="pad-btm" id="shop-list">
+                    <div class="flex-even shop-selection">
+                        <a class="popup-btn" href="input-shops">Add more shops</a>
+                    </div>
                 </div>
-                <a class="shop-selection" href="input-shops">Add more shops</a>
             </div>
         </div>
     </main>
@@ -69,7 +71,6 @@
 <template id="shop-list-section">
     <div class="flex-even shop-selection">
         <p></p>
-        <p>=======</p>
         <p></p>
     </div>
 </template>

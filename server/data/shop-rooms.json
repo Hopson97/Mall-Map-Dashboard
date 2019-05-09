@@ -1,9 +1,5 @@
 [
     {
-        "roomId": 7,
-        "shopId": 2
-    },
-    {
         "roomId": 1,
         "shopId": 3
     },
@@ -28,10 +24,6 @@
         "shopId": 2
     },
     {
-        "roomId": 18,
-        "shopId": 3
-    },
-    {
         "roomId": 23,
         "shopId": 3
     },
@@ -50,5 +42,25 @@
     {
         "roomId": 6,
         "shopId": 6
+    },
+    {
+        "roomId": 19,
+        "shopId": 6
+    },
+    {
+        "roomId": 18,
+        "shopId": 9
+    },
+    {
+        "roomId": 7,
+        "shopId": 10
+    },
+    {
+        "roomId": 8,
+        "shopId": 9
+    },
+    {
+        "roomId": 9,
+        "shopId": 4
     }
 ]

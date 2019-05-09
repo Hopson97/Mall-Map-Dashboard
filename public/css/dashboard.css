@@ -140,6 +140,9 @@ table .colour {
     General classes
 =====================================
 */
+.pad-btm {
+    padding-bottom: 10px;
+}
 .title {
     font-size: 3em;
     text-align: center;

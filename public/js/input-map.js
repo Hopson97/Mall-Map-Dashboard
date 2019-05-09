@@ -346,7 +346,7 @@ async function buildshopDOM() {
         const contentElements = clone.querySelectorAll('p');
 
         contentElements[0].textContent = shop.name;
-        contentElements[2].textContent = categoryInfo.name;
+        contentElements[1].textContent = categoryInfo.name;
 
         //Listens for the click event on the buttons
         container.addEventListener("click", async () => {

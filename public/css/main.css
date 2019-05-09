@@ -159,46 +159,7 @@ main .content-container {
     border: 2px solid var(--header-colour);
     border-radius: 25px;
 }
-/*
-===================
-  General classes
-===================
-*/
-.quick-transition {
-    transition: 0.2s;
-}
 
-.flip {
-    transform: rotate(180deg);
-}
-
-.grow-icon {
-    transition: 1s;
-}
-
-.grow-icon:hover {
-    transform: scale(1.1);
-}
-
-.center {
-    text-align: center;
-}
-
-.wide-button {
-    background-color: var(--header-colour);
-    color: white;
-    border: solid black;
-    padding: 10px;
-    transition: 1s;
-}
-
-.wide-button:hover {
-    background-color: var(--nav-hover-colour);
-}
-
-.hidden {
-    display: none;
-}
 
 /*
 ===================
@@ -282,6 +243,7 @@ td {
     padding: 20px;
     border: 1px solid #888;
     width: 25%; 
+    text-align: center;
 }
 
 
@@ -295,6 +257,52 @@ td {
 
 .shop-selection:hover {
     background-color: #5555;
+}
+
+.popup-btn {
+    text-decoration: none;
+    color: white;
+}
+
+/*
+===================
+  General classes
+===================
+*/
+.quick-transition {
+    transition: 0.2s;
+}
+
+.flip {
+    transform: rotate(180deg);
+}
+
+.grow-icon {
+    transition: 1s;
+}
+
+.grow-icon:hover {
+    transform: scale(1.1);
+}
+
+.center {
+    text-align: center;
+}
+
+.wide-button {
+    background-color: var(--header-colour);
+    color: white;
+    border: solid black;
+    padding: 10px;
+    transition: 1s;
+}
+
+.wide-button:hover {
+    background-color: var(--nav-hover-colour);
+}
+
+.hidden {
+    display: none;
 }
 
 /*
