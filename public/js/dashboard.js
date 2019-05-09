@@ -152,8 +152,6 @@ async function initLegendPanel() {
         cells[0].style.background = new Colour(...item.colour).asCSSString();
         cells[1].textContent = item.name;
     }, false);
-
-
 }
 
 
