@@ -28,14 +28,28 @@ window.addEventListener("load", async e => {
 async function handleMessage(event) {
     const data = JSON.parse(event.data);
     const objects = getObjects();
+
+    /**
+     * Updates a room using the roomID as a search query, giving it the new shop id
+     * @param {Number} roomId The room ID to search for
+     * @param {Number} shopID The shop ID to search for
+     */
+    async function updateRooms(roomId, shopID) {
+        for (const room of objects.rooms) {
+            if (room.roomId  === roomId) {
+                room.shopId = shopID;
+                await room.update();
+                break;
+            }
+        }
+    }
     switch (data.type) {
         case "RoomUpdate":
-            for (const room of objects.rooms) {
-                if (room.roomId === data.roomId) {
-                    room.shopId = data.shopId;
-                    await room.update();
-                }
-            }
+            await updateRooms(data.roomId, data.shopId);
+            break;
+
+        case "RoomRemove":
+            await updateRooms(data.roomId, -1);
             break;
 
         case "ShopDelete":
@@ -76,12 +90,19 @@ async function addCommerical(commercial) {
     dashboardStats.commercialCount++;
 }
 
+/**
+ * Adds the commericals to the commerical panel
+ * @param {Object[]} commercialList The list of commericals to add
+ */
 async function addCommericals(commercialList) {
     for (const commercial of commercialList) {
         await addCommerical(commercial);
     }
 }
 
+/**
+ * Sets up the data for the commerical panel and sets up the animations for the adverts
+ */
 async function initCommercialPanel() {
     dashboardStats.commercialCount = 0;
     removeAllChildren(document.getElementById("commercial-panel"));
@@ -91,7 +112,6 @@ async function initCommercialPanel() {
     await addCommericals(commercialList);
     //If there are more than 4 commercials, then it means they go 
     //past screen width, hence needs to scroll animation to see all of them,
-    console.log(dashboardStats.commercialCount);
     if (dashboardStats.commercialCount > 4) {
         addCommericals(commercialList);
         //Set up the scrolling animation times and speed based on number of elements added
@@ -106,7 +126,6 @@ async function initCommercialPanel() {
             }
         }
         `;
-        console.log("Animation set up");
     } else {
         //No animation needed for 4 or less adverts
         document.getElementById("keyframe").textContent =

@@ -364,6 +364,7 @@ export async function begin3DRenderer() {
 
     //Get lists of objects to render
     objects = await createMapMesh(renderer.gl);
+    console.log(objects);
 
     //Terrain
     const terrain = makeTerrainMesh(renderer.gl, 50, 50, 20, 20, 12, -10);

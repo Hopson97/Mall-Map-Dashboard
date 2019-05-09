@@ -54,6 +54,13 @@ function deleteSectionData(request, response) {
     const roomId = request.body.id;
     if (shopRooms.tryDeleteShopRoomByRoomId(roomId)) {
         response.sendStatus(204);
+        //Send info to all clients about the updated room
+        for (const client of wss.clients) {
+            client.send(JSON.stringify({
+                type: "RoomRemove",
+                roomId,
+            }));
+        }
     } else {
         response.sendStatus(404);
     }
