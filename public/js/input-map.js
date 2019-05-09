@@ -142,7 +142,7 @@ window.addEventListener("load", async () => {
 
     document.getElementById("click-off-popup")
     .addEventListener("click", () => {
-        popup.classList.add("hidden");
+        hidePopup();
     });
 
     //Build various DOM sections and initilize some data
@@ -151,19 +151,20 @@ window.addEventListener("load", async () => {
     
 
     //Set up the remove shop button
-    document.getElementById("remove-shop-btn").addEventListener("click", async () => {
-        const shopid = selectedshop.id;
-        lib.deleteRequestJson("/api/map/remove", {
-            id: shopid
-        });
-        const noCatRes = await fetch("/api/categories/get?id=1");
-        const noCategory = await noCatRes.json();
-    
-        selectedshop.name = "";
-        selectedshop.category = noCategory;
+    document
+        .getElementById("remove-shop-btn")
+        .addEventListener("click", async () => {
+            const shopid = selectedshop.id;
+            lib.deleteRequestJson("/api/map/remove", {
+                id: shopid
+            });
+            const noCatRes = await fetch("/api/categories/get?id=1");
+            const noCategory = await noCatRes.json();
+        
+            selectedshop.name = "";
+            selectedshop.category = noCategory;
 
-        hidePopup();
-
+            hidePopup();
     });
 
     //Begin the main loop

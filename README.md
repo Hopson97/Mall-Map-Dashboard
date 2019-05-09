@@ -4,7 +4,7 @@
 
 ## The idea
 
-The information is designed to be shown in multiple public spaces in ageneric shopping mall called "Twin Pines Mall". From the display, the public is able to see a map of the mall, and the locations of all of the shops. Ontop of this, they are also able to any running promotions/commercials of the shops, as well as a shop legend.
+The information is designed to be shown in multiple public spaces in a shopping center called "Twin Pines Mall". From the display, the public is able to see a map of the shopping center, and the locations of all of the shops. Ontop of this, they are also able to view any running promotions/commercials of the shops, as well as a shop legend.
 
 ## The Input
 
@@ -42,7 +42,17 @@ You are also able to add shops using the form at the bottom. You can also delete
 
 ## The Dashboard
 
+The dashboard displays 3 seperate pieces of information, on 3 panels. 
 
+The main panel is the 3D render of the shopping center, which continuously rotates, allowing for a full 360 view of the shopping center. This also displays billboards, which says the name of each shop, as well as the category of the shop (Eg food, toys, etc).
+
+The left panel is a basic information panel. This displays two pices of information:
+
+1. The time and the date, which is updated regularly to be accurate as possilbe
+
+2. A legend, mapping the category names to their colours.
+
+The bottom panel displays commericals. When there are more than 4 commericals, this panel will infinitly scroll, as to show the user every advert currently being ran through the shopping center.
 
 ## Libraries Used
 

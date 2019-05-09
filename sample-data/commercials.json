@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "shopId": "2",
+        "title": "Vegan Sausage Rolls Now Available!",
+        "body": "We have partnered with Quorn to bring you meat-free vegan and veterinarian friendly sausage rolls for the low low cost of just £1!",
+        "dateAdded": "22/3/2019"
+    },
+    {
+        "id": 7,
+        "shopId": "4",
+        "title": "Pizza hut now open!",
+        "body": "Head over to the north of the mall to feast your teeth on crunchy crusty chewy pizza pies!\n",
+        "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 8,
+        "shopId": "8",
+        "title": "Better than Odeon",
+        "body": "For real, we are definitely better than Odeon. ",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 9,
+        "shopId": "9",
+        "title": "STUDENTS",
+        "body": "50% OFF ALL TICKETS FOR STUDENTS! LIMITED TIME!",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 10,
+        "shopId": "10",
+        "title": "Toys! Lego! ",
+        "body": "Lego is now up to 20% off at Toymaster, while stocks last!",
+        "dateAdded": "6/4/2019"
+    }
+]

@@ -1,0 +1,44 @@
+[
+    {
+        "id": 2,
+        "name": "Greggs",
+        "categoryId": 4,
+        "dateAdded": "21/03/19"
+    },
+    {
+        "id": 3,
+        "name": "Next",
+        "categoryId": 6,
+        "dateAdded": "21/04/19"
+    },
+    {
+        "id": 4,
+        "categoryId": "5",
+        "name": "Pizza Hut",
+        "dateAdded": "23/3/2019"
+    },
+    {
+        "id": 6,
+        "categoryId": "7",
+        "name": "Tesco",
+        "dateAdded": "5/4/2019"
+    },
+    {
+        "id": 8,
+        "categoryId": "3",
+        "name": "Vue Cinema",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 9,
+        "categoryId": "3",
+        "name": "Odeon Cinema",
+        "dateAdded": "6/4/2019"
+    },
+    {
+        "id": 10,
+        "categoryId": "2",
+        "name": "Toymaster",
+        "dateAdded": "6/4/2019"
+    }
+]
