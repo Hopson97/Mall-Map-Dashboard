@@ -52,7 +52,9 @@ The left panel is a basic information panel. This displays two pices of informat
 
 2. A legend, mapping the category names to their colours.
 
-The bottom panel displays commericals. When there are more than 4 commericals, this panel will infinitly scroll, as to show the user every advert currently being ran through the shopping center.
+The bottom and final panel displays commericals. When there are more than 4 commericals, this panel will infinitly scroll, as to show the user every advert currently being ran through the shopping center.
+
+These panels use the JSON files in the `/server/data/` directory. I have also provided sample data, which can be found in the `sample-data` directory at the project root, which can be used to replace some of the server data. 
 
 ## Libraries Used
 

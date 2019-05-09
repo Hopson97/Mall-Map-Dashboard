@@ -20,7 +20,7 @@ window.addEventListener("load", async () => {
     const select = document.getElementById("shop-type");
     const response = await fetch("/api/categories/list");
     const categories = await response.json();
-    console.log(categories);
+
     for (const category of categories) {
         if (category.name == "None") {
             continue; 
@@ -64,7 +64,6 @@ async function onSubmitShop(event) {
     //If it was added succesfully then update the table
     if (response.status === 201) {
         const shop = await response.json();
-        console.log(shop);
         await tables.addTableRow(shop, "/api/shops/remove", addRowCallback);
     }
 

@@ -51,7 +51,6 @@ function postCommercial(request, response) {
  * @param {express.response} response
  */
 function deleteCommercial(request, response) {
-    console.log("Deleting: " + request.body.id);
     if (commercials.tryDeleteCommercial(request.body.id)) {
         response.sendStatus(204);
         for (const client of wss.clients) {
@@ -61,7 +60,6 @@ function deleteCommercial(request, response) {
         }
     } 
     else {
-        console.log(request.body.id);
         response.sendStatus(404);
     }
 }
