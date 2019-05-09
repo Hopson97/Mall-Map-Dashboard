@@ -148,6 +148,23 @@ window.addEventListener("load", async () => {
     //Build various DOM sections and initilize some data
     buildshopDOM();
     await initMapData();
+    
+
+    //Set up the remove shop button
+    document.getElementById("remove-shop-btn").addEventListener("click", async () => {
+        const shopid = selectedshop.id;
+        lib.deleteRequestJson("/api/map/remove", {
+            id: shopid
+        });
+        const noCatRes = await fetch("/api/categories/get?id=1");
+        const noCategory = await noCatRes.json();
+    
+        selectedshop.name = "";
+        selectedshop.category = noCategory;
+
+        hidePopup();
+
+    });
 
     //Begin the main loop
     loop(canvas, ctx);
@@ -214,21 +231,24 @@ function loop(canvas, context) {
         }
 
         //Draw the rooms
-        
         for (const room of mapData.rooms) {
             context.strokeStyle = "white";
+
+            //The selected room if the user has selected a room
             if (selectedshop.id == room.id) {
                 context.fillStyle = "lime";
             } else {
+                //For every other room
                 context.fillStyle = new Colour(...room.category.colour).asCSSString();
-
             }
+            //Draw the room
             renderer.renderRect(
                 room.x, 
                 room.y,
                 room.width, 
                 room.depth);
             
+            //Draw the room's name
             context.fillStyle = "black";
             if (room.category.id != 1) {
                 renderer.renderText(
@@ -334,10 +354,7 @@ async function buildshopDOM() {
     const response = await fetch("/api/shops/list");
     const json = await response.json();
     
-
-
     for (const shop of json) {
-
         const response = await fetch("/api/categories/get?id=" + shop.categoryId);
         const categoryInfo = await response.json();
 
@@ -357,11 +374,18 @@ async function buildshopDOM() {
             if (response.status === 201) {
                 selectedshop.name = shop.name;
                 selectedshop.category = categoryInfo;
-                selectedshop = -1;
-                const popup = document.getElementById("popup");
-                popup.classList.add("hidden");
+                hidePopup();
             }
         });
         shopList.append(clone);
     }
+}
+
+/**
+ * Hides the popup
+ */
+function hidePopup() {
+    selectedshop = -1;
+    const popup = document.getElementById("popup");
+    popup.classList.add("hidden");
 }
