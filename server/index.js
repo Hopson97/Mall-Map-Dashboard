@@ -16,7 +16,7 @@ app.use(ejslayout);
 app.set('view engine', 'ejs');
 app.set('views', __dirname + `/../public/views`)
 app.use(bodyParser.json());
-
+app.use(express.static(`./public/`));
 
 app.use('/api', api.router);
 

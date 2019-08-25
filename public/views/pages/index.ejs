@@ -15,10 +15,35 @@
         <img draggable=false src="img/zoom-in.png" id="btn-zoom-in">
         <img draggable=false src="img/zoom-out.png" id="btn-zoom-out">
       </div>
-      <canvas class="input-canvas" id="map-canvas"></canvas>
+      <button data-toggle="modal" data-target="#shop-modal">
+        <canvas class="input-canvas" id="map-canvas"></canvas>
+      </button>
     </div>
   </div>
 </div>
+
+<div class="modal" id = "shop-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select shop to set</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="shop-list">
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="popup" class="popup-bg hidden">
   <div class="popup" id="shop-select-popup">
     <img class="popup-head" id="click-off-popup" src="img/cross.png">
@@ -34,17 +59,9 @@
   </div>
 </div>
 
-<template id="nav-section">
-  <a>
-    <div class="nav-button-container">
-      <img class="nav-image" src="img/nav-map.png">
-      <div class="nav-button"></div>
-    </div>
-  </a>
-</template>
 <template id="shop-list-section">
-  <div class="flex-even shop-selection">
-    <p></p>
-    <p></p>
+  <div class="row">
+    <p class = "col"></p>
+    <p class = "col"></p>
   </div>
 </template>

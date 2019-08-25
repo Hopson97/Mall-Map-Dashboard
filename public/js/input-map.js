@@ -303,8 +303,6 @@ function handleCanvasClick(event) {
             x < room.x / scaleFactor + room.width / scaleFactor &&
             y > room.y / scaleFactor &&
             y < room.y / scaleFactor + room.depth / scaleFactor) {
-            const popup = document.getElementById("popup");
-            popup.classList.remove("hidden");
             selectedshop = room;
         }
     }

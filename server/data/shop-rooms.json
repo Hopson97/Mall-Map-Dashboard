@@ -4,15 +4,26 @@
         "shopId": 1
     },
     {
-        "roomId": 23,
-        "shopId": 1
-    },
-    {
         "roomId": 19,
         "shopId": 2
     },
     {
         "roomId": 27,
         "shopId": 2
+    },
+    {
+        "roomId": 24,
+        "shopId": 1
+    },
+    {
+        "roomId": 25,
+        "shopId": 2
+    },
+    {
+        "roomId": 23,
+        "shopId": 2
+    },
+    {
+        "shopId": 1
     }
 ]
