@@ -2,7 +2,7 @@
 
 [WEBSCPT] Configurable remote display, 76% achieved.
 
-![Demo](https://i.imgur.com/L3iP4WO.gifv)
+Demo: https://i.imgur.com/L3iP4WO.gifv
 
 ## The idea
 
