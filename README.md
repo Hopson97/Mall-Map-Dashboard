@@ -2,6 +2,8 @@
 
 [WEBSCPT] Configurable remote display, 76% achieved.
 
+![Demo](https://i.imgur.com/L3iP4WO.gifv)
+
 ## The idea
 
 The information is designed to be shown in multiple public spaces in a shopping center called "Twin Pines Mall". From the display, the public is able to see a map of the shopping center, and the locations of all of the shops. Ontop of this, they are also able to view any running promotions/commercials of the shops, as well as a shop legend.
