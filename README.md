@@ -1,6 +1,6 @@
 # Dashboard
 
-[WEBSCPT] Configurable remote display
+[WEBSCPT] Configurable remote display, 76% achieved.
 
 ## The idea
 
