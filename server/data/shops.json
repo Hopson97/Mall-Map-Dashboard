@@ -1,3 +1,14 @@
 [
-
+    {
+        "id": 1,
+        "categoryId": "3",
+        "name": "Pizza Hut",
+        "dateAdded": "25/7/2019"
+    },
+    {
+        "id": 2,
+        "categoryId": "6",
+        "name": "Next",
+        "dateAdded": "25/7/2019"
+    }
 ]

@@ -66,5 +66,4 @@ async function onSubmitShop(event) {
         const shop = await response.json();
         await tables.addTableRow(shop, "/api/shops/remove", addRowCallback);
     }
-
 }

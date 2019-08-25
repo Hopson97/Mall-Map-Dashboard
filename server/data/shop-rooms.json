@@ -1,3 +1,18 @@
 [
-
+    {
+        "roomId": 18,
+        "shopId": 1
+    },
+    {
+        "roomId": 23,
+        "shopId": 1
+    },
+    {
+        "roomId": 19,
+        "shopId": 2
+    },
+    {
+        "roomId": 27,
+        "shopId": 2
+    }
 ]

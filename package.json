@@ -16,7 +16,9 @@
         "qunit": "^2.9.2"
     },
     "dependencies": {
+        "ejs": "^2.6.2",
         "express": "^4.16.4",
+        "express-ejs-layouts": "^2.5.0",
         "express-ws": "^4.0.0"
     }
 }
